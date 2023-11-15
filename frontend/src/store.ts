@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import loginReducer from "./slices/login";
+import locationReducer from "./slices/location";
 import { combineReducers } from "redux";
 
 const reducers = combineReducers({
   loginReducer,
+  locationReducer
 })
 
 const store = configureStore({

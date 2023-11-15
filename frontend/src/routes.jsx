@@ -8,7 +8,7 @@ import DriverRegister from "./pages/DriverRegister";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />,
+    element: <Login />
   },
   {
     path: "/driver",

@@ -44,10 +44,10 @@
     git add .
     git commit -m "寫下當次的修改"
     git checkout frontend 
-    git pull origin frontend          # 本地frontend與遠端frontend合併
-    git checkout localdev
-    git merge frontend                 # localdev與frontend合併，注意這邊可能會有衝突
+    git pull origin frontend           # 本地frontend與遠端frontend合併
+    git merge localdev                 # localdev與frontend合併，注意這邊可能會有衝突
     git push origin frontend:frontend  # 遠端與本地端合併
+    git checkout localdev
     ```
 9. 不要改別人的資料與資料夾，會造成衝突
 

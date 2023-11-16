@@ -49,6 +49,7 @@
     git merge frontend                 # localdev與frontend合併，注意這邊可能會有衝突
     git push origin frontend:frontend  # 遠端與本地端合併
     ```
+9. 不要改別人的資料與資料夾，會造成衝突
 
 ## 專案資訊：
 - Group: 6

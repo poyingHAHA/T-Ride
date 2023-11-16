@@ -1,112 +1,32 @@
 from flask import Blueprint
-from repository.match import *
+from services.match import *
 
 match = Blueprint('match_page', __name__)
-
-# - DELETE /match/driver/invitation
-#     ```
-#     {
-#       token: str
-#       driverOrderId: int
-#       passengerOrderId: int
-#     }
-#     ```
-#     - 成功刪邀請 200
-#         ```
-#         {
-#           totalOrderCount: int // 總單數
-#           abandonCount: int // 棄單數
-#         }
-#         ```
-#     - token 無效 401
-#     - 不是自己的駕駛訂單 403
-#     - 不存在的訂單 404
-#     - 未發邀請、已完成的訂單 409
-# - GET /match/driver/invitation/total/{driverOrderId}
-#     - 正常回傳
-#         200
-#         ```
-#         {
-#           orders: [
-#             {
-#               passengerOrder: {
-#                 乘客訂單，跟 GET /order/passnger/{orderId} 回傳的一樣
-#               }
-#               time: int // 實際的乘客上車時間
-#               accepted: bool
-#             }
-#           ]
-#         }
-#         ```
-#     - 不存在的訂單 404
-#     - 已完成的訂單 409
-# - GET /match/passenger/invitation/{passengerOrderId}
-#     - 正常回傳
-#         ```
-#           {
-#             orders: [
-#               司機訂單，跟 GET /order/driver/{orderId} 回傳的一樣
-#             ]
-#           }
-#         ```
-# - POST /match/passenger/invitation/accept
-#     ```
-#     {
-#       token: str
-#       driverOrderId: int
-#       passengerOrderId: int
-#     }
-#     ```
-#     - 成功接受 200
-#     - token 無效 401
-#     - 不是自己的乘客訂單 403
-#     - 不存在的訂單 404
-#     - 未被邀請、已接受、已完成的訂單 409
-
-
-#     ``` 
-#     {
-#       token: str
-#       driverOrderId: int
-#       passengerOrderId: int
-#     }
-#     ```
-#     - 成功發邀請 200
-#     - 401
-#     - 不是自己的駕駛訂單 403
-#     - 不存在的訂單 404
-#     - 已發過邀請、已接受、已完成的訂單 409
-
 
 @match.route('/driver/invitation', methods=['POST'])
 def post_driver_invitation():
   """
-    發送邀請
+    司機發邀請給乘客
     ---
-    tags:
-      - Match
-    produces: application/json,
     parameters:
     - name: token
       in: requestBody
       type: string
       required: true
-      description: 認證使用
+      description: 認證司機身分所使用
     - name: driverOrderId
       in: requestBody
       type: integer
       required: true
-      description: 司機訂單id
+      description: 司機訂單
     - name: passengerOrderId
       in: requestBody 
       type: integer
       required: true
-      description: 乘客訂單id
+      description: 乘客訂單
     responses:
       200:
         description: 成功送出邀請
-        examples:
-          node-list: [ ]
       401:
         description: token 無效 
       403:
@@ -116,42 +36,82 @@ def post_driver_invitation():
       409:
         description: 已發過邀請、已接受、已完成的訂單
   """
-  send_driver_invitation() 
+  return send_driver_invitation() 
 
 @match.route('/driver/invitation', methods=['DELETE'])
 def delete_driver_invitation():
-  """
-    發送邀請
+    """
+    刪除司機送給乘客的邀請
     ---
-    tags:
-      - Match
-    produces: application/json,
     parameters:
     - name: token
       in: requestBody
       type: string
       required: true
-      description: 認證使用
+      description: 認證身分使用
     - name: driverOrderId
       in: requestBody
       type: integer
       required: true
-      description: 司機訂單id
+      description: 司機訂單
     - name: passengerOrderId
       in: requestBody 
       type: integer
       required: true
-      description: 乘客訂單id
+      description: 乘客訂單
+    definitions:
+      cancelResponse:
+        type: object
+        properties:
+          totalOrderCount:
+            type: integer
+          abandonCount:
+            type: integer
     responses:
       200:
-        description: 成功送出邀請
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'          
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
+        description: 成功刪除司機給乘客的邀請
+        schema:
+          $ref: '#/definitions/cancelResponse' 
+      401:
+        description: token 無效 
+      403:
+        description: 不是自己的駕駛訂單 
+      404:
+        description: 不存在的訂單
+      409:
+        description: 已發過邀請、已接受、已完成的訂單
+    """
+    send_driver_invitation() 
+
+
+@match.route('/driver/invitation/total/<int:driverOrderId>', methods=['GET'])
+def get_driver_all_invitations(driverOrderId):
+    """
+    發送邀請
+    ---
+    parameters:
+      - name: driverOrderId
+        in: path
+        type: integer
+        required: true
+        description: 司機訂單
+    definitions:
+      Palette:
+        type: object
+        properties:
+          palette_name:
+            type: array
+            items:
+              $ref: '#/definitions/Color'
+      Color:
+        type: string
+    responses:
+      200:
+        description: 成功刪除
+        schema:
+          $ref: '#/definitions/Palette'
+        examples:
+          rgb: ['red', 'green', 'blue']
       401:
         description: token 無效 
       403:
@@ -169,5 +129,5 @@ def delete_driver_invitation():
             type: integer
             format: int64
             example: 10
-  """
-  send_driver_invitation() 
+    """
+    return ""

@@ -1,6 +1,7 @@
 from flasgger import Swagger
 from flask import *
 from controller.matchController import match
+import subprocess
 
 app = Flask(__name__)
 app.config['SWAGGER'] = {
@@ -15,6 +16,13 @@ Swagger(app)
 
 @app.route('/github-webhook', methods=['POST'])
 def github_webhook():
+    """
+        自動更新程式碼
+        ---
+        tags:
+        - Match
+        produces: application/json,   
+    """
     subprocess.run(['git', 'pull'])
     return 'OK'
 

@@ -44,7 +44,7 @@
     git add .
     git commit -m "寫下當次的修改"
     git checkout frontend 
-    git pull origin/frontend          # 本地frontend與遠端frontend合併
+    git pull origin frontend          # 本地frontend與遠端frontend合併
     git checkout localdev
     git merge frontend                 # localdev與frontend合併，注意這邊可能會有衝突
     git push origin frontend:frontend  # 遠端與本地端合併

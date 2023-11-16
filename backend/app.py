@@ -20,4 +20,4 @@ def github_webhook():
 
 if __name__ == '__main__':
     app.register_blueprint(match, url_prefix='/match')
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5239, debug=True)

@@ -1,4 +1,5 @@
 from flask import Blueprint
+from repository.match import *
 
 match = Blueprint('match_page', __name__)
 
@@ -75,8 +76,10 @@ match = Blueprint('match_page', __name__)
 #     - 不是自己的駕駛訂單 403
 #     - 不存在的訂單 404
 #     - 已發過邀請、已接受、已完成的訂單 409
+
+
 @match.route('/driver/invitation', methods=['POST'])
-def node_topo():
+def post_driver_invitation():
   """
     發送邀請
     ---
@@ -91,19 +94,19 @@ def node_topo():
       description: 認證使用
     - name: driverOrderId
       in: requestBody
-      type: int
+      type: integer
       required: true
-      description: driver訂單ID
-    - name: PassengerOrderId
+      description: 司機訂單id
+    - name: passengerOrderId
       in: requestBody 
-      type: int
+      type: integer
       required: true
-      description: 乘客訂單號
+      description: 乘客訂單id
     responses:
       200:
         description: 成功送出邀請
         examples:
-          node-list: [{"id":26},{"id":44}]
+          node-list: [ ]
       401:
         description: token 無效 
       403:
@@ -112,8 +115,59 @@ def node_topo():
         description: 不存在的訂單
       409:
         description: 已發過邀請、已接受、已完成的訂單
-      
-      
   """
-  ret = jsonify(ret_list)
-  return ret
+  send_driver_invitation() 
+
+@match.route('/driver/invitation', methods=['DELETE'])
+def delete_driver_invitation():
+  """
+    發送邀請
+    ---
+    tags:
+      - Match
+    produces: application/json,
+    parameters:
+    - name: token
+      in: requestBody
+      type: string
+      required: true
+      description: 認證使用
+    - name: driverOrderId
+      in: requestBody
+      type: integer
+      required: true
+      description: 司機訂單id
+    - name: passengerOrderId
+      in: requestBody 
+      type: integer
+      required: true
+      description: 乘客訂單id
+    responses:
+      200:
+        description: 成功送出邀請
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'          
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/User'
+      401:
+        description: token 無效 
+      403:
+        description: 不是自己的駕駛訂單 
+      404:
+        description: 不存在的訂單
+      409:
+        description: 已發過邀請、已接受、已完成的訂單
+    components:
+      schemas:
+        User:
+        type: object
+        properties:
+            id:
+            type: integer
+            format: int64
+            example: 10
+  """
+  send_driver_invitation() 

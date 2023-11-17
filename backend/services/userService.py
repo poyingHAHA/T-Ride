@@ -6,7 +6,14 @@ class UserService:
         self.userRepository = UserRepository()
 
     def get_user(self, user_id):
+        '''
+        return None if user doesn't exist
+        driver_data = None if not found
+        '''
         user_entity = self.userRepository.get_user(user_id)
+        
+        if user_entity is None:
+            return None
 
         return UserDto(user_entity)
 

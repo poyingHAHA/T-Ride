@@ -26,26 +26,26 @@ class UserRepository:
         with self.conn.cursor() as cur:
             cur.execute(get_user_sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-            rows = cur.fetchone()
+            row = cur.fetchone()
 
-            if len(rows) == 0:
+            if row is None:
                 return None
 
-            user_id = rows[f2i['id']]
-            user_name = rows[f2i['username']]
-            total_order_count = rows[f2i['total_order_count']]
-            abandon_order_count = rows[f2i['abandon_order_count']]
-            driver_data_id = rows[f2i['driver_data_id']]
+            user_id = row[f2i['id']]
+            user_name = row[f2i['username']]
+            total_order_count = row[f2i['total_order_count']]
+            abandon_order_count = row[f2i['abandon_order_count']]
+            driver_data_id = row[f2i['driver_data_id']]
 
             if driver_data_id != None:
                 cur.execute(get_driver_data_sql.format(driver_data_id))
                 f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-                rows = cur.fetchone()
+                row = cur.fetchone()
 
                 driver_data = DriverDataEntity(
-                    rows[f2i['vehicle_name']],
-                    rows[f2i['vehicle_plate']],
-                    rows[f2i['passenger_count']])
+                    row[f2i['vehicle_name']],
+                    row[f2i['vehicle_plate']],
+                    row[f2i['passenger_count']])
             else:
                 driver_data = None
 

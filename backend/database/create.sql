@@ -1,3 +1,9 @@
+CREATE TABLE "session" (
+  "token" varchar PRIMARY KEY,
+  "expire" integer,
+  "user_id" integer
+);
+
 CREATE TABLE "users" (
   "id" serial PRIMARY KEY,
   "username" varchar,
@@ -60,6 +66,8 @@ CREATE TABLE "spots" (
   "point" varchar,
   "name" varchar
 );
+
+ALTER TABLE "session" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "users" ADD FOREIGN KEY ("driver_data_id") REFERENCES "driver_datas" ("id");
 

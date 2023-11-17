@@ -29,6 +29,7 @@ CREATE TABLE "driver_orders" (
   "start_name" varchar,
   "end_point" varchar,
   "end_name" varchar,
+  "passenger_count" integer,
   "finished" bool
 );
 

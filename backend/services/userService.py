@@ -15,16 +15,21 @@ class UserService:
         if user_entity is None:
             return None
 
-        return UserDto(user_entity)
+        if user_entity.driver_data_id is None:
+            driver_data_dto = None
+        else:
+            driver_data_entity = self.userRepository.get_driver_data(user_entity.driver_data_id)
+            driver_data_dto = DriverDataDto(driver_data_entity)
+
+        return UserDto(user_entity, driver_data_dto)
 
 
 class UserDto:
-    def __init__(self, user_entity):
-        self.user_id = user_entity.user_id
+    def __init__(self, user_entity, driver_data_dto):
         self.user_name = user_entity.user_name
         self.total_order_count = user_entity.total_order_count
         self.abandon_order_count = user_entity.abandon_order_count
-        self.driver_data = user_entity.driver_data
+        self.driver_data = driver_data_dto
 
 
 class DriverDataDto:

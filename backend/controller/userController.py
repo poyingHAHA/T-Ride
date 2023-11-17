@@ -40,4 +40,11 @@ class UserVo:
         self.user_name = user_dto.user_name
         self.total_order_count = user_dto.total_order_count
         self.abandon_order_count = user_dto.abandon_order_count
-        self.driver_data = user_dto.driver_data
+        self.driver_data = DriverDataVo(user_dto.driver_data) if user_dto.driver_data is not None else None
+
+
+class DriverDataVo:
+    def __init__(self, driver_data_dto):
+        self.vehicle_name = driver_data_dto.vehicle_name
+        self.vehicle_plate = driver_data_dto.vehicle_plate
+        self.passenger_count = driver_data_dto.passenger_count

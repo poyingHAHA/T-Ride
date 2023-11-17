@@ -16,58 +16,59 @@ class UserRepository:
     def get_user(self, user_id):
         '''
         return None if user doesn't exist
-        driver_data = None if not found
         '''
-        get_user_sql = f'''SELECT * FROM users
+        sql = f'''SELECT * FROM users
                            WHERE id = {user_id};'''
-        get_driver_data_sql = '''SELECT * FROM driver_datas
-                                 WHERE id = {};'''
 
         with self.conn.cursor() as cur:
-            cur.execute(get_user_sql)
+            cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
             row = cur.fetchone()
 
             if row is None:
                 return None
 
-            user_id = row[f2i['id']]
-            user_name = row[f2i['username']]
-            total_order_count = row[f2i['total_order_count']]
-            abandon_order_count = row[f2i['abandon_order_count']]
-            driver_data_id = row[f2i['driver_data_id']]
-
-            if driver_data_id != None:
-                cur.execute(get_driver_data_sql.format(driver_data_id))
-                f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-                row = cur.fetchone()
-
-                driver_data = DriverDataEntity(
-                    row[f2i['vehicle_name']],
-                    row[f2i['vehicle_plate']],
-                    row[f2i['passenger_count']])
-            else:
-                driver_data = None
-
             return UserEntity(
-                user_id,
-                user_name,
-                total_order_count,
-                abandon_order_count,
-                driver_data)
+                row[f2i['id']],
+                row[f2i['username']],
+                row[f2i['password_salt']],
+                row[f2i['password_hash']],
+                row[f2i['driver_data_id']],
+                row[f2i['total_order_count']],
+                row[f2i['abandon_order_count']])
+
+    def get_driver_data(self, driver_data_id):
+        '''
+        driver_data exists
+        '''
+        sql = f'''SELECT * FROM driver_datas
+                 WHERE id = {driver_data_id};'''
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            row = cur.fetchone()
+
+            return DriverDataEntity(
+                row[f2i['id']],
+                row[f2i['vehicle_name']],
+                row[f2i['vehicle_plate']],
+                row[f2i['passenger_count']])
 
 
 class UserEntity:
-    def __init__(self, user_id, user_name, total_order_count, abandon_order_count, driver_data):
+    def __init__(self, user_id, user_name, password_salt, password_hash, driver_data_id, total_order_count, abandon_order_count):
         self.user_id = user_id
         self.user_name = user_name
+        self.password_salt = password_salt
+        self.password_hash = password_hash
+        self.driver_data_id = driver_data_id
         self.total_order_count = total_order_count
         self.abandon_order_count = abandon_order_count
-        self.driver_data = driver_data
 
 
 class DriverDataEntity:
-    def __init__(self, vehicle_name, vehicle_plate, passenger_count):
+    def __init__(self, data_id, vehicle_name, vehicle_plate, passenger_count):
+        self.data_id = data_id
         self.vehicle_name = vehicle_name
         self.vehicle_plate = vehicle_plate
         self.passenger_count = passenger_count

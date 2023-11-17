@@ -1,21 +1,13 @@
-from flasgger import Swagger
-from flask import *
-from controller.matchController import match
+from quart import Quart
 import subprocess
+from controller.matchController import match
+from controller.orderController import order
+from controller.userController import user
 
-app = Flask(__name__)
-app.config['SWAGGER'] = {
-        "title": "T-RIDE",
-        "description": "T-RIDE API Backend",
-        "version": "1.0.2",
-        "termsOfService": "",
-        "hide_top_bar": True
-    }
-#CORS(app)
-Swagger(app)
+app = Quart(__name__)
 
 @app.route('/github-webhook', methods=['POST'])
-def github_webhook():
+async def github_webhook():
     """
         自動更新程式碼
         ---
@@ -28,4 +20,6 @@ def github_webhook():
 
 if __name__ == '__main__':
     app.register_blueprint(match, url_prefix='/match')
+    app.register_blueprint(order, url_prefix='/order')
+    app.register_blueprint(user, url_prefix='/user')
     app.run(host='0.0.0.0', port=5239, debug=True)

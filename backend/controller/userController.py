@@ -7,6 +7,11 @@ user = Blueprint('user_page', __name__)
 
 userService = UserService()
 
+@user.route('/register', methods=['POST'])
+async def register():
+    payload = await request.get_data()
+    return "NOT IMPLEMENTED"
+
 
 @user.route('/login', methods=['POST'])
 async def user_login():

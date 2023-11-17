@@ -25,25 +25,27 @@ class UserRepository:
 
         with self.conn.cursor() as cur:
             cur.execute(get_user_sql)
-            rows = pd.DataFrame(cur.fetchall(), columns=[d[0] for d in cur.description])
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            rows = cur.fetchone()
 
             if len(rows) == 0:
                 return None
 
-            user_id = rows['id'].values[0]
-            user_name = rows['username'].values[0]
-            total_order_count = rows['total_order_count'].values[0]
-            abandon_order_count = rows['abandon_order_count'].values[0]
-            driver_data_id = rows['driver_data_id'].values[0]
+            user_id = rows[f2i['id']]
+            user_name = rows[f2i['username']]
+            total_order_count = rows[f2i['total_order_count']]
+            abandon_order_count = rows[f2i['abandon_order_count']]
+            driver_data_id = rows[f2i['driver_data_id']]
 
             if driver_data_id != None:
                 cur.execute(get_driver_data_sql.format(driver_data_id))
-                rows = pd.DataFrame(cur.fetchall(), columns=[d[0] for d in cur.description])
+                f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+                rows = cur.fetchone()
 
                 driver_data = DriverDataEntity(
-                    rows['vehicle_name'].values[0],
-                    rows['vehicle_plate'].values[0],
-                    rows['passenger_count'].values[0])
+                    rows[f2i['vehicle_name']],
+                    rows[f2i['vehicle_plate']],
+                    rows[f2i['passenger_count']])
             else:
                 driver_data = None
 

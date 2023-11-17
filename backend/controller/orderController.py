@@ -59,7 +59,11 @@ async def post_passenger_order_finished():
 
 @order.route('/passenger/unfinished/<int:userId>', methods=['GET'])
 async def get_passenger_order_unfinished(userId):
-    return "not implemented"
+    orders = orderService.get_unfinished_passenger_orders(userId)
+
+    if orders is None:
+        return await make_response("user doesn't exist", 404)
+    return to_json([PassengerOrderVo(order) for order in orders])
 
 
 @order.route('/passenger/spot/all/<int:departureTime>', methods=['GET'])
@@ -86,3 +90,16 @@ class DriverOrderVo:
         self.end_point = driver_order_dto.end_point
         self.end_name = driver_order_dto.end_name
         self.passenger_count = driver_order_dto.passenger_count
+
+
+class PassengerOrderVo:
+    def __init__(self, passenger_order_dto):
+        self.order_id = passenger_order_dto.order_id
+        self.departure_time1 = passenger_order_dto.departure_time1
+        self.departure_time2 = passenger_order_dto.departure_time2
+        self.passenger_count = passenger_order_dto.passenger_count
+        self.start_point = passenger_order_dto.start_point
+        self.start_name = passenger_order_dto.start_name
+        self.end_point = passenger_order_dto.end_point
+        self.end_name = passenger_order_dto.end_name
+        self.fee = passenger_order_dto.fee

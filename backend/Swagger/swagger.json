@@ -512,6 +512,148 @@ paths:
           description: Order not found
         '409':
           description: Order already completed
+  /match/driver/invitation:
+    post:
+      summary: Send Invitation to Passenger
+      tags:
+        - match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                driverOrderId:
+                  type: integer
+                passengerOrderId:
+                  type: integer
+              required:
+                - token
+                - driverOrderId
+                - passengerOrderId
+      responses:
+        '200':
+          description: Invitation sent successfully
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Invitation already sent, accepted, or order completed
+  /match/driver/invitation/{driverOrderId}/{passengerOrderId}:
+    delete:
+      summary: Cancel Invitation to passengers
+      tags:
+        - match
+      parameters:
+        - name: driverOrderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+        - name: passengerOrderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+        - name: token
+          in: query
+          description: Authentication token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation canceled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrderCount:
+                    type: integer
+                  abandonCount:
+                    type: integer
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Invitation not sent or order completed
+  /match/driver/invitation/total/{driverOrderId}:
+    get:
+      summary: Get Total Invitations for a Driver Order
+      tags:
+        - match
+      parameters:
+        - name: driverOrderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalInvitations'
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed  
+  /match/passenger/invitation/{passengerOrderId}:
+    get:
+      summary: Get Driver Orders Invited to a Passenger Order
+      tags:
+        - match
+      parameters:
+        - name: passengerOrderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DriverOrderDetails'
+        '404':
+          description: Order not found
+
+  /match/passenger/invitation/accept:
+    post:
+      summary: Accept Invitation to a Driver Order
+      tags:
+        - match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitationRequest'
+      responses:
+        '200':
+          description: Successfully accepted invitation
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the passenger's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Invitation not received or order already accepted/completed
 components:
   schemas:
     DriverOrderDetails:
@@ -554,6 +696,35 @@ components:
           type: integer
         fee:
           type: integer
+    TotalInvitations:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            type: object
+            properties:
+              passengerOrder:
+                $ref: '#/components/schemas/PassengerOrderDetails'
+              time:  
+                type: integer
+              accepted:
+                type: boolean  
+    
+    AcceptInvitationRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        driverOrderId:
+          type: integer
+        passengerOrderId:
+          type: integer
+      required:
+        - token
+        - driverOrderId
+        - passengerOrderId
+        
     PassengerSpotDetails:
       type: object
       properties:

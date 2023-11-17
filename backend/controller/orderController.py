@@ -1,5 +1,6 @@
 from quart import Blueprint, request
 from services.orderService import *
+from utils.json import *
 
 
 order = Blueprint('order_page', __name__)
@@ -23,7 +24,7 @@ async def get_driver_order_unfinished(userId):
 
     if orders is None:
         return await make_response("user doesn't exist", 404)
-    return to_json(DriverOrderVo(order) for order in orders)
+    return to_json([DriverOrderVo(order) for order in orders])
 
 
 @order.route('/driver/<int:orderId>', methods=['GET'])

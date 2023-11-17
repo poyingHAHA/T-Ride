@@ -28,7 +28,7 @@ async def post_passenger_order():
   return "not implemented"
 
 @order.route('/passenger', methods=['DELETE'])
-async def delete_driver_order():
+async def delete_passenger_order():
   return "not implemented"
 
 @order.route('/passenger/<int:orderId>', methods=['GET'])
@@ -51,6 +51,6 @@ async def get_spots(departureTime):
 async def get_passenger_orders_from_spot(spotId):
   return "not implemented"
 
-@order.route('/fee/<str:startPoint>/<str:endPoint>/<int:passengerCount>', methods=['GET'])
+@order.route('/fee/<startPoint>/<endPoint>/<int:passengerCount>', methods=['GET'])
 async def get_order_fee(startPoint, endPoint, passengerCount):
   return "not implemented"

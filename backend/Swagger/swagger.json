@@ -1,0 +1,122 @@
+openapi: 3.0.0
+info:
+  title: T-Ride
+  description: |-
+    T-Ride
+  version: 0.0.01
+tags:
+  - name: user
+    description: 管理使用者資料
+  - name: order
+    description: 負責訂單
+  - name: match
+    description: 負責配對
+paths:
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: 註冊
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - password
+      responses:
+        '200':
+          description: 註冊成功
+  /user/driver_data:
+    post:
+      tags:
+        - user
+      summary: 上傳司機資料
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vehicleName:
+                  type: string
+                vehiclePlate:
+                  type: string
+                passengerCount:
+                  type: integer
+              required:
+                - vehicleName
+                - vehiclePlate
+                - passengerCount
+      responses:
+        '200':
+          description: 註冊成功
+        '401':
+          description: 無效token
+        '404':
+          description: 乘客數為無效參數
+        '409':
+          description: 資料已上傳過
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: 登入
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+              required:
+                - name
+                - passwor
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Unauthorized
+  /user/{userId}:
+    get:
+      tags:
+          - user 
+      summary: Get User Data by ID
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  TODO:
+                    type: string
+                  userData:
+                    type: object
+                      # Define the structure of the user data here
+        '404':
+          description: User ID not found

@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "./pages/Error"
 import Driver, { DriverMain, DriverRoute, DriverHistory, DriverSetting } from "./pages/Driver";
+import Passenger, { PassengerMain, PassengerRoute, PassengerHistory, PassengerAccount, PassengerTripinfo } from "./pages/Passenger";
 import Login from "./pages/Login";
 import SelectRole from "./pages/SelectRole";
 import DriverRegister from "./pages/DriverRegister";
@@ -25,11 +26,38 @@ const router = createBrowserRouter([
       },
       {
         path: "history",
-        element: <DriverHistory/>
+        element: <DriverHistory />
       },
       {
         path: "setting",
         element: <DriverSetting />
+      },
+    ]
+  },
+  {
+    path: "/passenger",
+    element: <Passenger />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        index: true,
+        element: <PassengerMain />
+      },
+      {
+        path: "route",
+        element: <PassengerRoute />
+      },
+      {
+        path: "history",
+        element: <PassengerHistory />
+      },
+      {
+        path: "account",
+        element: <PassengerAccount />
+      },
+      {
+        path: "tripinfo",
+        element: <PassengerTripinfo />
       },
     ]
   },

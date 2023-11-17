@@ -31,6 +31,6 @@ async def swagger(path=None):
 
 if __name__ == '__main__':
     #app.register_blueprint(match, url_prefix='/match')
-    #app.register_blueprint(order, url_prefix='/order')
+    app.register_blueprint(order, url_prefix='/order')
     app.register_blueprint(user, url_prefix='/user')
     app.run(host='0.0.0.0', port=5239, debug=True)

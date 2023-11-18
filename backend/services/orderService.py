@@ -96,7 +96,7 @@ class OrderService:
 
     def get_fee(self, point1, point2, passenger_count):
         # TODO: this is sooooooooooo expensive
-        return self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count
+        return min(self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count, 10000000)
 
     def is_valid_point(self, point):
         try:

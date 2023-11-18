@@ -33,36 +33,6 @@ paths:
       responses:
         '200':
           description: 註冊成功
-  /user/driver_data:
-    post:
-      tags:
-        - user
-      summary: 上傳司機資料
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                vehicleName:
-                  type: string
-                vehiclePlate:
-                  type: string
-                passengerCount:
-                  type: integer
-              required:
-                - vehicleName
-                - vehiclePlate
-                - passengerCount
-      responses:
-        '200':
-          description: 註冊成功
-        '401':
-          description: 無效token
-        '404':
-          description: 乘客數為無效參數
-        '409':
-          description: 資料已上傳過
   /user/login:
     post:
       tags:
@@ -91,35 +61,64 @@ paths:
                 properties:
                   token:
                     type: string
+                  userId:
+                    type: integer
         '401':
           description: Unauthorized
+  /user/driver_data:
+    post:
+      tags:
+        - user
+      summary: 上傳司機資料
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                vehicleName:
+                  type: string
+                vehiclePlate:
+                  type: string
+                passengerCount:
+                  type: integer
+              required:
+                - vehicleName
+                - vehiclePlate
+                - passengerCount
+      responses:
+        '200':
+          description: 註冊成功
+        '401':
+          description: 無效token
+        '404':
+          description: 乘客數為無效參數
+        '409':
+          description: 資料已上傳過
+          
   /user/{userId}:
     get:
+      summary: Get User Information by ID
       tags:
-          - user 
-      summary: Get User Data by ID
+        - user
       parameters:
         - name: userId
           in: path
           description: ID of the user
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: Successful response
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  TODO:
-                    type: string
-                  userData:
-                    type: object
-                      # Define the structure of the user data here
+                $ref: '#/components/schemas/UserDriverDetails'
         '404':
-          description: User ID not found
+          description: User not found
   /order/driver:
     post:
       summary: Create Driver Order
@@ -233,46 +232,8 @@ paths:
           description: Invalid token
         '400':
           description: Incorrect parameter format
-
-  /order/passenger/{orderId}:
-    delete:
-      summary: Delete Passenger Order by ID and Token
-      tags:
-        - order
-      parameters:
-        - name: orderId
-          in: path
-          description: ID of the passenger order
-          required: true
-          schema:
-            type: integer
-        - name: token
-          in: query
-          description: User token
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Order deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  totalOrderCount:
-                    type: integer
-                  abandonCount:
-                    type: integer
-        '401':
-          description: Invalid token
-        '403':
-          description: Not the passenger's own order
-        '404':
-          description: Order not found
-        '409':
-          description: Order already completed
-  
+          
+          
   /order/driver/unfinished/{user_id}:
     get:
       summary: Get Unfinished Driver Orders for a User
@@ -284,7 +245,7 @@ paths:
           description: ID of the user
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Successful response
@@ -432,7 +393,7 @@ paths:
                 $ref: '#/components/schemas/DriverOrderDetails'
         '404':
           description: Order not found
-  /order/passnger/{orderId}:
+  /order/passenger/{orderId}:
     get:
       summary: Get Passenger Order by ID
       tags:
@@ -453,6 +414,43 @@ paths:
                 $ref: '#/components/schemas/PassengerOrderDetails'
         '404':
           description: Order not found
+    delete:
+      summary: Delete Passenger Order by ID and Token
+      tags:
+        - order
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+        - name: token
+          in: query
+          description: User token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrderCount:
+                    type: integer
+                  abandonCount:
+                    type: integer
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the passenger's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed
   /order/driver/finish:
     post:
       summary: Finish Driver Order
@@ -677,7 +675,7 @@ components:
       type: object
       properties:
         userId:
-          type: string
+          type: integer
         startPoint:
           type: string
         startName:
@@ -696,6 +694,24 @@ components:
           type: integer
         fee:
           type: integer
+    UserDriverDetails:
+      type: object
+      properties:
+        username:
+          type: string
+        total_order_count:
+          type: integer
+        abandon_order_count:
+          type: integer
+        driverdata:
+          type: object
+          properties:
+            vehicle_name:
+              type: string
+            vehicle_plate:
+              type: string
+            passenger_count:
+              type: integer
     TotalInvitations:
       type: object
       properties:

@@ -134,7 +134,21 @@ async def get_passenger_orders_from_spot(spotId):
 
 @order.route('/fee', methods=['GET'])
 async def get_order_fee():
-    return "not implemented"
+    if not utils.is_keys_in_query(request, [
+        "startPoint",
+        "endPoint",
+        "passengerCount"]):
+        return await make_response("Incorrect parameter format", 400)
+    start_point = request.args.get("startPoint")
+    end_point = request.args.get("endPoint")
+    passenger_count = int(request.args.get("passengerCount"))
+
+    fee = order_service.get_fee(start_point, end_point, passenger_count)
+
+    if fee is None:
+        return await make_response("Incorrect parameter format", 400)
+
+    return utils.to_json({"fee": fee})
 
 
 class DriverOrderVo:

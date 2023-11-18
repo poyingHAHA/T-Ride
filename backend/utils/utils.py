@@ -13,6 +13,13 @@ def is_keys_in_body(body, keys):
     return True
 
 
+def is_keys_in_query(request, keys):
+    for key in keys:
+        if key not in request.args:
+            return False
+    return True
+
+
 def get_time():
     # utc time
     return int(datetime.utcnow().timestamp())

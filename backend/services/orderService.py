@@ -30,12 +30,14 @@ class OrderService:
     def create_driver_order(self, user_id, create_driver_order_dto):
         '''
         return "user not found" if user doesn't exist
-        return "invalid order" if points are invalid
+        return "invalid order" if order is invalid
         return order_id
         '''
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
-        if not self.is_valid_point(create_driver_order_dto.start_point) or not self.is_valid_point(create_driver_order_dto.end_point):
+        if not self.is_valid_point(create_driver_order_dto.start_point) or\
+            not self.is_valid_point(create_driver_order_dto.end_point) or\
+            create_driver_order_dto.passenger_count < 1:
             return "invalid order"
 
         return self.order_repository.create_driver_order(DriverOrderEntity(
@@ -52,15 +54,18 @@ class OrderService:
     def create_passenger_order(self, user_id, create_passenger_order_dto):
         '''
         return "user not found" if user doesn't exist
-        return "invalid order" if points are invalid
+        return "invalid order" if order is invalid
         return order_id
         '''
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
-        if not self.is_valid_point(create_passenger_order_dto.start_point) or not self.is_valid_point(create_passenger_order_dto.end_point):
+        if not self.is_valid_point(create_passenger_order_dto.start_point) or\
+            not self.is_valid_point(create_passenger_order_dto.end_point) or\
+            create_passenger_order_dto.departure_time1 > create_passenger_order_dto.departure_time2 or\
+            create_passenger_order_dto.passenger_count < 1:
             return "invalid order"
 
-        nearest_spot = self.get_nearest_spot(create_passenger_order_dto.start_point)
+        nearest_spot = self.__get_nearest_spot(create_passenger_order_dto.start_point)
         return self.order_repository.create_passenger_order(PassengerOrderEntity(
             None,
             user_id,
@@ -75,7 +80,7 @@ class OrderService:
             nearest_spot.spot_id,
             False))
 
-    def get_nearest_spot(self, point):
+    def __get_nearest_spot(self, point):
         '''
         return None if no spots at all
         '''
@@ -96,6 +101,9 @@ class OrderService:
 
     def get_fee(self, point1, point2, passenger_count):
         # TODO: this is sooooooooooo expensive
+        if not self.is_valid_point(point1) or not self.is_valid_point(point2) or passenger_count < 1:
+            return None
+
         return min(self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count, 10000000)
 
     def is_valid_point(self, point):

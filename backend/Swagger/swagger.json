@@ -320,6 +320,8 @@ paths:
                 properties:
                   fee:
                     type: integer
+        '400':
+          description: Incorrect parameter format
   /order/passenger/spot/all/{departureTime}:
     get:
       summary: Get Spots with Passengers for a Departure Time Range

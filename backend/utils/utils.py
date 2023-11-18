@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 
 def to_json(obj):
@@ -6,4 +7,12 @@ def to_json(obj):
 
 
 def is_keys_in_body(body, keys):
-    pass
+    for key in keys:
+        if key not in body:
+            return False
+    return True
+
+
+def get_time():
+    # utc time
+    return int(datetime.utcnow().timestamp())

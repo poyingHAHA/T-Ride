@@ -5,6 +5,7 @@ import DriverHistory from './pages/DriverHistory';
 import DriverMain from './pages/DriverMain';
 import DriverRoute from './pages/DriverRoute';
 import DriverSetting from './pages/DriverSetting';
+import DriverInfo from './pages/DriverInfo';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { setLocation } from '../../slices/location';
 
@@ -35,5 +36,5 @@ const Driver: React.FC = () => {
   </>
 }
 
-export { DriverMain, DriverRoute, DriverHistory, DriverSetting };
+export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo };
 export default Driver;

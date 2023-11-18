@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "./pages/Error"
-import Driver, { DriverMain, DriverRoute, DriverHistory, DriverSetting } from "./pages/Driver";
+import Driver, { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo } from "./pages/Driver";
 import Passenger, { PassengerMain, PassengerRoute, PassengerHistory, PassengerAccount, PassengerTripinfo } from "./pages/Passenger";
 import Login from "./pages/Login";
 import SelectRole from "./pages/SelectRole";
@@ -31,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "setting",
         element: <DriverSetting />
+      },
+      {
+        path: "info",
+        element: <DriverInfo />
       },
     ]
   },

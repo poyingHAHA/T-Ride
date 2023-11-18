@@ -25,9 +25,15 @@ async def swagger(path=None):
     file_name = 'index.html'
 
     if path is None:
-        return await send_from_directory(folder_path, file_name)
+        response = await send_from_directory(folder_path, file_name)
+    else:
+        response = await send_from_directory(folder_path, path)
 
-    return await send_from_directory(folder_path, path)
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+    
 
 if __name__ == '__main__':
     app.register_blueprint(match, url_prefix='/match')

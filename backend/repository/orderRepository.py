@@ -65,6 +65,38 @@ class OrderRepository:
                 row[f2i['spot_id']],
                 row[f2i['finished']]) for row in rows]
 
+    def create_driver_order(self, DriverOrderEntity):
+        '''
+        order is valid
+        return order_id
+        '''
+        sql = f'''INSERT INTO driver_orders (
+                      user_id,
+                      time,
+                      start_point,
+                      start_name,
+                      end_point,
+                      end_name,
+                      passenger_count,
+                      finished)
+                  VALUES (%s, %s, %s, %s, %s ,%s, %s, %s)
+                  RETURNING id;'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql, (
+                DriverOrderEntity.user_id,
+                DriverOrderEntity.departure_time,
+                DriverOrderEntity.start_point,
+                DriverOrderEntity.start_name,
+                DriverOrderEntity.end_point,
+                DriverOrderEntity.end_name,
+                DriverOrderEntity.passenger_count,
+                DriverOrderEntity.finished))
+            order_id = cur.fetchone()[0]
+            self.conn.commit()
+
+        return order_id
+
 
 class DriverOrderEntity:
     def __init__(self, order_id, user_id, departure_time, start_point, start_name, end_point, end_name, passenger_count, finished):

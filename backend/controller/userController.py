@@ -5,7 +5,7 @@ from utils import utils
 
 user = Blueprint('user_page', __name__)
 
-userService = UserService()
+user_service = UserService()
 
 @user.route('/register', methods=['POST'])
 async def register():
@@ -21,10 +21,10 @@ async def user_login():
 
 @user.route('/<int:userId>', methods=['GET'])
 async def get_driver_data(userId):
-    user_dto = userService.get_user(userId)
+    user_dto = user_service.get_user(userId)
 
     if user_dto is None:
-        return await make_response("user doesn't exist", 404)
+        return await make_response("User not found", 404)
     else:
         return utils.to_json(UserVo(user_dto))
 

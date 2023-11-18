@@ -1,6 +1,6 @@
 from quart import Blueprint, request, make_response
 from services.userService import *
-import utils.utils
+from utils import utils
 
 
 user = Blueprint('user_page', __name__)

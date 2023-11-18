@@ -1,6 +1,6 @@
 from quart import Blueprint, request, make_response
 from services.orderService import *
-import utils.utils
+from utils import utils
 
 
 order = Blueprint('order_page', __name__)

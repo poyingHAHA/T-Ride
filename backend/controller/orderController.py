@@ -21,7 +21,7 @@ async def post_driver_order():
         "endName",
         "departureTime",
         "passengerCount"]):
-        return await make_reponse("Incorrect parameter format", 400)
+        return await make_response("Incorrect parameter format", 400)
 
     user_id = user_service.get_user_id(body["token"])
     if user_id is None:
@@ -64,7 +64,38 @@ async def post_driver_order_finished():
 
 @order.route('/passenger', methods=['POST'])
 async def post_passenger_order():
-    return "not implemented"
+    body = await request.json
+    if not utils.is_keys_in_body(body, [
+        "token",
+        "startPoint",
+        "startName",
+        "endPoint",
+        "endName",
+        "departureTime1",
+        "departureTime2",
+        "passengerCount"]):
+        return await make_response("Incorrect parameter format", 400)
+
+    user_id = user_service.get_user_id(body["token"])
+    if user_id is None:
+        return await make_response("Invalid token", 401)
+
+    ret = order_service.create_passenger_order(user_id, CreatePassengerOrderDto(
+        body["departureTime1"],
+        body["departureTime2"],
+        body["startPoint"],
+        body["startName"],
+        body["endPoint"],
+        body["endName"],
+        body["passengerCount"]))
+
+    if ret == "user not found":
+        # should not happen, unless user is deleted but token still exists
+        return await make_response("Invalid token", 401)
+    if ret == "invalid order":
+        return await make_response("Incorrect parameter format", 400)
+
+    return utils.to_json({"orderId": ret})
 
 
 @order.route('/passenger/<int:orderId>', methods=['DELETE'])

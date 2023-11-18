@@ -1,6 +1,6 @@
 from quart import Blueprint, request, make_response
 from services.userService import *
-from utils.json import *
+from utils import utils
 
 
 user = Blueprint('user_page', __name__)
@@ -26,7 +26,7 @@ async def get_driver_data(userId):
     if user_dto is None:
         return await make_response("user doesn't exist", 404)
     else:
-        return to_json(UserVo(user_dto))
+        return utils.to_json(UserVo(user_dto))
 
 
 @user.route('/driver_data', methods=['POST'])

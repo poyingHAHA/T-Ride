@@ -43,12 +43,6 @@ async def post_driver_order():
 
     return utils.to_json({"orderId": ret})
 
-
-@order.route('/driver', methods=['DELETE'])
-async def delete_driver_order():
-    return "not implemented"
-
-
 @order.route('/driver/unfinished/<int:userId>', methods=['GET'])
 async def get_driver_order_unfinished(userId):
     orders = order_service.get_unfinished_driver_orders(userId)
@@ -59,7 +53,7 @@ async def get_driver_order_unfinished(userId):
 
 
 @order.route('/driver/<int:orderId>', methods=['GET'])
-async def get_driver_order_details():
+async def get_driver_order_details(orderId):
     return "not implemented"
 
 
@@ -73,13 +67,13 @@ async def post_passenger_order():
     return "not implemented"
 
 
-@order.route('/passenger', methods=['DELETE'])
-async def delete_passenger_order():
+@order.route('/passenger/<int:orderId>', methods=['DELETE'])
+async def delete_passenger_order(orderId):
     return "not implemented"
 
 
 @order.route('/passenger/<int:orderId>', methods=['GET'])
-async def get_passenger_order_details():
+async def get_passenger_order_details(orderId):
     return "not implemented"
 
 
@@ -107,8 +101,8 @@ async def get_passenger_orders_from_spot(spotId):
     return "not implemented"
 
 
-@order.route('/fee/<startPoint>/<endPoint>/<int:passengerCount>', methods=['GET'])
-async def get_order_fee(startPoint, endPoint, passengerCount):
+@order.route('/fee', methods=['GET'])
+async def get_order_fee():
     return "not implemented"
 
 

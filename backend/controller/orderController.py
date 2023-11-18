@@ -1,17 +1,47 @@
 from quart import Blueprint, request, make_response
 from services.orderService import *
+from services.userService import *
 from utils import utils
 
 
 order = Blueprint('order_page', __name__)
 
-orderService = OrderService()
+order_service = OrderService()
+user_service = UserService()
 
 
 @order.route('/driver', methods=['POST'])
 async def post_driver_order():
     body = await request.json
-    return "not implemented"
+    if not utils.is_keys_in_body(body, [
+        "token",
+        "startPoint",
+        "startName",
+        "endPoint",
+        "endName",
+        "departureTime",
+        "passengerCount"]):
+        return await make_reponse("Incorrect parameter format", 400)
+
+    user_id = user_service.get_user_id(body["token"])
+    if user_id is None:
+        return await make_response("Invalid token", 401)
+
+    ret = order_service.create_driver_order(user_id, CreateDriverOrderDto(
+        body["departureTime"],
+        body["startPoint"],
+        body["startName"],
+        body["endPoint"],
+        body["endName"],
+        body["passengerCount"]))
+
+    if ret == "user not found":
+        # should not happen, unless user is deleted but token still exists
+        return await make_response("Invalid token", 401)
+    if ret == "invalid order":
+        return await make_response("Incorrect parameter format", 400)
+
+    return utils.to_json({"orderId": ret})
 
 
 @order.route('/driver', methods=['DELETE'])
@@ -21,10 +51,10 @@ async def delete_driver_order():
 
 @order.route('/driver/unfinished/<int:userId>', methods=['GET'])
 async def get_driver_order_unfinished(userId):
-    orders = orderService.get_unfinished_driver_orders(userId)
+    orders = order_service.get_unfinished_driver_orders(userId)
 
     if orders is None:
-        return await make_response("user doesn't exist", 404)
+        return await make_response("User not found", 404)
     return utils.to_json([DriverOrderVo(order) for order in orders])
 
 
@@ -60,10 +90,10 @@ async def post_passenger_order_finished():
 
 @order.route('/passenger/unfinished/<int:userId>', methods=['GET'])
 async def get_passenger_order_unfinished(userId):
-    orders = orderService.get_unfinished_passenger_orders(userId)
+    orders = order_service.get_unfinished_passenger_orders(userId)
 
     if orders is None:
-        return await make_response("user doesn't exist", 404)
+        return await make_response("User not found", 404)
     return utils.to_json([PassengerOrderVo(order) for order in orders])
 
 

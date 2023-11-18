@@ -1,6 +1,7 @@
 import psycopg2
 import pandas as pd
 from utils.config import ConfigUtil
+from utils import utils
 
 
 class UserRepository:
@@ -37,12 +38,39 @@ class UserRepository:
                 row[f2i['total_order_count']],
                 row[f2i['abandon_order_count']])
 
+    def get_user_id(self, token):
+        '''
+        return None if token is invalid
+        '''
+        get_id_sql = f'''SELECT expire, user_id FROM session
+                         WHERE token = '{token}';'''
+        delete_token_sql = f'''DELETE FROM session
+                               WHERE token = '{token}';'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(get_id_sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            row = cur.fetchone()
+
+            if row is None:
+                # token doesn't exist
+                return None
+
+            if row[f2i['expire']] < utils.get_time():
+                # token has expired, delete it
+                cur.execute(delete_token_sql)
+                self.conn.commit()
+                return None
+
+            return row[f2i['user_id']]
+
     def get_driver_data(self, driver_data_id):
         '''
         driver_data exists
         '''
         sql = f'''SELECT * FROM driver_datas
-                 WHERE id = {driver_data_id};'''
+                  WHERE id = {driver_data_id};'''
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}

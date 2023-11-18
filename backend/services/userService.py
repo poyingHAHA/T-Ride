@@ -3,14 +3,14 @@ from repository.userRepository import *
 
 class UserService:
     def __init__(self):
-        self.userRepository = UserRepository()
+        self.user_repository = UserRepository()
 
     def get_user(self, user_id):
         '''
         return None if user doesn't exist
         driver_data = None if not found
         '''
-        user_entity = self.userRepository.get_user(user_id)
+        user_entity = self.user_repository.get_user(user_id)
         
         if user_entity is None:
             return None
@@ -18,10 +18,16 @@ class UserService:
         if user_entity.driver_data_id is None:
             driver_data_dto = None
         else:
-            driver_data_entity = self.userRepository.get_driver_data(user_entity.driver_data_id)
+            driver_data_entity = self.user_repository.get_driver_data(user_entity.driver_data_id)
             driver_data_dto = DriverDataDto(driver_data_entity)
 
         return UserDto(user_entity, driver_data_dto)
+
+    def get_user_id(self, token):
+        '''
+        return None if token is invalid
+        '''
+        return self.user_repository.get_user_id(token)
 
 
 class UserDto:

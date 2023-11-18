@@ -1,11 +1,13 @@
 from repository.orderRepository import *
 from repository.userRepository import *
+from repository.gmapsRepository import *
 
 
 class OrderService:
     def __init__(self):
         self.order_repository = OrderRepository()
         self.user_repository = UserRepository()
+        self.gmaps_repository = GmapsRepository()
 
     def get_unfinished_driver_orders(self, user_id):
         '''
@@ -33,7 +35,6 @@ class OrderService:
         '''
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
-
         if not self.is_valid_point(create_driver_order_dto.start_point) or not self.is_valid_point(create_driver_order_dto.end_point):
             return "invalid order"
 
@@ -48,6 +49,55 @@ class OrderService:
             create_driver_order_dto.passenger_count,
             False))
 
+    def create_passenger_order(self, user_id, create_passenger_order_dto):
+        '''
+        return "user not found" if user doesn't exist
+        return "invalid order" if points are invalid
+        return order_id
+        '''
+        if self.user_repository.get_user(user_id) is None:
+            return "user not found"
+        if not self.is_valid_point(create_passenger_order_dto.start_point) or not self.is_valid_point(create_passenger_order_dto.end_point):
+            return "invalid order"
+
+        nearest_spot = self.get_nearest_spot(create_passenger_order_dto.start_point)
+        return self.order_repository.create_passenger_order(PassengerOrderEntity(
+            None,
+            user_id,
+            create_passenger_order_dto.departure_time1,
+            create_passenger_order_dto.departure_time2,
+            create_passenger_order_dto.passenger_count,
+            create_passenger_order_dto.start_point,
+            create_passenger_order_dto.start_name,
+            create_passenger_order_dto.end_point,
+            create_passenger_order_dto.end_name,
+            self.get_fee(create_passenger_order_dto.start_point, nearest_spot.point, create_passenger_order_dto.passenger_count),
+            nearest_spot.spot_id,
+            False))
+
+    def get_nearest_spot(self, point):
+        '''
+        return None if no spots at all
+        '''
+        spots = self.order_repository.get_all_spots()
+
+        if len(spots) == 0:
+            return None
+
+        nearest_spot = SpotDto(spots[0])
+        nearest_distance = self.gmaps_repository.get_distance(point, spots[0].point)
+        for spot in spots[1:]:
+            candidate = self.gmaps_repository.get_distance(point, spot.point)
+            if candidate < nearest_distance:
+                nearest_spot = SpotDto(spot)
+                nearest_distance = candidate
+
+        return nearest_spot
+
+    def get_fee(self, point1, point2, passenger_count):
+        # TODO: this is sooooooooooo expensive
+        return self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count
+
     def is_valid_point(self, point):
         try:
             longitude, latitude = map(float, point.split(','))
@@ -59,6 +109,17 @@ class OrderService:
 class CreateDriverOrderDto:
     def __init__(self, departure_time, start_point, start_name, end_point, end_name, passenger_count):
         self.departure_time = departure_time
+        self.start_point = start_point
+        self.start_name = start_name
+        self.end_point = end_point
+        self.end_name = end_name
+        self.passenger_count = passenger_count
+
+
+class CreatePassengerOrderDto:
+    def __init__(self, departure_time1, departure_time2, start_point, start_name, end_point, end_name, passenger_count):
+        self.departure_time1 = departure_time1
+        self.departure_time2 = departure_time2
         self.start_point = start_point
         self.start_name = start_name
         self.end_point = end_point
@@ -88,3 +149,10 @@ class PassengerOrderDto:
         self.end_point = passenger_order_entity.end_point
         self.end_name = passenger_order_entity.end_name
         self.fee = passenger_order_entity.fee
+
+
+class SpotDto:
+    def __init__(self, spot_entity):
+        self.spot_id = spot_entity.spot_id
+        self.point = spot_entity.point
+        self.name = spot_entity.name

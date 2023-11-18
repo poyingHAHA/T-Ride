@@ -1,6 +1,5 @@
 import psycopg2
 from utils.config import ConfigUtil
-from repository.userRepository import *
 
 
 class OrderRepository:
@@ -12,7 +11,6 @@ class OrderRepository:
             password=config.get('password'),
             host=config.get('host'),
             port=config.get('port'))
-        self.userRepository = UserRepository()
 
     def get_unfinished_driver_orders(self, user_id):
         '''
@@ -27,16 +25,16 @@ class OrderRepository:
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
             rows = cur.fetchall()
             
-            return [DriverOrderEntity(
-                row[f2i['id']],
-                row[f2i['user_id']],
-                row[f2i['time']],
-                row[f2i['start_point']],
-                row[f2i['start_name']],
-                row[f2i['end_point']],
-                row[f2i['end_name']],
-                row[f2i['passenger_count']],
-                row[f2i['finished']]) for row in rows]
+        return [DriverOrderEntity(
+            row[f2i['id']],
+            row[f2i['user_id']],
+            row[f2i['time']],
+            row[f2i['start_point']],
+            row[f2i['start_name']],
+            row[f2i['end_point']],
+            row[f2i['end_name']],
+            row[f2i['passenger_count']],
+            row[f2i['finished']]) for row in rows]
 
     def get_unfinished_passenger_orders(self, user_id):
         '''
@@ -51,21 +49,21 @@ class OrderRepository:
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
             rows = cur.fetchall()
 
-            return [PassengerOrderEntity(
-                row[f2i['id']],
-                row[f2i['user_id']],
-                row[f2i['time1']],
-                row[f2i['time2']],
-                row[f2i['people']],
-                row[f2i['start_point']],
-                row[f2i['start_name']],
-                row[f2i['end_point']],
-                row[f2i['end_name']],
-                row[f2i['fee']],
-                row[f2i['spot_id']],
-                row[f2i['finished']]) for row in rows]
+        return [PassengerOrderEntity(
+            row[f2i['id']],
+            row[f2i['user_id']],
+            row[f2i['time1']],
+            row[f2i['time2']],
+            row[f2i['people']],
+            row[f2i['start_point']],
+            row[f2i['start_name']],
+            row[f2i['end_point']],
+            row[f2i['end_name']],
+            row[f2i['fee']],
+            row[f2i['spot_id']],
+            row[f2i['finished']]) for row in rows]
 
-    def create_driver_order(self, DriverOrderEntity):
+    def create_driver_order(self, driver_order_entity):
         '''
         order is valid
         return order_id
@@ -84,18 +82,69 @@ class OrderRepository:
 
         with self.conn.cursor() as cur:
             cur.execute(sql, (
-                DriverOrderEntity.user_id,
-                DriverOrderEntity.departure_time,
-                DriverOrderEntity.start_point,
-                DriverOrderEntity.start_name,
-                DriverOrderEntity.end_point,
-                DriverOrderEntity.end_name,
-                DriverOrderEntity.passenger_count,
-                DriverOrderEntity.finished))
+                driver_order_entity.user_id,
+                driver_order_entity.departure_time,
+                driver_order_entity.start_point,
+                driver_order_entity.start_name,
+                driver_order_entity.end_point,
+                driver_order_entity.end_name,
+                driver_order_entity.passenger_count,
+                driver_order_entity.finished))
             order_id = cur.fetchone()[0]
             self.conn.commit()
 
         return order_id
+
+    def create_passenger_order(self, passenger_order_entity):
+        '''
+        order is valid
+        return order_id
+        '''
+        sql = f'''INSERT INTO passenger_orders (
+                      user_id,
+                      time1,
+                      time2,
+                      people,
+                      start_point,
+                      start_name,
+                      end_point,
+                      end_name,
+                      fee,
+                      spot_id,
+                      finished)
+                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                  RETURNING id;'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql, (
+                passenger_order_entity.user_id,
+                passenger_order_entity.departure_time1,
+                passenger_order_entity.departure_time2,
+                passenger_order_entity.passenger_count,
+                passenger_order_entity.start_point,
+                passenger_order_entity.start_name,
+                passenger_order_entity.end_point,
+                passenger_order_entity.end_name,
+                passenger_order_entity.fee,
+                passenger_order_entity.spot_id,
+                passenger_order_entity.finished))
+            order_id = cur.fetchone()[0]
+            self.conn.commit()
+
+        return order_id
+
+    def get_all_spots(self):
+        sql = '''SELECT * FROM spots;'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            rows = cur.fetchall()
+
+        return [SpotEntity(
+            row[f2i['id']],
+            row[f2i['point']],
+            row[f2i['name']]) for row in rows]
 
 
 class DriverOrderEntity:
@@ -125,3 +174,10 @@ class PassengerOrderEntity:
         self.fee = fee
         self.spot_id = spot_id
         self.finished = finished
+
+
+class SpotEntity:
+    def __init__(self, spot_id, point, name):
+        self.spot_id = spot_id
+        self.point = point
+        self.name = name

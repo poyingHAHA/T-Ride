@@ -4,6 +4,16 @@ from repository.userRepository import *
 class UserService:
     def __init__(self):
         self.user_repository = UserRepository()
+    
+    def login(self, user_name, password):
+        '''
+        return None if authentication fails
+        '''
+        login_entity = self.user_repository.login(user_name, password)
+        if login_entity is None:
+            return None
+        else:
+            return LoginDto(login_entity)
 
     def get_user(self, user_id):
         '''
@@ -29,6 +39,10 @@ class UserService:
         '''
         return self.user_repository.get_user_id(token)
 
+class LoginDto:
+    def __init__(self, login_entity):
+        self.token = login_entity.token
+        self.user_id = login_entity.user_id
 
 class UserDto:
     def __init__(self, user_entity, driver_data_dto):

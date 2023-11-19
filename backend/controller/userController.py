@@ -15,8 +15,18 @@ async def register():
 
 @user.route('/login', methods=['POST'])
 async def user_login():
-    payload = await request.get_data()
-    return "NOT IMPLEMENTED"
+    body = await request.json
+    if not utils.is_keys_in_body(body, [
+        "username",
+        "password"]):
+        return await make_response("Unauthorized", 401)
+    
+    login_dto = user_service.login(body["username"],body["password"])
+
+    if login_dto is None:
+        return await make_response("Unauthorized", 401)
+    else:
+        return utils.to_json(LoginVo(login_dto))
 
 
 @user.route('/<int:userId>', methods=['GET'])
@@ -34,6 +44,10 @@ async def post_driver_data():
     payload = await request.get_data()
     return "NOT IMPLEMENTED"
 
+class LoginVo:
+    def __init__(self, login_dto):
+        self.token = login_dto.token
+        self.userId = login_dto.userId
 
 class UserVo:
     def __init__(self, user_dto):

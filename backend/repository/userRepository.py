@@ -115,6 +115,37 @@ class UserRepository:
                 row[f2i['vehicle_name']],
                 row[f2i['vehicle_plate']],
                 row[f2i['passenger_count']])
+        
+    def create_driver(self, user_id, vehicle_name, vehicle_plate, passenger_count):
+        sql = f'''INSERT INTO driver_datas (vehicle_name, vehicle_plate, passenger_count)
+                  VALUES (%s, %s, %s)
+                  RETURNING id;'''
+        
+        if passenger_count < 1:
+            return None
+        else:
+            with self.conn.cursor() as cur:
+                cur.execute(sql, (vehicle_name, vehicle_plate, passenger_count))
+                data_id = cur.fetchone()[0]
+                update_sql = f'''UPDATE users
+                                 SET driver_data_id = {data_id}
+                                 WHERE id = {user_id};'''
+                cur.execute(update_sql)
+                self.conn.commit()
+            return DriverDataEntity(data_id, vehicle_name, vehicle_plate, passenger_count)
+        
+    def edit_driver(self, data_id, vehicle_name, vehicle_plate, passenger_count):
+        sql = f'''UPDATE driver_datas
+                  SET vehicle_name = %s, vehicle_plate = %s, passenger_count = %s
+                  WHERE id = {data_id};'''
+        if passenger_count < 1:
+            return None
+        else:
+            with self.conn.cursor() as cur:
+                cur.execute(sql,(vehicle_name, vehicle_plate, passenger_count))
+                self.conn.commit()
+            return DriverDataEntity(data_id, vehicle_name, vehicle_plate, passenger_count)
+
 class LoginEntity:
     def __init__(self, token, user_id):
         self.token = token

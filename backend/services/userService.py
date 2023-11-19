@@ -14,6 +14,19 @@ class UserService:
             return None
         else:
             return LoginDto(login_entity)
+    
+    def set_driver_data(self, user_id, vehicle_name, vehicle_plate, passenger_count):
+        '''
+        return None if set data fail
+
+        '''
+        user_entity = self.user_repository.get_user(user_id)
+        data_id = user_entity.driver_data_id
+        if data_id is None:
+            driver_data_entity = self.user_repository.create_driver(user_id, vehicle_name, vehicle_plate, passenger_count)
+        else:
+            driver_data_entity = self.user_repository.edit_driver(data_id, vehicle_name, vehicle_plate, passenger_count)
+        return DriverDataDto(driver_data_entity)
 
     def get_user(self, user_id):
         '''

@@ -41,8 +41,24 @@ async def get_driver_data(userId):
 
 @user.route('/driver_data', methods=['POST'])
 async def post_driver_data():
-    payload = await request.get_data()
-    return "NOT IMPLEMENTED"
+    body = await request.json
+    if not utils.is_keys_in_body(body, [
+        "token",
+        "vehicle_name",
+        "vehicle_plate",
+        "passenger_count"]):
+        return await make_response("Incorrect parameter format", 400)
+    
+    user_id = user_service.get_user_id(body["token"])
+    if user_id is None:
+        return await make_response("Invalid token", 401)
+    
+    driver_dto = user_service.set_driver_data(user_id, body["vehicle_name"], body["vehicle_plate"], body["passenger_count"])
+
+    if driver_dto is None:
+        return await make_response("Incorrect parameter format", 400)
+    else:
+        return utils.to_json(DriverDataVo(driver_dto))
 
 class LoginVo:
     def __init__(self, login_dto):

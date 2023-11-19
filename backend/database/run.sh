@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 NAME="t-ride-db"
-PASSWORD="password"
 PORT=5432
 
-docker run -p $PORT:5432 -d --name "$NAME" --rm -e POSTGRES_PASSWORD="$PASSWORD" postgres
+read -p "set password: " password
+
+docker run -p $PORT:5432 -d --name "$NAME" --rm -e POSTGRES_PASSWORD="$password" postgres
+#docker run -p $PORT:5432 -v $(pwd)/postgresql.conf:/etc/postgresql/postgresql.conf -d --name "$NAME"\
+#    --rm -e POSTGRES_PASSWORD="$password" postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+
 if [[ $? -ne 0 ]]; then
     echo "db is already running"
+    echo "maybe you should \"docker kill $NAME\""
     exit
 fi
 

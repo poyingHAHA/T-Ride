@@ -105,6 +105,16 @@ class OrderService:
 
         return PassengerOrderDto(order_entity)
 
+    def get_passenger_order(self, order_id):
+        '''
+        return None if order doesn't exist
+        '''
+        order_entity = self.order_repository.get_passenger_order(order_id)
+        if order_entity is None:
+            return None
+
+        return PassengerOrderDto(order_entity)
+
     def finish_driver_order(self, user_id, order_id):
         '''
         return "user not found",

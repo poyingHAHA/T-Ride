@@ -132,7 +132,11 @@ async def delete_passenger_order(orderId):
 
 @order.route('/passenger/<int:orderId>', methods=['GET'])
 async def get_passenger_order_details(orderId):
-    return "not implemented"
+    order_dto = order_service.get_passenger_order(orderId)
+    if order_dto is None:
+        return await make_response("Order not found", 404)
+
+    return utils.to_json(PassengerOrderVo(order_dto))
 
 
 @order.route('/passenger/finish', methods=['POST'])

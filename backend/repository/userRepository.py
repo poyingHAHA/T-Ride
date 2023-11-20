@@ -146,6 +146,18 @@ class UserRepository:
                 self.conn.commit()
             return DriverDataEntity(data_id, vehicle_name, vehicle_plate, passenger_count)
 
+    def add_total_order_count(self, user_id, num):
+        '''
+        user exists
+        '''
+        sql = f'''UPDATE users
+                  SET total_order_count = total_order_count + {num}
+                  WHERE id = {user_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            self.conn.commit()
+
 class LoginEntity:
     def __init__(self, token, user_id):
         self.token = token

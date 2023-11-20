@@ -300,19 +300,25 @@ paths:
       parameters:
         - name: startPoint
           in: query
-          description: Start point coordinates (latitude, longitude)
+          description: Start point coordinates (longitude, latitude)
           required: true
           schema:
             type: string
         - name: endPoint
           in: query
-          description: End point coordinates (latitude, longitude)
+          description: End point coordinates (longitude, latitude)
           required: true
           schema:
             type: string
         - name: passengerCount
           in: query
           description: Number of passengers
+          required: true
+          schema:
+            type: integer
+        - name: departureTime
+          in: query
+          description: Passenger departure time 
           required: true
           schema:
             type: integer

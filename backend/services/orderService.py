@@ -192,7 +192,7 @@ class OrderService:
 
     def is_valid_point(self, point):
         try:
-            longitude, latitude = map(float, point.split(','))
+            latitude, longitude = map(float, point.split(','))
         except:
             return False
         return True

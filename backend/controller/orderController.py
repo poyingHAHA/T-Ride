@@ -217,26 +217,26 @@ async def get_order_fee():
 
 class DriverOrderVo:
     def __init__(self, driver_order_dto):
-        self.order_id = driver_order_dto.order_id
-        self.user_id = driver_order_dto.user_id
-        self.departure_time = driver_order_dto.departure_time
-        self.start_point = driver_order_dto.start_point
-        self.start_name = driver_order_dto.start_name
-        self.end_point = driver_order_dto.end_point
-        self.end_name = driver_order_dto.end_name
-        self.passenger_count = driver_order_dto.passenger_count
+        self.orderId = driver_order_dto.order_id
+        self.userId = driver_order_dto.user_id
+        self.departureTime = driver_order_dto.departure_time
+        self.startPoint = driver_order_dto.start_point
+        self.startName = driver_order_dto.start_name
+        self.endPoint = driver_order_dto.end_point
+        self.endName = driver_order_dto.end_name
+        self.passengerCount = driver_order_dto.passenger_count
 
 
 class PassengerOrderVo:
     def __init__(self, passenger_order_dto, arrival_time):
-        self.order_id = passenger_order_dto.order_id
-        self.user_id = passenger_order_dto.user_id
-        self.departure_time1 = passenger_order_dto.departure_time1
-        self.departure_time2 = passenger_order_dto.departure_time2
-        self.passenger_count = passenger_order_dto.passenger_count
-        self.start_point = passenger_order_dto.start_point
-        self.start_name = passenger_order_dto.start_name
-        self.end_point = passenger_order_dto.end_point
-        self.end_name = passenger_order_dto.end_name
+        self.orderId = passenger_order_dto.order_id
+        self.userId = passenger_order_dto.user_id
+        self.departureTime1 = passenger_order_dto.departure_time1
+        self.departureTime2 = passenger_order_dto.departure_time2
+        self.passengerCount = passenger_order_dto.passenger_count
+        self.startPoint = passenger_order_dto.start_point
+        self.startName = passenger_order_dto.start_name
+        self.endPoint = passenger_order_dto.end_point
+        self.endName = passenger_order_dto.end_name
         self.fee = passenger_order_dto.fee
-        self.arrival_time = arrival_time
+        self.arrivalTime = arrival_time

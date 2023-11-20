@@ -60,21 +60,23 @@ async def post_driver_data():
     else:
         return utils.to_json(DriverDataVo(driver_dto))
 
+
 class LoginVo:
     def __init__(self, login_dto):
         self.token = login_dto.token
         self.userId = login_dto.userId
 
+
 class UserVo:
     def __init__(self, user_dto):
-        self.user_name = user_dto.user_name
-        self.total_order_count = user_dto.total_order_count
-        self.abandon_order_count = user_dto.abandon_order_count
-        self.driver_data = DriverDataVo(user_dto.driver_data) if user_dto.driver_data is not None else None
+        self.userName = user_dto.user_name
+        self.totalOrderCount = user_dto.total_order_count
+        self.abandonOrderCount = user_dto.abandon_order_count
+        self.driverData = DriverDataVo(user_dto.driver_data) if user_dto.driver_data is not None else None
 
 
 class DriverDataVo:
     def __init__(self, driver_data_dto):
-        self.vehicle_name = driver_data_dto.vehicle_name
-        self.vehicle_plate = driver_data_dto.vehicle_plate
-        self.passenger_count = driver_data_dto.passenger_count
+        self.vehicleName = driver_data_dto.vehicle_name
+        self.vehiclePlate = driver_data_dto.vehicle_plate
+        self.passengerCount = driver_data_dto.passenger_count

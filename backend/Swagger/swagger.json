@@ -232,7 +232,7 @@ paths:
           description: Incorrect parameter format
         '401':
           description: Invalid token
-        '404'
+        '404':
           description: no spots in database
           
           
@@ -508,6 +508,8 @@ paths:
       responses:
         '200':
           description: Order finished successfully
+        '400':
+          description: Incorrect parameter format
         '401':
           description: Invalid token
         '403':

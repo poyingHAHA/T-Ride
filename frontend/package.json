@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-google-maps/api": "^2.19.2",
     "@reduxjs/toolkit": "^1.9.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -24,6 +25,7 @@
     "react-scripts": "5.0.1",
     "sort-by": "^1.2.0",
     "typescript": "^4.9.5",
+    "use-places-autocomplete": "^4.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -52,7 +54,6 @@
     ]
   },
   "devDependencies": {
-    "google-map-react": "^2.2.1",
     "tailwindcss": "^3.3.5"
   }
 }

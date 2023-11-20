@@ -19,7 +19,9 @@ const tempLocation = [
 const DriverMain = () => {
   return <>
     <div className='grow h-[58vh] scale-110'>
-      <DriverMap />
+      <div className="bg-gray-200 flex justify-center items-center h-full">
+        <DriverMap />
+      </div>
     </div>
     
     <div className='flex flex-col justify-around items-center h-[30vh] bg-white rounded-t-3xl overflow-hidden z-10'>

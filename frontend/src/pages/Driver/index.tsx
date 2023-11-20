@@ -13,15 +13,20 @@ const Driver: React.FC = () => {
   const dispatch = useAppDispatch();
   
   // 取得使用者位置
+  console.log("Index")
   useEffect(() => {
+    console.log("Index: useEffect")
     const id = navigator.geolocation.watchPosition((position) => {
-      console.log(position)
+      console.log("Index: ", position)
       const { latitude, longitude } = position.coords;
       const timestamp = position.timestamp;
       dispatch(setLocation({ latitude, longitude, timestamp }));
+    }, (error) => {
+      console.log("Index: ", error)
     })
 
     return () => {
+      console.log("Index: clear")
       navigator.geolocation.clearWatch(id)
     }
   }, [])

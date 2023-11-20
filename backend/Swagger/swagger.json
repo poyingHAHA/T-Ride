@@ -352,6 +352,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PassengerSpotDetails'
+        '400':
+          description: Incorrect parameter format
   /order/passenger/spot/{spotId}:
     get:
       summary: Get Passenger Orders for a Spot
@@ -382,6 +384,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PassengerOrderDetails'
+        '400':
+          description: Incorrect parameter format
         '404':
           description: Spot not found
   /order/driver/{orderId}:
@@ -675,6 +679,8 @@ components:
       properties:
         orderId:
           type: integer
+        userId:
+          type: integer
         startPoint:
           type: string
         startName:
@@ -690,6 +696,8 @@ components:
     PassengerOrderDetails:
       type: object
       properties:
+        orderId:
+          type: integer
         userId:
           type: integer
         startPoint:

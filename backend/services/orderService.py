@@ -105,16 +105,6 @@ class OrderService:
 
         return PassengerOrderDto(order_entity)
 
-    def get_passenger_order(self, order_id):
-        '''
-        return None if order doesn't exist
-        '''
-        order_entity = self.order_repository.get_passenger_order(order_id)
-        if order_entity is None:
-            return None
-
-        return PassengerOrderDto(order_entity)
-
     def finish_driver_order(self, user_id, order_id):
         '''
         return "user not found",
@@ -168,6 +158,21 @@ class OrderService:
             return "order is finished"
 
         ret = self.order_repository.finish_passenger_order(order_id)
+
+    def get_spot_passenger_orders(self, spot_id, departure_time):
+        '''
+        return "spot not found" if spot doens't exist
+
+        return passenger order that departs in [departure_time-T, departure_time+T]
+        '''
+        if self.order_repository.get_spot(spot_id) is None:
+            return "spot not found"
+
+        return [PassengerOrderDto(entity) for entity in self.order_repository.get_spot_passenger_orders(spot_id, departure_time)]
+
+    def get_estimated_arrival_time(self, point1, point2, departure_time):
+        # TODO
+        return departure_time + 10
 
     def get_fee(self, point1, point2, passenger_count):
         # TODO: this is sooooooooooo expensive
@@ -228,6 +233,7 @@ class CreatePassengerOrderDto:
 class DriverOrderDto:
     def __init__(self, driver_order_entity):
         self.order_id = driver_order_entity.order_id
+        self.user_id = driver_order_entity.user_id
         self.departure_time = driver_order_entity.departure_time
         self.start_point = driver_order_entity.start_point
         self.start_name = driver_order_entity.start_name
@@ -239,6 +245,7 @@ class DriverOrderDto:
 class PassengerOrderDto:
     def __init__(self, passenger_order_entity):
         self.order_id = passenger_order_entity.order_id
+        self.user_id = passenger_order_entity.user_id
         self.departure_time1 = passenger_order_entity.departure_time1
         self.departure_time2 = passenger_order_entity.departure_time2
         self.passenger_count = passenger_order_entity.passenger_count

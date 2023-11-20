@@ -132,11 +132,12 @@ async def delete_passenger_order(orderId):
 
 @order.route('/passenger/<int:orderId>', methods=['GET'])
 async def get_passenger_order_details(orderId):
-    order_dto = order_service.get_passenger_order(orderId)
-    if order_dto is None:
+    order = order_service.get_passenger_order(orderId)
+    if order is None:
         return await make_response("Order not found", 404)
 
-    return utils.to_json(PassengerOrderVo(order_dto))
+    return utils.to_json(PassengerOrderVo(order, order_service.get_estimated_arrival_time(
+        order.start_point, order.end_point, order.departure_time1)))
 
 
 @order.route('/passenger/finish', methods=['POST'])
@@ -172,7 +173,8 @@ async def get_passenger_order_unfinished(userId):
     if orders is None:
         return await make_response("User not found", 404)
 
-    return utils.to_json([PassengerOrderVo(order) for order in orders])
+    return utils.to_json([PassengerOrderVo(order, order_service.get_estimated_arrival_time(
+        order.start_point, order.end_point, order.departure_time1)) for order in orders])
 
 
 @order.route('/passenger/spot/all/<int:departureTime>', methods=['GET'])
@@ -182,7 +184,16 @@ async def get_spots(departureTime):
 
 @order.route('/passenger/spot/<int:spotId>', methods=['GET'])
 async def get_passenger_orders_from_spot(spotId):
-    return "not implemented"
+    if not utils.is_keys_in_query(request, ["departureTime"]):
+        return await make_response("Incorrect parameter format", 400)
+    departure_time = int(request.args.get("departureTime"))
+
+    ret = order_service.get_spot_passenger_orders(spotId, departure_time)
+    if ret == "spot not found":
+        return await make_response("Spot not found", 404)
+
+    return utils.to_json([PassengerOrderVo(order, order_service.get_estimated_arrival_time(
+        order.start_point, order.end_point, order.departure_time1)) for order in ret])
 
 
 @order.route('/fee', methods=['GET'])
@@ -207,6 +218,7 @@ async def get_order_fee():
 class DriverOrderVo:
     def __init__(self, driver_order_dto):
         self.order_id = driver_order_dto.order_id
+        self.user_id = driver_order_dto.user_id
         self.departure_time = driver_order_dto.departure_time
         self.start_point = driver_order_dto.start_point
         self.start_name = driver_order_dto.start_name
@@ -216,8 +228,9 @@ class DriverOrderVo:
 
 
 class PassengerOrderVo:
-    def __init__(self, passenger_order_dto):
+    def __init__(self, passenger_order_dto, arrival_time):
         self.order_id = passenger_order_dto.order_id
+        self.user_id = passenger_order_dto.user_id
         self.departure_time1 = passenger_order_dto.departure_time1
         self.departure_time2 = passenger_order_dto.departure_time2
         self.passenger_count = passenger_order_dto.passenger_count
@@ -226,3 +239,4 @@ class PassengerOrderVo:
         self.end_point = passenger_order_dto.end_point
         self.end_name = passenger_order_dto.end_name
         self.fee = passenger_order_dto.fee
+        self.arrival_time = arrival_time

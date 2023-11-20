@@ -133,7 +133,29 @@ async def get_passenger_order_details(orderId):
 
 @order.route('/passenger/finish', methods=['POST'])
 async def post_passenger_order_finished():
-    return "not implemented"
+    body = await request.json
+    if not utils.is_keys_in_body(body, [
+        "token",
+        "orderId"]):
+        return await make_response("Incorrect parameter format", 400)
+
+    user_id = user_service.get_user_id(body["token"])
+    if user_id is None:
+        return await make_response("Invalid token", 401)
+
+    ret = order_service.finish_passenger_order(user_id, body["orderId"])
+
+    if ret == "user not found":
+        # should not happen, unless user is deleted but token still exists
+        return await make_response("Invalid token", 401)
+    if ret == "user incorrect":
+        return await make_response("Not the passenger's own order", 403)
+    if ret == "order not found":
+        return await make_response("Order not found", 404)
+    if ret == "order is finished":
+        return await make_response("Order already completed", 409)
+
+    return "Order finished successfully"
 
 
 @order.route('/passenger/unfinished/<int:userId>', methods=['GET'])

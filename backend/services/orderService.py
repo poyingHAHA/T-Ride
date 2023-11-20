@@ -114,6 +114,31 @@ class OrderService:
         if ret == "related passenger order isn't finished":
             return "related passenger order isn't finished"
 
+    def finish_passenger_order(self, user_id, order_id):
+        '''
+        return "user not found",
+               "user incorrect",
+               "order not found",
+               "order is finished"
+
+        return None on success
+        '''
+        user = self.user_repository.get_user(user_id)
+        if user is None:
+            return "user not found"
+        user_id = user.user_id
+
+        order = self.order_repository.get_passenger_order(order_id)
+        if order is None:
+            return "order not found"
+
+        if user_id != order.user_id:
+            return "user incorrect"
+        if order.finished:
+            return "order is finished"
+
+        ret = self.order_repository.finish_passenger_order(order_id)
+
     def get_fee(self, point1, point2, passenger_count):
         # TODO: this is sooooooooooo expensive
         if not self.is_valid_point(point1) or not self.is_valid_point(point2) or passenger_count < 1:

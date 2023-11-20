@@ -172,6 +172,35 @@ class OrderRepository:
                 row[f2i['passenger_count']],
                 row[f2i['finished']])
 
+    def get_passenger_order(self, order_id):
+        '''
+        return None if order doesn't exist
+        '''
+        sql = f'''SELECT * FROM passenger_orders
+                  WHERE id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            row = cur.fetchone()
+
+            if row is None:
+                return None
+
+            return PassengerOrderEntity(
+                row[f2i['id']],
+                row[f2i['user_id']],
+                row[f2i['time1']],
+                row[f2i['time2']],
+                row[f2i['people']],
+                row[f2i['start_point']],
+                row[f2i['start_name']],
+                row[f2i['end_point']],
+                row[f2i['end_name']],
+                row[f2i['fee']],
+                row[f2i['spot_id']],
+                row[f2i['finished']])
+
     def finish_driver_order(self, order_id):
         '''
         order exists and isn't finished
@@ -196,6 +225,21 @@ class OrderRepository:
                     return "related passenger order isn't finished"
 
             cur.execute(finish_sql)
+            self.conn.commit()
+
+    def finish_passenger_order(self, order_id):
+        '''
+        order exists and isn't finished
+
+        return None on success
+        '''
+
+        sql = f'''UPDATE passenger_orders
+                  SET finished = true
+                  WHERE id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
             self.conn.commit()
 
 

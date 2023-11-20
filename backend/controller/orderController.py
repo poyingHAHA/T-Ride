@@ -115,6 +115,8 @@ async def post_passenger_order():
         return await make_response("Invalid token", 401)
     if ret == "invalid order":
         return await make_response("Incorrect parameter format", 400)
+    if ret == "no spots in database":
+        return await make_response("no spots in database", 404)
 
     return utils.to_json({"orderId": ret})
 

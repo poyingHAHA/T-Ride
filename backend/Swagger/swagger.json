@@ -228,10 +228,12 @@ paths:
                 properties:
                   orderId:
                     type: integer
-        '401':
-          description: Invalid token
         '400':
           description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '404'
+          description: no spots in database
           
           
   /order/driver/unfinished/{user_id}:

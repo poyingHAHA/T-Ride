@@ -53,8 +53,10 @@ class OrderService:
 
     def create_passenger_order(self, user_id, create_passenger_order_dto):
         '''
-        return "user not found" if user doesn't exist
-        return "invalid order" if order is invalid
+        return "user not found",
+               "invalid order",
+               "no spots in database"
+
         return order_id
         '''
         if self.user_repository.get_user(user_id) is None:
@@ -66,8 +68,9 @@ class OrderService:
             return "invalid order"
 
         nearest_spot = self.__get_nearest_spot(create_passenger_order_dto.start_point)
-        # TODO: check whether nearest_spot is none
-        #       add new return state, maybe "no spots in database"?
+        if nearest_spot is None:
+            return "no spots in database"
+
         return self.order_repository.create_passenger_order(PassengerOrderEntity(
             None,
             user_id,

@@ -93,6 +93,8 @@ paths:
       responses:
         '200':
           description: 註冊成功
+        '400':
+          description: Invalid parameter format
         '401':
           description: 無效token
         '404':

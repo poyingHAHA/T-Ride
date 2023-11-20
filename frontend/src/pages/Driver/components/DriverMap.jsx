@@ -34,6 +34,7 @@ const DriverMap = () => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const location = { ...locationReducer}
   const [activeMarker, setActiveMarker] = useState(null);
+  const [test, setTest] = useState(0);
 
   const defaultProps = {
     center: {
@@ -46,7 +47,8 @@ const DriverMap = () => {
   // useJsApiLoader hook to load the Google Maps API
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API_KEY || "",
-    libraries: ["marker"]
+    libraries: ["marker"],
+    version: "beta"
   });
 
   const handleActiveMarker = (marker) => {
@@ -66,7 +68,9 @@ const DriverMap = () => {
             onClick={() => {setActiveMarker(null)}}
             mapContainerStyle={{ height: "100vh", width: "100%" }}
             options={{
-              mapId: "955417d2092c184d"
+              mapId: "955417d2092c184d",
+              disableDefaultUI: true,
+              clickableIcons: false,
             }}
           >
             
@@ -76,9 +80,14 @@ const DriverMap = () => {
             
             <AdvMarker
               position={defaultProps.center}
+              zIndex={100}
+              onClick={()=>{setTest(0)}}
             >
-              <div className="border-solid border-black h-5 w-6 text-white bg-black"  >
-                here
+              <div 
+                className="border-solid border-black h-5 w-6 text-white bg-black" 
+                onMouseEnter={() => {setTest(42)}}
+              >
+                {test}
               </div>
             </AdvMarker>
 

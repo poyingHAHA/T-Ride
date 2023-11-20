@@ -66,6 +66,8 @@ class OrderService:
             return "invalid order"
 
         nearest_spot = self.__get_nearest_spot(create_passenger_order_dto.start_point)
+        # TODO: check whether nearest_spot is none
+        #       add new return state, maybe "no spots in database"?
         return self.order_repository.create_passenger_order(PassengerOrderEntity(
             None,
             user_id,
@@ -80,8 +82,52 @@ class OrderService:
             nearest_spot.spot_id,
             False))
 
+    def finish_driver_order(self, user_id, order_id):
+        '''
+        return "user not found",
+               "user incorrect",
+               "order not found",
+               "order is finished",
+               "related passenger order isn't finished"
+
+        return None on success
+        '''
+        user = self.user_repository.get_user(user_id)
+        if user is None:
+            return "user not found"
+        user_id = user.user_id
+
+        order = self.order_repository.get_driver_order(order_id)
+        if order is None:
+            return "order not found"
+
+        if user_id != order.user_id:
+            return "user incorrect"
+        if order.finished:
+            return "order is finished"
+
+        ret = self.order_repository.finish_driver_order(order_id)
+
+        if ret == "related passenger order isn't finished":
+            return "related passenger order isn't finished"
+
+    def get_fee(self, point1, point2, passenger_count):
+        # TODO: this is sooooooooooo expensive
+        if not self.is_valid_point(point1) or not self.is_valid_point(point2) or passenger_count < 1:
+            return None
+
+        return min(self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count, 10000000)
+
+    def is_valid_point(self, point):
+        try:
+            longitude, latitude = map(float, point.split(','))
+        except:
+            return False
+        return True
+
     def __get_nearest_spot(self, point):
         '''
+        point is valid
         return None if no spots at all
         '''
         spots = self.order_repository.get_all_spots()
@@ -98,20 +144,6 @@ class OrderService:
                 nearest_distance = candidate
 
         return nearest_spot
-
-    def get_fee(self, point1, point2, passenger_count):
-        # TODO: this is sooooooooooo expensive
-        if not self.is_valid_point(point1) or not self.is_valid_point(point2) or passenger_count < 1:
-            return None
-
-        return min(self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count, 10000000)
-
-    def is_valid_point(self, point):
-        try:
-            longitude, latitude = map(float, point.split(','))
-        except:
-            return False
-        return True
 
 
 class CreateDriverOrderDto:

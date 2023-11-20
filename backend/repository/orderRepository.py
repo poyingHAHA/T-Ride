@@ -146,6 +146,58 @@ class OrderRepository:
             row[f2i['point']],
             row[f2i['name']]) for row in rows]
 
+    def get_driver_order(self, order_id):
+        '''
+        return None if order doesn't exist
+        '''
+        sql = f'''SELECT * FROM driver_orders
+                  WHERE id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            row = cur.fetchone()
+
+            if row is None:
+                return None
+
+            return DriverOrderEntity(
+                row[f2i['id']],
+                row[f2i['user_id']],
+                row[f2i['time']],
+                row[f2i['start_point']],
+                row[f2i['start_name']],
+                row[f2i['end_point']],
+                row[f2i['end_name']],
+                row[f2i['passenger_count']],
+                row[f2i['finished']])
+
+    def finish_driver_order(self, order_id):
+        '''
+        order exists and isn't finished
+
+        return "related passenger order isn't finished"
+
+        return None on success
+        '''
+        finish_sql = f'''UPDATE driver_orders
+                         SET finished = true
+                         WHERE id = {order_id};'''
+        related_order_sql = f'''SELECT passenger_orders.finished FROM passenger_orders
+                                JOIN matches ON passenger_orders.id = matches.passenger_order_id
+                                WHERE matches.driver_order_id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(related_order_sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            rows = cur.fetchall()
+            for row in rows:
+                if not row[f2i['finished']]:
+                    return "related passenger order isn't finished"
+
+            cur.execute(finish_sql)
+            self.conn.commit()
+
 
 class DriverOrderEntity:
     def __init__(self, order_id, user_id, departure_time, start_point, start_name, end_point, end_name, passenger_count, finished):

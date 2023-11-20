@@ -474,6 +474,8 @@ paths:
       responses:
         '200':
           description: Order finished successfully
+        '400':
+          description: Incorrect parameter format
         '401':
           description: Invalid token
         '403':

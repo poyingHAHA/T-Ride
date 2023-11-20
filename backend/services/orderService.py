@@ -168,6 +168,10 @@ class OrderService:
 
         self.user_repository.add_total_order_count(user_id, 1)
 
+    def get_spots_with_passenger(self, departure_time):
+        return [SpotWithCountDto(spot)
+            for spot in self.order_repository.get_spots_with_passenger(departure_time)]
+
     def get_spot_passenger_orders(self, spot_id, departure_time):
         '''
         return "spot not found" if spot doens't exist
@@ -283,3 +287,11 @@ class SpotDto:
         self.spot_id = spot_entity.spot_id
         self.point = spot_entity.point
         self.name = spot_entity.name
+
+
+class SpotWithCountDto:
+    def __init__(self, spot_with_count_entity):
+        self.spot_id = spot_with_count_entity.spot_id
+        self.point = spot_with_count_entity.point
+        self.name = spot_with_count_entity.name
+        self.order_count = spot_with_count_entity.order_count

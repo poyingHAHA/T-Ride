@@ -244,6 +244,29 @@ class OrderRepository:
             cur.execute(sql)
             self.conn.commit()
 
+    def get_spots_with_passenger(self, departure_time):
+        # TODO: use config to set time range
+        time_range = 3600
+        sql = f'''SELECT spots.*, COUNT(spot_id) AS order_count
+                  FROM spots JOIN passenger_orders
+                  ON spots.id = spot_id
+                  WHERE NOT (time1 > {departure_time + time_range}
+                  OR time2 < {departure_time - time_range})
+                  AND NOT finished
+                  GROUP BY spots.id;'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+
+            rows = cur.fetchall()
+
+        return [SpotWithCountEntity(
+            row[f2i['id']],
+            row[f2i['point']],
+            row[f2i['name']],
+            row[f2i['order_count']]) for row in rows]
+
     def get_spot_passenger_orders(self, spot_id, departure_time):
         '''
         spot exists
@@ -313,3 +336,11 @@ class SpotEntity:
         self.spot_id = spot_id
         self.point = point
         self.name = name
+
+
+class SpotWithCountEntity:
+    def __init__(self, spot_id, point, name, order_count):
+        self.spot_id = spot_id
+        self.point = point
+        self.name = name
+        self.order_count = order_count

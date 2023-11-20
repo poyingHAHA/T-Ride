@@ -177,10 +177,15 @@ async def get_passenger_order_unfinished(userId):
         order.start_point, order.end_point, order.departure_time1)) for order in orders])
 
 
-@order.route('/passenger/spot/all/<int:departureTime>', methods=['GET'])
-async def get_spots(departureTime):
-    return "not implemented"
+@order.route('/passenger/spot/all', methods=['GET'])
+async def get_spots():
+    if not utils.is_keys_in_query(request, ["departureTime"]):
+        return await make_response("Incorrect parameter format", 400)
 
+    departure_time = int(request.args.get("departureTime"))
+
+    return utils.to_json([SpotWithCountVo(spot)
+        for spot in order_service.get_spots_with_passenger(departure_time)])
 
 @order.route('/passenger/spot/<int:spotId>', methods=['GET'])
 async def get_passenger_orders_from_spot(spotId):
@@ -241,3 +246,11 @@ class PassengerOrderVo:
         self.endName = passenger_order_dto.end_name
         self.fee = passenger_order_dto.fee
         self.arrivalTime = arrival_time
+
+
+class SpotWithCountVo:
+    def __init__(self, spot_with_count_dto):
+        self.spot_id = spot_with_count_dto.spot_id
+        self.point = spot_with_count_dto.point
+        self.name = spot_with_count_dto.name
+        self.order_count = spot_with_count_dto.order_count

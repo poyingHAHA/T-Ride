@@ -7,8 +7,10 @@ class GmapsRepository:
     def __init__(self):
         config = ConfigUtil.get('googleMapsApi')
 
-        self.test = bool(config.get('test'))
-        self.gmaps = googlemaps.Client(key=config.get('api_key'))
+        self.test = bool(int(config.get('test')))
+
+        if not self.test:
+            self.gmaps = googlemaps.Client(key=config.get('api_key'))
 
     def get_distance(self, point1, point2, departure_time = None):
         '''

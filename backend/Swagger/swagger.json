@@ -328,14 +328,14 @@ paths:
                     type: integer
         '400':
           description: Incorrect parameter format
-  /order/passenger/spot/all/{departureTime}:
+  /order/passenger/spot/all:
     get:
       summary: Get Spots with Passengers for a Departure Time Range
       tags:
         - order
       parameters:
         - name: departureTime
-          in: path
+          in: query
           description: Departure time in Unix timestamp format
           required: true
           schema:
@@ -352,8 +352,6 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PassengerSpotDetails'
-        '404':
-          description: No spots found for the specified departure time
   /order/passenger/spot/{spotId}:
     get:
       summary: Get Passenger Orders for a Spot
@@ -363,6 +361,12 @@ paths:
         - name: spotId
           in: path
           description: ID of the spot
+          required: true
+          schema:
+            type: integer
+        - name: departureTime
+          in: query
+          description: Departure time in Unix timestamp format
           required: true
           schema:
             type: integer
@@ -379,7 +383,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/PassengerOrderDetails'
         '404':
-          description: No orders found for the specified spot
+          description: Spot not found
   /order/driver/{orderId}:
     get:
       summary: Get Driver Order by ID

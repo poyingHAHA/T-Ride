@@ -139,13 +139,14 @@ paths:
                 startPoint:
                   type: string
                   description: Start point coordinates ("latitude, longitude")
-                  example: "110.25,23.56"
+                  example: "12.34,56.78"
                 startName:
                   type: string
                   description: Name of the starting location
                 endPoint:
                   type: string
                   description: End point coordinates (latitude, longitude)
+                  example: "23.45,67.89"
                 endName:
                   type: string
                   description: Name of the destination location
@@ -155,6 +156,7 @@ paths:
                 passengerCount:
                   type: integer
                   description: Number of passengers
+                  example: 4
               required:
                 - token
                 - startPoint
@@ -193,26 +195,29 @@ paths:
                 startPoint:
                   type: string
                   description: Start point coordinates (latitude, longitude)
-                  example: "121,23.5"
+                  example: "12.34,56.78"
                 startName:
                   type: string
                   description: Name of the starting location
                 endPoint:
                   type: string
                   description: End point coordinates (latitude, longitude)
-                  example: "121,23.6"
+                  example: "23.45,67.89"
                 endName:
                   type: string
                   description: Name of the destination location
                 departureTime1:
                   type: integer
                   description: First choice of departure time in Unix timestamp format (seconds)
+                  example: 100
                 departureTime2:
                   type: integer
                   description: Second choice of departure time in Unix timestamp format (seconds)
+                  example: 200
                 passengerCount:
                   type: integer
                   description: Number of passengers
+                  example: 2
               required:
                 - token
                 - startPoint
@@ -301,12 +306,14 @@ paths:
         - name: startPoint
           in: query
           description: Start point coordinates (latitude, longitude)
+          example: "12.34,56.78"
           required: true
           schema:
             type: string
         - name: endPoint
           in: query
           description: End point coordinates (latitude, longitude)
+          example: "23.45,67.89"
           required: true
           schema:
             type: string

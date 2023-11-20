@@ -1,6 +1,7 @@
 from repository.orderRepository import *
 from repository.userRepository import *
 from repository.gmapsRepository import *
+from repository.matchRepository import *
 
 
 class OrderService:
@@ -8,6 +9,7 @@ class OrderService:
         self.order_repository = OrderRepository()
         self.user_repository = UserRepository()
         self.gmaps_repository = GmapsRepository()
+        self.match_repository = MatchRepository()
 
     def get_unfinished_driver_orders(self, user_id):
         '''
@@ -135,6 +137,10 @@ class OrderService:
         if ret == "related passenger order isn't finished":
             return "related passenger order isn't finished"
 
+        self.user_repository.add_total_order_count(
+            user_id,
+            len(self.match_repository.get_matches(order_id)))
+
     def finish_passenger_order(self, user_id, order_id):
         '''
         return "user not found",
@@ -160,7 +166,7 @@ class OrderService:
 
         self.order_repository.finish_passenger_order(order_id)
 
-        self.user_repository.add_total_order(user_id, 1)
+        self.user_repository.add_total_order_count(user_id, 1)
 
     def get_spot_passenger_orders(self, spot_id, departure_time):
         '''

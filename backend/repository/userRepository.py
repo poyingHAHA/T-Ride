@@ -146,7 +146,7 @@ class UserRepository:
                 self.conn.commit()
             return DriverDataEntity(data_id, vehicle_name, vehicle_plate, passenger_count)
 
-    def add_total_order(self, user_id, num):
+    def add_total_order_count(self, user_id, num):
         '''
         user exists
         '''

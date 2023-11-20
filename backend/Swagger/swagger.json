@@ -44,10 +44,12 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                username:
                   type: string
+                  example: tester 
                 password:
                   type: string
+                  example: tester
               required:
                 - name
                 - passwor

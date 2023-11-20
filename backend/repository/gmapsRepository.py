@@ -7,7 +7,7 @@ class GmapsRepository:
     def __init__(self):
         config = ConfigUtil.get('googleMapsApi')
 
-        self.test = config.get('test')
+        self.test = bool(config.get('test'))
         self.gmaps = googlemaps.Client(key=config.get('api_key'))
 
     def get_distance(self, point1, point2, departure_time = None):
@@ -19,7 +19,7 @@ class GmapsRepository:
         lat1, long1 = map(float, point1.split(','))
         lat2, long2 = map(float, point2.split(','))
         
-        if self.test == 'true': 
+        if self.test: 
             return self.haversine(lat1, long1, lat2, long2) 
     
         # 使用 Distance Matrix API 計算距離
@@ -33,7 +33,7 @@ class GmapsRepository:
                 return distance
             else:
                 return None 
-                
+
         except:
             return None 
 

@@ -201,7 +201,7 @@ class OrderService:
             return None 
 
         fee = distance / 1000 * passenger_count * 9
-        return min(fee, 500)
+        return min(int(fee), 500) 
 
     def is_valid_point(self, point):
         try:

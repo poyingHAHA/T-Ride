@@ -1,6 +1,7 @@
 from repository.orderRepository import *
 from repository.userRepository import *
 from repository.gmapsRepository import *
+from repository.matchRepository import *
 
 
 class OrderService:
@@ -8,6 +9,7 @@ class OrderService:
         self.order_repository = OrderRepository()
         self.user_repository = UserRepository()
         self.gmaps_repository = GmapsRepository()
+        self.match_repository = MatchRepository()
 
     def get_unfinished_driver_orders(self, user_id):
         '''
@@ -106,6 +108,7 @@ class OrderService:
         return PassengerOrderDto(order_entity)
 
     def finish_driver_order(self, user_id, order_id):
+        # TODO: add order count of user
         '''
         return "user not found",
                "user incorrect",
@@ -134,6 +137,10 @@ class OrderService:
         if ret == "related passenger order isn't finished":
             return "related passenger order isn't finished"
 
+        self.user_repository.add_total_order_count(
+            user_id,
+            len(self.match_repository.get_matches(order_id)))
+
     def finish_passenger_order(self, user_id, order_id):
         '''
         return "user not found",
@@ -157,7 +164,9 @@ class OrderService:
         if order.finished:
             return "order is finished"
 
-        ret = self.order_repository.finish_passenger_order(order_id)
+        self.order_repository.finish_passenger_order(order_id)
+
+        self.user_repository.add_total_order_count(user_id, 1)
 
     def get_spot_passenger_orders(self, spot_id, departure_time):
         '''
@@ -174,16 +183,29 @@ class OrderService:
         # TODO
         return departure_time + 10
 
-    def get_fee(self, point1, point2, passenger_count):
-        # TODO: this is sooooooooooo expensive
-        if not self.is_valid_point(point1) or not self.is_valid_point(point2) or passenger_count < 1:
+    def get_fee(self, point1, point2, passenger_count, departure_time):
+        if not self.is_valid_point(point1) or not self.is_valid_point(point2):
             return None
+    
+        try:
+            passenger_count = int(passenger_count)
+            departure_time = int(departure_time)
+            if departure_time < 0 or passenger_count < 1:
+                return None
+        except ValueError:
+            return None
+        
+        distance = self.gmaps_repository.get_distance(point1, point2, departure_time)
 
-        return min(self.gmaps_repository.get_distance(point1, point2) // 1000 * passenger_count, 10000000)
+        if distance == None: 
+            return None 
+
+        fee = distance / 1000 * passenger_count * 9
+        return min(fee, 500)
 
     def is_valid_point(self, point):
         try:
-            longitude, latitude = map(float, point.split(','))
+            latitude, longitude = map(float, point.split(','))
         except:
             return False
         return True

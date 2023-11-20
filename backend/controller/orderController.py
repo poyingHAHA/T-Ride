@@ -201,13 +201,14 @@ async def get_order_fee():
     if not utils.is_keys_in_query(request, [
         "startPoint",
         "endPoint",
-        "passengerCount"]):
+        "passengerCount", 
+        "departureTime"]):
         return await make_response("Incorrect parameter format", 400)
     start_point = request.args.get("startPoint")
     end_point = request.args.get("endPoint")
-    passenger_count = int(request.args.get("passengerCount"))
-
-    fee = order_service.get_fee(start_point, end_point, passenger_count)
+    passenger_count = request.args.get("passengerCount")
+    departure_time = request.args.get("departureTime")
+    fee = order_service.get_fee(start_point, end_point, passenger_count, departure_time)
 
     if fee is None:
         return await make_response("Incorrect parameter format", 400)

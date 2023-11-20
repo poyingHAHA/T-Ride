@@ -306,7 +306,6 @@ paths:
         - name: startPoint
           in: query
           description: Start point coordinates (latitude, longitude)
-          example: "12.34,56.78"
           required: true
           schema:
             type: string
@@ -314,7 +313,6 @@ paths:
         - name: endPoint
           in: query
           description: End point coordinates (latitude, longitude)
-          example: "23.45,67.89"
           required: true
           schema:
             type: string

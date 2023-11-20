@@ -19,7 +19,7 @@ async def user_login():
     if not utils.is_keys_in_body(body, [
         "username",
         "password"]):
-        return await make_response("Unauthorized", 401)
+        return await make_response("Bad Request", 400)
     
     login_dto = user_service.login(body["username"],body["password"])
 

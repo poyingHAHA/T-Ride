@@ -52,8 +52,7 @@ CREATE TABLE "matches" (
   "id" serial PRIMARY KEY,
   "driver_order_id" integer,
   "passenger_order_id" integer,
-  "time" integer,
-  "finished" bool
+  "time" integer
 );
 
 CREATE TABLE "match_invitations" (

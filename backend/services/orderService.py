@@ -106,6 +106,7 @@ class OrderService:
         return PassengerOrderDto(order_entity)
 
     def finish_driver_order(self, user_id, order_id):
+        # TODO: add order count of user
         '''
         return "user not found",
                "user incorrect",
@@ -157,7 +158,9 @@ class OrderService:
         if order.finished:
             return "order is finished"
 
-        ret = self.order_repository.finish_passenger_order(order_id)
+        self.order_repository.finish_passenger_order(order_id)
+
+        self.user_repository.add_total_order(user_id, 1)
 
     def get_spot_passenger_orders(self, spot_id, departure_time):
         '''

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "../../../hooks";
-import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF, OverlayView } from "@react-google-maps/api";
+import { GoogleMap, MarkerF, InfoWindowF, OverlayView } from "@react-google-maps/api";
 import AdvMarker from "./AdvancedMarker"
+import { getNearLandMark } from "../../../services/nearLandMark";
 
 const markers = [
   {
@@ -30,26 +31,31 @@ const markers = [
   },
 ]
 
-const DriverMap = () => {
+const DriverMap = ({isLoaded}) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const location = { ...locationReducer}
   const [activeMarker, setActiveMarker] = useState(null);
-  const [test, setTest] = useState(0);
+  
+  useEffect(() => {
+    // 取得附近地標
+    async function fetchData(){
+      const nearLandMark = await getNearLandMark({lat: location.lat, lng: location.lng});
+      console.log(nearLandMark);
+    }
+    try {
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   const defaultProps = {
     center: {
-      lat: location.latitude,
-      lng: location.longitude
+      lat: location.lat,
+      lng: location.lng
     },
     zoom: 15
   };
-
-  // useJsApiLoader hook to load the Google Maps API
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API_KEY || "",
-    libraries: ["marker"],
-    version: "beta"
-  });
 
   const handleActiveMarker = (marker) => {
     if (marker === activeMarker) {
@@ -78,10 +84,10 @@ const DriverMap = () => {
               console.log(mapRef.current)
             } */}
             
-            <AdvMarker
+            {/* <AdvMarker
               position={defaultProps.center}
               zIndex={100}
-              onClick={()=>{setTest(0)}}
+              // onClick={()=>{setTest(42)}}
             >
               <div 
                 className="border-solid border-black h-5 w-6 text-white bg-black" 
@@ -89,7 +95,14 @@ const DriverMap = () => {
               >
                 {test}
               </div>
-            </AdvMarker>
+            </AdvMarker> */}
+
+            <MarkerF
+              position={defaultProps.center}
+              label={"Here"}
+            >
+
+            </MarkerF>
 
             {/* {
               markers.map(({id, name, position}) => {

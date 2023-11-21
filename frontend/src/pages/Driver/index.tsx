@@ -20,7 +20,7 @@ const Driver: React.FC = () => {
       console.log("Index: ", position)
       const { latitude, longitude } = position.coords;
       const timestamp = position.timestamp;
-      dispatch(setLocation({ latitude, longitude, timestamp }));
+      dispatch(setLocation({ lat: latitude, lng: longitude, timestamp }));
     }, (error) => {
       console.log("Index: ", error)
     })

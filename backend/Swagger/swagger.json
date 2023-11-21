@@ -44,10 +44,12 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                username:
                   type: string
+                  example: tester 
                 password:
                   type: string
+                  example: tester
               required:
                 - name
                 - passwor
@@ -63,6 +65,8 @@ paths:
                     type: string
                   userId:
                     type: integer
+        '400':
+          description: Invalid parameter format
         '401':
           description: Unauthorized
   /user/driver_data:
@@ -91,6 +95,8 @@ paths:
       responses:
         '200':
           description: 註冊成功
+        '400':
+          description: Invalid parameter format
         '401':
           description: 無效token
         '404':
@@ -135,13 +141,14 @@ paths:
                 startPoint:
                   type: string
                   description: Start point coordinates ("latitude, longitude")
-                  example: "110.25,23.56"
+                  example: "12.34,56.78"
                 startName:
                   type: string
                   description: Name of the starting location
                 endPoint:
                   type: string
                   description: End point coordinates (latitude, longitude)
+                  example: "23.45,67.89"
                 endName:
                   type: string
                   description: Name of the destination location
@@ -151,6 +158,7 @@ paths:
                 passengerCount:
                   type: integer
                   description: Number of passengers
+                  example: 4
               required:
                 - token
                 - startPoint
@@ -189,26 +197,29 @@ paths:
                 startPoint:
                   type: string
                   description: Start point coordinates (latitude, longitude)
-                  example: "121,23.5"
+                  example: "12.34,56.78"
                 startName:
                   type: string
                   description: Name of the starting location
                 endPoint:
                   type: string
                   description: End point coordinates (latitude, longitude)
-                  example: "121,23.6"
+                  example: "23.45,67.89"
                 endName:
                   type: string
                   description: Name of the destination location
                 departureTime1:
                   type: integer
                   description: First choice of departure time in Unix timestamp format (seconds)
+                  example: 100
                 departureTime2:
                   type: integer
                   description: Second choice of departure time in Unix timestamp format (seconds)
+                  example: 200
                 passengerCount:
                   type: integer
                   description: Number of passengers
+                  example: 2
               required:
                 - token
                 - startPoint
@@ -228,10 +239,12 @@ paths:
                 properties:
                   orderId:
                     type: integer
-        '401':
-          description: Invalid token
         '400':
           description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '404':
+          description: no spots in database
           
           
   /order/driver/unfinished/{user_id}:
@@ -298,18 +311,28 @@ paths:
           required: true
           schema:
             type: string
+            example: 25.01291500,121.5321100
         - name: endPoint
           in: query
           description: End point coordinates (latitude, longitude)
           required: true
           schema:
             type: string
+            example: 25.014054,121.4612000
         - name: passengerCount
           in: query
           description: Number of passengers
           required: true
           schema:
             type: integer
+            example: 5
+        - name: departureTime
+          in: query
+          description: Passenger departure time 
+          required: true
+          schema:
+            type: integer
+            example: 1703050472
       responses:
         '200':
           description: Successful response
@@ -322,14 +345,14 @@ paths:
                     type: integer
         '400':
           description: Incorrect parameter format
-  /order/passenger/spot/all/{departureTime}:
+  /order/passenger/spot/all:
     get:
       summary: Get Spots with Passengers for a Departure Time Range
       tags:
         - order
       parameters:
         - name: departureTime
-          in: path
+          in: query
           description: Departure time in Unix timestamp format
           required: true
           schema:
@@ -346,8 +369,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PassengerSpotDetails'
-        '404':
-          description: No spots found for the specified departure time
+        '400':
+          description: Incorrect parameter format
   /order/passenger/spot/{spotId}:
     get:
       summary: Get Passenger Orders for a Spot
@@ -357,6 +380,12 @@ paths:
         - name: spotId
           in: path
           description: ID of the spot
+          required: true
+          schema:
+            type: integer
+        - name: departureTime
+          in: query
+          description: Departure time in Unix timestamp format
           required: true
           schema:
             type: integer
@@ -372,8 +401,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PassengerOrderDetails'
+        '400':
+          description: Incorrect parameter format
         '404':
-          description: No orders found for the specified spot
+          description: Spot not found
   /order/driver/{orderId}:
     get:
       summary: Get Driver Order by ID
@@ -474,6 +505,8 @@ paths:
       responses:
         '200':
           description: Order finished successfully
+        '400':
+          description: Incorrect parameter format
         '401':
           description: Invalid token
         '403':
@@ -504,6 +537,8 @@ paths:
       responses:
         '200':
           description: Order finished successfully
+        '400':
+          description: Incorrect parameter format
         '401':
           description: Invalid token
         '403':
@@ -661,6 +696,8 @@ components:
       properties:
         orderId:
           type: integer
+        userId:
+          type: integer
         startPoint:
           type: string
         startName:
@@ -676,6 +713,8 @@ components:
     PassengerOrderDetails:
       type: object
       properties:
+        orderId:
+          type: integer
         userId:
           type: integer
         startPoint:
@@ -754,3 +793,4 @@ components:
           type: string
         passengerCount:
           type: integer
+ 

@@ -12,24 +12,6 @@ class MatchRepository:
             host=config.get('host'),
             port=config.get('port'))
 
-    def get_matches(self, driver_order_id):
-        '''
-        order exists
-        '''
-        sql = f'''SELECT * FROM matches
-                  WHERE driver_order_id = {driver_order_id};'''
-
-        with self.conn.cursor() as cur:
-            cur.execute(sql)
-            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-            rows = cur.fetchall()
-
-        return [MatchEntity(
-            row[f2i['id']],
-            row[f2i['driver_order_id']],
-            row[f2i['passenger_order_id']],
-            row[f2i['time']]) for row in rows]
-
 
 class MatchEntity():
     def __init__(self, match_id, driver_order_id, passenger_order_id, departure_time):

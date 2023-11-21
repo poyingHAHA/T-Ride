@@ -158,6 +158,18 @@ class UserRepository:
             cur.execute(sql)
             self.conn.commit()
 
+    def add_abandon_order_count(self, user_id, num):
+        '''
+        user exists
+        '''
+        sql = f'''UPDATE users
+                  SET abandon_order_count = abandon_order_count + {num}
+                  WHERE id = {user_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            self.conn.commit()
+
 class LoginEntity:
     def __init__(self, token, user_id):
         self.token = token

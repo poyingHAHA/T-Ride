@@ -1,3 +1,4 @@
+# TODO: token validation should be in service
 from quart import Blueprint, request, make_response
 from services.orderService import *
 from services.userService import *
@@ -127,8 +128,30 @@ async def post_passenger_order():
 
 @order.route('/passenger/<int:orderId>', methods=['DELETE'])
 async def delete_passenger_order(orderId):
-    return "not implemented"
+    if not utils.is_keys_in_query(request, ["token"]):
+        return await make_response("Incorrect parameter format", 400)
 
+    user_id = user_service.get_user_id(request.args.get("token"))
+    if user_id is None:
+        return await make_response("Invalid token", 401)
+
+    ret = order_service.delete_passenger_order(user_id, orderId)
+
+    if ret == "user not found":
+        # should not happen, unless user is deleted but token still exists
+        return await make_response("Invalid token", 401)
+    if ret == "user incorrect":
+        return await make_response("Not the passenger's own order", 403)
+    if ret == "order not found":
+        return await make_response("Order not found", 404)
+    if ret == "order is finished":
+        return await make_response("Order already completed", 409)
+
+    user = user_service.get_user(user_id)
+
+    return utils.to_json({
+        "totalOrderCount": user.total_order_count,
+        "abandonCount": user.abandon_order_count})
 
 @order.route('/passenger/<int:orderId>', methods=['GET'])
 async def get_passenger_order_details(orderId):

@@ -206,28 +206,17 @@ class OrderRepository:
 
     def finish_driver_order(self, order_id):
         '''
-        order exists and isn't finished
-
-        return "related passenger order isn't finished"
+        order exists and isn't finished,
+        related passenger orders are finished
 
         return None on success
         '''
-        finish_sql = f'''UPDATE driver_orders
+        sql = f'''UPDATE driver_orders
                          SET finished = true
                          WHERE id = {order_id};'''
-        related_order_sql = f'''SELECT passenger_orders.finished FROM passenger_orders
-                                JOIN matches ON passenger_orders.id = matches.passenger_order_id
-                                WHERE matches.driver_order_id = {order_id};'''
 
         with self.conn.cursor() as cur:
-            cur.execute(related_order_sql)
-            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-            rows = cur.fetchall()
-            for row in rows:
-                if not row[f2i['finished']]:
-                    return "related passenger order isn't finished"
-
-            cur.execute(finish_sql)
+            cur.execute(sql)
             self.conn.commit()
 
     def finish_passenger_order(self, order_id):
@@ -242,6 +231,25 @@ class OrderRepository:
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
+            self.conn.commit()
+
+    def delete_passenger_order(self, order_id):
+        '''
+        order exists and isn't finished
+
+        return None on success
+        '''
+        order_sql = f'''DELETE FROM passenger_orders
+                        WHERE id = {order_id};'''
+        match_sql = f'''DELETE FROM matches
+                        WHERE passenger_order_id = {order_id};'''
+        invitation_sql = f'''DELETE FROM match_invitations
+                             WHERE passenger_order_id = {order_id}'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(match_sql);
+            cur.execute(invitation_sql);
+            cur.execute(order_sql);
             self.conn.commit()
 
     def get_spots_with_passenger(self, departure_time):
@@ -280,6 +288,45 @@ class OrderRepository:
                   AND NOT finished;'''
 
         return self.__sql_get_passenger_orders(sql)
+
+    def get_driver_related_orders(self, order_id):
+        '''
+        order exists
+        '''
+        sql = f'''SELECT passenger_orders.* FROM passenger_orders
+                  JOIN matches ON passenger_orders.id = matches.passenger_order_id
+                  WHERE matches.driver_order_id = {order_id};'''
+
+        return self.__sql_get_passenger_orders(sql)
+
+    def get_passenger_related_order(self, order_id):
+        '''
+        order exists
+
+        return None if no related order
+        '''
+        sql = f'''SELECT driver_orders.* FROM driver_orders
+                  JOIN matches ON driver_orders.id = matches.driver_order_id
+                  WHERE matches.passenger_order_id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            row = cur.fetchone()
+
+        if row is None:
+            return None
+
+        return DriverOrderEntity(
+            row[f2i['id']],
+            row[f2i['user_id']],
+            row[f2i['time']],
+            row[f2i['start_point']],
+            row[f2i['start_name']],
+            row[f2i['end_point']],
+            row[f2i['end_name']],
+            row[f2i['passenger_count']],
+            row[f2i['finished']])
 
     def __sql_get_passenger_orders(self, sql):
         with self.conn.cursor() as cur:

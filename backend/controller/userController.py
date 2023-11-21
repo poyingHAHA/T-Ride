@@ -1,3 +1,4 @@
+# TODO: token validation should be in service
 from quart import Blueprint, request, make_response
 from services.userService import *
 from utils import utils

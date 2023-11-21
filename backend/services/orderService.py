@@ -108,7 +108,6 @@ class OrderService:
         return PassengerOrderDto(order_entity)
 
     def finish_driver_order(self, user_id, order_id):
-        # TODO: add order count of user
         '''
         return "user not found",
                "user incorrect",
@@ -118,10 +117,8 @@ class OrderService:
 
         return None on success
         '''
-        user = self.user_repository.get_user(user_id)
-        if user is None:
+        if self.user_repository.get_user(user_id) is None:
             return "user not found"
-        user_id = user.user_id
 
         order = self.order_repository.get_driver_order(order_id)
         if order is None:
@@ -132,14 +129,16 @@ class OrderService:
         if order.finished:
             return "order is finished"
 
-        ret = self.order_repository.finish_driver_order(order_id)
-
-        if ret == "related passenger order isn't finished":
-            return "related passenger order isn't finished"
+        related_orders = self.order_repository.get_driver_related_orders(order_id)
+        for order in related_orders:
+            if not order.finished:
+                return "related passenger order isn't finished"
 
         self.user_repository.add_total_order_count(
             user_id,
-            len(self.match_repository.get_matches(order_id)))
+            len(related_orders))
+
+        self.order_repository.finish_driver_order(order_id)
 
     def finish_passenger_order(self, user_id, order_id):
         '''
@@ -150,10 +149,8 @@ class OrderService:
 
         return None on success
         '''
-        user = self.user_repository.get_user(user_id)
-        if user is None:
+        if self.user_repository.get_user(user_id) is None:
             return "user not found"
-        user_id = user.user_id
 
         order = self.order_repository.get_passenger_order(order_id)
         if order is None:
@@ -164,9 +161,36 @@ class OrderService:
         if order.finished:
             return "order is finished"
 
+        if self.order_repository.get_passenger_related_order(order_id) is not None:
+            self.user_repository.add_total_order_count(user_id, 1)
+
         self.order_repository.finish_passenger_order(order_id)
 
-        self.user_repository.add_total_order_count(user_id, 1)
+    def delete_passenger_order(self, user_id, order_id):
+        '''
+        return "user not found",
+               "user incorrect",
+               "order not found",
+               "order is finished"
+
+        return None on success
+        '''
+        if self.user_repository.get_user(user_id) is None:
+            return "user not found"
+
+        order = self.order_repository.get_passenger_order(order_id)
+        if order is None:
+            return "order not found"
+
+        if user_id != order.user_id:
+            return "user incorrect"
+        if order.finished:
+            return "order is finished"
+
+        if self.order_repository.get_passenger_related_order(order_id) is not None:
+            self.user_repository.add_abandon_order_count(user_id, 1)
+
+        self.order_repository.delete_passenger_order(order_id)
 
     def get_spots_with_passenger(self, departure_time):
         return [SpotWithCountDto(spot)

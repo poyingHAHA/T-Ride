@@ -12,6 +12,34 @@ class GmapsRepository:
         if not self.test:
             self.gmaps = googlemaps.Client(key=config.get('api_key'))
 
+    def get_estimate_time(self, point1, point2, departure_time = None):
+        '''
+        points are valid
+        return in meters(string format)
+        '''
+        
+        lat1, long1 = map(float, point1.split(','))
+        lat2, long2 = map(float, point2.split(','))
+        
+        if self.test: 
+            return 1005
+    
+        # 使用 Distance Matrix API 計算行車預計時間
+        try:
+            result = self.gmaps.distance_matrix(point1, point2, mode="driving", units="metric", departure_time=departure_time)
+
+            # 檢查回傳結果 
+            if result['status'] == 'OK':
+                duration = result['rows'][0]['elements'][0]['duration']['value']
+                
+                return duration
+            else:
+                return None 
+
+        except:
+            return None 
+
+
     def get_distance(self, point1, point2, departure_time = None):
         '''
         points are valid

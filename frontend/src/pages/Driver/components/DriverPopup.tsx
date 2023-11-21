@@ -38,7 +38,7 @@ const DriverPopup: React.FC<{
                             handleCloseModal();
                            }
                            else {
-                            navigate('/');
+                            navigate('/driver');
                            }
                         }}
                     >確定</button>

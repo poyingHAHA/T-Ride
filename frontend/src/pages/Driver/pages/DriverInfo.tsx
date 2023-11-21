@@ -85,7 +85,7 @@ const DriverInfo: React.FC = () => {
         <button 
           className="w-[120px] h-[50px] bg-[#f3e779] rounded-[10px] text-[24px]"
           onClick={() => {
-            navigate("/")
+            navigate("/driver")
           }}
           >返回</button>
         <span className="text-[16px]">已邀請： 0/4 已接受： 0/3</span>

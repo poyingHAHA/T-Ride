@@ -15,6 +15,28 @@ class UserRepository:
             host=config.get('host'),
             port=config.get('port'))
 
+    def register(self, user_name, password):
+        '''
+        return None if register fails (user name exist)
+        '''
+        sql = f'''SELECT * FROM users
+                           WHERE username = '{user_name}';'''
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            row = cur.fetchone()
+
+            if row is not None:
+                return None
+
+        pwd_salt = utils.rand_str()
+        pwd_hash = hashlib.sha256((password+pwd_salt).encode()).hexdigest()
+        sql = f'''INSERT INTO users(username, password_salt, password_hash, total_order_count, abandon_order_count) 
+                         VALUES (%s,%s,%s,0,0);'''
+        with self.conn.cursor() as cur:
+            cur.execute(sql,(user_name,pwd_salt,pwd_hash))
+            self.conn.commit()
+        return True
+
     def login(self, user_name, password):
         '''
         return None if authentication fails

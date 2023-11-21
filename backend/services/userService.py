@@ -5,6 +5,13 @@ class UserService:
     def __init__(self):
         self.user_repository = UserRepository()
     
+    def register(self, user_name, password):
+        '''
+        return None if register fails (user name exist)
+        return True if success
+        '''
+        return self.user_repository.register(user_name, password)
+
     def login(self, user_name, password):
         '''
         return None if authentication fails

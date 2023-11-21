@@ -9,8 +9,18 @@ user_service = UserService()
 
 @user.route('/register', methods=['POST'])
 async def register():
-    payload = await request.get_data()
-    return "NOT IMPLEMENTED"
+    body = await request.json
+    if not utils.is_keys_in_body(body, [
+        "username",
+        "password"]):
+        return await make_response("Incorrect parameter format", 400)
+    
+    ret = user_service.register(body["username"],body["password"])
+
+    if ret is None:
+        return await make_response("user exist", 401)
+    else:
+        return await make_response("註冊成功", 200)
 
 
 @user.route('/login', methods=['POST'])

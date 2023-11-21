@@ -289,6 +289,17 @@ class OrderRepository:
 
         return self.__sql_get_passenger_orders(sql)
 
+    def get_invited_orders(self, order_id):
+        '''
+        order exists
+        '''
+        sql = f'''SELECT passenger_orders.*
+                  FROM passenger_orders JOIN match_invitations
+                  ON passenger_orders.id = match_invitations.passenger_order_id
+                  WHERE match_invitations.driver_order_id = {order_id};'''
+
+        return self.__sql_get_passenger_orders(sql)
+
     def get_driver_related_orders(self, order_id):
         '''
         order exists

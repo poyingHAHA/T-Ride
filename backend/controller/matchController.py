@@ -1,20 +1,46 @@
+# TODO: token validation should be in service
+from quart import Blueprint, request, make_response
 from services.matchService import *
-from quart import Blueprint, request, jsonify  
+from services.userService import *
+from utils import utils
 
 match = Blueprint('match_page', __name__)
+
+match_service = MatchService()
+user_service = UserService()
 
 
 @match.route('/driver/invitation', methods=['POST'])
 async def match_driver_invitation():
-    data = await request.get_json()
-    token = data.get('token')
-    driver_order_id = data.get('driverOrderId')
-    passenger_order_id = data.get('passengerOrderId')
+    body = await request.json
+    if not utils.is_keys_in_body(body, [
+        "token",
+        "driverOrderId",
+        "passengerOrderId"]):
+        return await make_response("Incorrect parameter format", 400)
 
-    # TODO: 實現邏輯，處理發送司機邀請的情況
+    user_id = user_service.get_user_id(body["token"])
+    if user_id is None:
+        return await make_response("Invalid token", 401)
 
+    ret = match_service.send_invitation(
+        user_id,
+        body["driverOrderId"],
+        body["passengerOrderId"])
 
-    return jsonify({'message': 'NOT implemented'}), 200
+    if ret == "user not found":
+        return await make_response("Invalid token", 401)
+    if ret == "user incorrect":
+        return await make_response("Not the driver's own order", 403)
+    if ret == "driver order not found" or ret == "passenger order not found":
+        return await make_response("Order not found", 404)
+    if ret == "driver order is finished" or\
+        ret == "passenger order is finished" or\
+        ret == "already matched" or\
+        ret == "already invited":
+        return await make_response("Invitation already sent, accepted, or order completed", 409)
+
+    return await make_response("Invitation sent successfully", 200)
 
 @match.route('/driver/invitation/<int:driverOrderId>/<int:passengerOrderId>', methods=['DELETE'])
 async def delete_driver_invitation(driverOrderId, passengerOrderId):

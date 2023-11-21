@@ -12,6 +12,21 @@ class MatchRepository:
             host=config.get('host'),
             port=config.get('port'))
 
+    def send_invitation(self, driver_order_id, passenger_order_id):
+        '''
+        orders exist and not finished, not matched, not invited
+        '''
+        sql = f'''INSERT INTO match_invitations (
+                      driver_order_id,
+                      passenger_order_id)
+                  VALUES (
+                      {driver_order_id},
+                      {passenger_order_id});'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            self.conn.commit()
+
 
 class MatchEntity():
     def __init__(self, match_id, driver_order_id, passenger_order_id, departure_time):

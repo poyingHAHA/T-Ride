@@ -18,7 +18,7 @@ async def register():
     
     ret = user_service.register(body["username"],body["password"])
 
-    if ret is None:
+    if ret == "user exist":
         return await make_response("user exist", 401)
     else:
         return await make_response("註冊成功", 200)
@@ -64,12 +64,14 @@ async def post_driver_data():
     if user_id is None:
         return await make_response("Invalid token", 401)
     
-    driver_dto = user_service.set_driver_data(user_id, body["vehicle_name"], body["vehicle_plate"], body["passenger_count"])
+    ret = user_service.set_driver_data(user_id, body["vehicle_name"], body["vehicle_plate"], body["passenger_count"])
 
-    if driver_dto is None:
-        return await make_response("Incorrect parameter format", 400)
+    if ret == "Invalid passenger count":
+        return await make_response("Invalid passenger count", 404)
+    if ret == "data already exist":
+        return await make_response("data already exist", 409)
     else:
-        return utils.to_json(DriverDataVo(driver_dto))
+        return await make_response("註冊成功", 200)
 
 
 class LoginVo:

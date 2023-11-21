@@ -17,7 +17,8 @@ class UserRepository:
 
     def register(self, user_name, password):
         '''
-        return None if register fails (user name exist)
+        return "user exist"
+        return None on success
         '''
         sql = f'''SELECT * FROM users
                            WHERE username = '{user_name}';'''
@@ -26,7 +27,7 @@ class UserRepository:
             row = cur.fetchone()
 
             if row is not None:
-                return None
+                return "user exist"
 
         pwd_salt = utils.rand_str()
         pwd_hash = hashlib.sha256((password+pwd_salt).encode()).hexdigest()
@@ -35,7 +36,7 @@ class UserRepository:
         with self.conn.cursor() as cur:
             cur.execute(sql,(user_name,pwd_salt,pwd_hash))
             self.conn.commit()
-        return True
+        return None
 
     def login(self, user_name, password):
         '''
@@ -139,12 +140,17 @@ class UserRepository:
                 row[f2i['passenger_count']])
         
     def create_driver(self, user_id, vehicle_name, vehicle_plate, passenger_count):
+        '''
+        return "Invalid passenger count"
+        return None on success
+        '''
+
         sql = f'''INSERT INTO driver_datas (vehicle_name, vehicle_plate, passenger_count)
                   VALUES (%s, %s, %s)
                   RETURNING id;'''
         
         if passenger_count < 1:
-            return None
+            return "Invalid passenger count"
         else:
             with self.conn.cursor() as cur:
                 cur.execute(sql, (vehicle_name, vehicle_plate, passenger_count))
@@ -154,9 +160,12 @@ class UserRepository:
                                  WHERE id = {user_id};'''
                 cur.execute(update_sql)
                 self.conn.commit()
-            return DriverDataEntity(data_id, vehicle_name, vehicle_plate, passenger_count)
+            return None
         
     def edit_driver(self, data_id, vehicle_name, vehicle_plate, passenger_count):
+        '''
+        unused
+        '''
         sql = f'''UPDATE driver_datas
                   SET vehicle_name = %s, vehicle_plate = %s, passenger_count = %s
                   WHERE id = {data_id};'''

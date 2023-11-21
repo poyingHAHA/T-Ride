@@ -7,8 +7,8 @@ class UserService:
     
     def register(self, user_name, password):
         '''
-        return None if register fails (user name exist)
-        return True if success
+        return "user exist"
+        return None on success
         '''
         return self.user_repository.register(user_name, password)
 
@@ -24,16 +24,17 @@ class UserService:
     
     def set_driver_data(self, user_id, vehicle_name, vehicle_plate, passenger_count):
         '''
-        return None if set data fail
-
+        return "Invalid passenger count"
+               "data already exist"
+        return None on success
         '''
         user_entity = self.user_repository.get_user(user_id)
         data_id = user_entity.driver_data_id
         if data_id is None:
-            driver_data_entity = self.user_repository.create_driver(user_id, vehicle_name, vehicle_plate, passenger_count)
+            ret = self.user_repository.create_driver(user_id, vehicle_name, vehicle_plate, passenger_count)
+            return ret
         else:
-            driver_data_entity = self.user_repository.edit_driver(data_id, vehicle_name, vehicle_plate, passenger_count)
-        return DriverDataDto(driver_data_entity)
+            return "data already exist"
 
     def get_user(self, user_id):
         '''

@@ -62,9 +62,10 @@ export default function Home() {
         libraries: ['places']
     })
 
-    if (!isLoaded) return <div>Loading...</div>;
+    // if (!isLoaded) return <div>Loading...</div>;
 
-    return (
+    return <>{isLoaded && (
+
         <main className="bg-gray-300 flex flex-col items-center h-screen">
 
             <div className="flex-2 w-full h-full">
@@ -133,12 +134,14 @@ export default function Home() {
                     className="text-white text-xl bg-black p-3 items-center mt-6 rounded-xl mb-5"
                     type="button"
                     onClick={() => {
-                        navigate("/passenger/Tripinfo")
+                        navigate("/passenger/Tripinfo", { state: { start, end } });
                     }}
 
                 >Confirm</button>
             </div>
 
         </main>
-    )
+
+    )}
+    </>
 }

@@ -77,7 +77,7 @@ async def post_driver_data():
 class LoginVo:
     def __init__(self, login_dto):
         self.token = login_dto.token
-        self.userId = login_dto.userId
+        self.userId = login_dto.user_id
 
 
 class UserVo:

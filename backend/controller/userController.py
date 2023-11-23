@@ -30,7 +30,7 @@ async def user_login():
     if not utils.is_keys_in_body(body, [
         "username",
         "password"]):
-        return await make_response("Bad Request", 400)
+        return await make_response("Invalid parameter format", 400)
     
     login_dto = user_service.login(body["username"],body["password"])
 
@@ -55,21 +55,21 @@ async def post_driver_data():
     body = await request.json
     if not utils.is_keys_in_body(body, [
         "token",
-        "vehicle_name",
-        "vehicle_plate",
-        "passenger_count"]):
+        "vehicleName",
+        "vehiclePlate",
+        "passengerCount"]):
         return await make_response("Incorrect parameter format", 400)
     
     user_id = user_service.get_user_id(body["token"])
     if user_id is None:
-        return await make_response("Invalid token", 401)
+        return await make_response("無效token", 401)
     
-    ret = user_service.set_driver_data(user_id, body["vehicle_name"], body["vehicle_plate"], body["passenger_count"])
+    ret = user_service.set_driver_data(user_id, body["vehicleName"], body["vehiclePlate"], body["passengerCount"])
 
     if ret == "Invalid passenger count":
-        return await make_response("Invalid passenger count", 404)
+        return await make_response("乘客數為無效參數", 404)
     if ret == "data already exist":
-        return await make_response("data already exist", 409)
+        return await make_response("資料已上傳過", 409)
     else:
         return await make_response("註冊成功", 200)
 

@@ -3,7 +3,7 @@ info:
   title: T-Ride
   description: |-
     T-Ride
-  version: 0.0.01
+  version: 0.0.99
 tags:
   - name: user
     description: 管理使用者資料
@@ -139,16 +139,34 @@ paths:
                 token:
                   type: string
                 startPoint:
-                  type: string
+                  type: object
+                  properties:
+                    lng:
+                      type: float
+                      example: 120.99777403377531
+                    lat:
+                      type: float
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
                   description: Start point coordinates ("latitude, longitude")
-                  example: "12.34,56.78"
                 startName:
                   type: string
                   description: Name of the starting location
                 endPoint:
-                  type: string
+                  type: object
+                  properties:
+                    lng:
+                      type: float
+                      example: 120.99777403377531
+                    lat:
+                      type: float
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
                   description: End point coordinates (latitude, longitude)
-                  example: "23.45,67.89"
                 endName:
                   type: string
                   description: Name of the destination location
@@ -195,16 +213,34 @@ paths:
                 token:
                   type: string
                 startPoint:
-                  type: string
+                  type: object
+                  properties:
+                    lng:
+                      type: float
+                      example: 120.99777403377531
+                    lat:
+                      type: float
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
                   description: Start point coordinates (latitude, longitude)
-                  example: "12.34,56.78"
                 startName:
                   type: string
                   description: Name of the starting location
                 endPoint:
-                  type: string
+                  type: object
+                  properties:
+                    lng:
+                      type: float
+                      example: 120.99777403377531
+                    lat:
+                      type: float
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
                   description: End point coordinates (latitude, longitude)
-                  example: "23.45,67.89"
                 endName:
                   type: string
                   description: Name of the destination location
@@ -310,15 +346,33 @@ paths:
           description: Start point coordinates (latitude, longitude)
           required: true
           schema:
-            type: string
-            example: 25.01291500,121.5321100
+            type: object
+            properties:
+              startLng:
+                type: float
+                example: 120.99777403377531
+              startLat:
+                type: float
+                example: 24.787707214648197
+            required:
+              - lng
+              - lat
         - name: endPoint
           in: query
           description: End point coordinates (latitude, longitude)
           required: true
           schema:
-            type: string
-            example: 25.014054,121.4612000
+            type: object
+            properties:
+              endLng:
+                type: float
+                example: 120.99777403377531
+              endLat:
+                type: float
+                example: 24.787707214648197
+            required:
+              - lng
+              - lat
         - name: passengerCount
           in: query
           description: Number of passengers

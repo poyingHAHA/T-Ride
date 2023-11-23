@@ -208,8 +208,22 @@ class OrderService:
         return [PassengerOrderDto(entity) for entity in self.order_repository.get_spot_passenger_orders(spot_id, departure_time)]
 
     def get_estimated_arrival_time(self, point1, point2, departure_time):
-        # TODO
-        return departure_time + 10
+        if not self.is_valid_point(point1) or not self.is_valid_point(point2):
+            return -1
+        try:
+            departure_time = int(departure_time)
+            if departure_time < 0:
+                return -1 
+        except ValueError:
+            return -1 
+
+        time = self.gmaps_repository.get_estimate_time(point1, point2, departure_time)
+
+        if time == None:   
+            return   -1 
+        
+        return departure_time + time 
+
 
     def get_fee(self, point1, point2, passenger_count, departure_time):
         if not self.is_valid_point(point1) or not self.is_valid_point(point2):

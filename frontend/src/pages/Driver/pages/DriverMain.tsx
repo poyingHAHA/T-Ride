@@ -53,6 +53,7 @@ const DriverMain = () => {
 
           <button 
             className='rounded bg-cyan-800 w-[80vw] h-10  text-white text-xl'
+            onClick={() => navigate('/driver/pickup')}
           >
             確認
           </button>

@@ -152,7 +152,7 @@ paths:
                   required:
                     - lng
                     - lat
-                  description: Start point coordinates ("latitude, longitude")
+                  description: Start point coordinates
                 startName:
                   type: string
                   description: Name of the starting location
@@ -168,7 +168,7 @@ paths:
                   required:
                     - lng
                     - lat
-                  description: End point coordinates (latitude, longitude)
+                  description: End point coordinates
                 endName:
                   type: string
                   description: Name of the destination location
@@ -226,7 +226,7 @@ paths:
                   required:
                     - lng
                     - lat
-                  description: Start point coordinates (latitude, longitude)
+                  description: Start point coordinates
                 startName:
                   type: string
                   description: Name of the starting location
@@ -242,7 +242,7 @@ paths:
                   required:
                     - lng
                     - lat
-                  description: End point coordinates (latitude, longitude)
+                  description: End point coordinates
                 endName:
                   type: string
                   description: Name of the destination location
@@ -751,11 +751,25 @@ components:
         userId:
           type: integer
         startPoint:
-          type: string
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
         startName:
           type: string
         endPoint:
-          type: string
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
         endName:
           type: string
         departureTime:
@@ -770,11 +784,25 @@ components:
         userId:
           type: integer
         startPoint:
-          type: string
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
         startName:
           type: string
         endPoint:
-          type: string
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
         endName:
           type: string
         pickTime1:
@@ -842,7 +870,14 @@ components:
         spotName:
           type: string
         spotPoint:
-          type: string
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
         passengerCount:
           type: integer
  

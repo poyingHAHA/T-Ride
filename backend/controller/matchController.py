@@ -13,7 +13,7 @@ user_service = UserService()
 @match.route('/driver/invitation', methods=['POST'])
 async def match_driver_invitation():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "token",
         "driverOrderId",
         "passengerOrderId"]):

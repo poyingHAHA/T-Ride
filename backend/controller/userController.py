@@ -11,7 +11,7 @@ user_service = UserService()
 @user.route('/register', methods=['POST'])
 async def register():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "username",
         "password"]):
         return await make_response("Incorrect parameter format", 400)
@@ -27,7 +27,7 @@ async def register():
 @user.route('/login', methods=['POST'])
 async def user_login():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "username",
         "password"]):
         return await make_response("Invalid parameter format", 400)
@@ -53,7 +53,7 @@ async def get_driver_data(userId):
 @user.route('/driver_data', methods=['POST'])
 async def post_driver_data():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "token",
         "vehicleName",
         "vehiclePlate",

@@ -25,8 +25,10 @@ paths:
               properties:
                 username:
                   type: string
+                  example: tester
                 password:
                   type: string
+                  example: tester
               required:
                 - name
                 - password
@@ -142,10 +144,10 @@ paths:
                   type: object
                   properties:
                     lng:
-                      type: float
+                      type: number
                       example: 120.99777403377531
                     lat:
-                      type: float
+                      type: number
                       example: 24.787707214648197
                   required:
                     - lng
@@ -158,10 +160,10 @@ paths:
                   type: object
                   properties:
                     lng:
-                      type: float
+                      type: number
                       example: 120.99777403377531
                     lat:
-                      type: float
+                      type: number
                       example: 24.787707214648197
                   required:
                     - lng
@@ -216,10 +218,10 @@ paths:
                   type: object
                   properties:
                     lng:
-                      type: float
+                      type: number
                       example: 120.99777403377531
                     lat:
-                      type: float
+                      type: number
                       example: 24.787707214648197
                   required:
                     - lng
@@ -232,10 +234,10 @@ paths:
                   type: object
                   properties:
                     lng:
-                      type: float
+                      type: number
                       example: 120.99777403377531
                     lat:
-                      type: float
+                      type: number
                       example: 24.787707214648197
                   required:
                     - lng
@@ -341,38 +343,34 @@ paths:
       tags:
         - order
       parameters:
-        - name: startPoint
+        - name: startLat
           in: query
-          description: Start point coordinates (latitude, longitude)
+          description: Start point latitude
           required: true
           schema:
-            type: object
-            properties:
-              startLng:
-                type: float
-                example: 120.99777403377531
-              startLat:
-                type: float
-                example: 24.787707214648197
-            required:
-              - lng
-              - lat
-        - name: endPoint
+            type: number
+            example: 24.787707214648197
+        - name: startLng
           in: query
-          description: End point coordinates (latitude, longitude)
+          description: Start point longitude
           required: true
           schema:
-            type: object
-            properties:
-              endLng:
-                type: float
-                example: 120.99777403377531
-              endLat:
-                type: float
-                example: 24.787707214648197
-            required:
-              - lng
-              - lat
+            type: number
+            example: 120.99777403377531
+        - name: endLat
+          in: query
+          description: Start point latitude
+          required: true
+          schema:
+            type: number
+            example: 22.787707214648197
+        - name: endLng
+          in: query
+          description: Start point longitude
+          required: true
+          schema:
+            type: number
+            example: 122.99777403377531
         - name: passengerCount
           in: query
           description: Number of passengers

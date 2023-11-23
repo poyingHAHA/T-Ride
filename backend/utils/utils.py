@@ -7,16 +7,9 @@ def to_json(obj):
     return json.dumps(obj, default=lambda o: o.__dict__, sort_keys=True, indent=2)
 
 
-def is_keys_in_body(body, keys):
+def is_keys_in_dict(d, keys):
     for key in keys:
-        if key not in body:
-            return False
-    return True
-
-
-def is_keys_in_query(request, keys):
-    for key in keys:
-        if key not in request.args:
+        if key not in d:
             return False
     return True
 

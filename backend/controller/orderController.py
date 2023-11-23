@@ -14,7 +14,7 @@ user_service = UserService()
 @order.route('/driver', methods=['POST'])
 async def post_driver_order():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "token",
         "startPoint",
         "startName",
@@ -23,11 +23,11 @@ async def post_driver_order():
         "departureTime",
         "passengerCount"]):
         return await make_response("Incorrect parameter format", 400)
-    if not utils.is_keys_in_body(body["startPoint"], [
+    if not utils.is_keys_in_dict(body["startPoint"], [
         "lat",
         "lng"]):
         return await make_response("Incorrect parameter format", 400)
-    if not utils.is_keys_in_body(body["endPoint"], [
+    if not utils.is_keys_in_dict(body["endPoint"], [
         "lat",
         "lng"]):
         return await make_response("Incorrect parameter format", 400)
@@ -74,7 +74,7 @@ async def get_driver_order_details(orderId):
 @order.route('/driver/finish', methods=['POST'])
 async def post_driver_order_finished():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "token",
         "orderId"]):
         return await make_response("Incorrect parameter format", 400)
@@ -100,7 +100,7 @@ async def post_driver_order_finished():
 @order.route('/passenger', methods=['POST'])
 async def post_passenger_order():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "token",
         "startPoint",
         "startName",
@@ -110,11 +110,11 @@ async def post_passenger_order():
         "departureTime2",
         "passengerCount"]):
         return await make_response("Incorrect parameter format", 400)
-    if not utils.is_keys_in_body(body["startPoint"], [
+    if not utils.is_keys_in_dict(body["startPoint"], [
         "lat",
         "lng"]):
         return await make_response("Incorrect parameter format", 400)
-    if not utils.is_keys_in_body(body["endPoint"], [
+    if not utils.is_keys_in_dict(body["endPoint"], [
         "lat",
         "lng"]):
         return await make_response("Incorrect parameter format", 400)
@@ -145,10 +145,11 @@ async def post_passenger_order():
 
 @order.route('/passenger/<int:orderId>', methods=['DELETE'])
 async def delete_passenger_order(orderId):
-    if not utils.is_keys_in_query(request, ["token"]):
+    query = request.args
+    if not utils.is_keys_in_dict(query, ["token"]):
         return await make_response("Incorrect parameter format", 400)
 
-    user_id = user_service.get_user_id(request.args.get("token"))
+    user_id = user_service.get_user_id(query["token"])
     if user_id is None:
         return await make_response("Invalid token", 401)
 
@@ -183,7 +184,7 @@ async def get_passenger_order_details(orderId):
 @order.route('/passenger/finish', methods=['POST'])
 async def post_passenger_order_finished():
     body = await request.json
-    if not utils.is_keys_in_body(body, [
+    if not utils.is_keys_in_dict(body, [
         "token",
         "orderId"]):
         return await make_response("Incorrect parameter format", 400)
@@ -219,19 +220,21 @@ async def get_passenger_order_unfinished(userId):
 
 @order.route('/passenger/spot/all', methods=['GET'])
 async def get_spots():
-    if not utils.is_keys_in_query(request, ["departureTime"]):
+    query = request.args
+    if not utils.is_keys_in_dict(query, ["departureTime"]):
         return await make_response("Incorrect parameter format", 400)
 
-    departure_time = int(request.args.get("departureTime"))
+    departure_time = int(query["departureTime"])
 
     return utils.to_json([SpotWithCountVo(spot)
         for spot in order_service.get_spots_with_passenger(departure_time)])
 
 @order.route('/passenger/spot/<int:spotId>', methods=['GET'])
 async def get_passenger_orders_from_spot(spotId):
-    if not utils.is_keys_in_query(request, ["departureTime"]):
+    query = request.args
+    if not utils.is_keys_in_dict(query, ["departureTime"]):
         return await make_response("Incorrect parameter format", 400)
-    departure_time = int(request.args.get("departureTime"))
+    departure_time = int(query["departureTime"])
 
     ret = order_service.get_spot_passenger_orders(spotId, departure_time)
     if ret == "spot not found":
@@ -243,7 +246,8 @@ async def get_passenger_orders_from_spot(spotId):
 
 @order.route('/fee', methods=['GET'])
 async def get_order_fee():
-    if not utils.is_keys_in_query(request, [
+    query = request.args
+    if not utils.is_keys_in_dict(query, [
         "startLat",
         "startLng",
         "endLat",
@@ -251,10 +255,10 @@ async def get_order_fee():
         "passengerCount", 
         "departureTime"]):
         return await make_response("Incorrect parameter format", 400)
-    start_point = f'{request.args.get("startLat")},{request.args.get("startLng")}'
-    end_point = f'{request.args.get("endLat")},{request.args.get("endLng")}'
-    passenger_count = request.args.get("passengerCount")
-    departure_time = request.args.get("departureTime")
+    start_point = f'{query["startLat"]},{query["startLng"]}'
+    end_point = f'{query["endLat"]},{query["endLng"]}'
+    passenger_count = query["passengerCount"]
+    departure_time = query["departureTime"]
 
     fee = order_service.get_fee(start_point, end_point, passenger_count, departure_time)
 

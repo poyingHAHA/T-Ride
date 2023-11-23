@@ -14,9 +14,7 @@ const Driver: React.FC = () => {
   const dispatch = useAppDispatch();
   
   // 取得使用者位置
-  console.log("Index")
   useEffect(() => {
-    console.log("Index: useEffect")
     const id = navigator.geolocation.watchPosition((position) => {
       console.log("Index: ", position)
       const { latitude, longitude } = position.coords;
@@ -27,7 +25,6 @@ const Driver: React.FC = () => {
     })
 
     return () => {
-      console.log("Index: clear")
       navigator.geolocation.clearWatch(id)
     }
   }, [])

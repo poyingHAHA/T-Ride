@@ -83,7 +83,7 @@ class OrderService:
             create_passenger_order_dto.start_name,
             create_passenger_order_dto.end_point,
             create_passenger_order_dto.end_name,
-            self.get_fee(create_passenger_order_dto.start_point, nearest_spot.point, create_passenger_order_dto.passenger_count),
+            self.get_fee(create_passenger_order_dto.start_point, nearest_spot.point, create_passenger_order_dto.passenger_count, create_passenger_order_dto.departure_time1),
             nearest_spot.spot_id,
             False))
 

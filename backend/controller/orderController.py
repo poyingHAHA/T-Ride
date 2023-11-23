@@ -23,6 +23,15 @@ async def post_driver_order():
         "departureTime",
         "passengerCount"]):
         return await make_response("Incorrect parameter format", 400)
+    if not utils.is_keys_in_body(body["startPoint"], [
+        "lat",
+        "lng"]):
+        return await make_response("Incorrect parameter format", 400)
+    if not utils.is_keys_in_body(body["endPoint"], [
+        "lat",
+        "lng"]):
+        return await make_response("Incorrect parameter format", 400)
+
 
     user_id = user_service.get_user_id(body["token"])
     if user_id is None:
@@ -30,9 +39,9 @@ async def post_driver_order():
 
     ret = order_service.create_driver_order(user_id, CreateDriverOrderDto(
         body["departureTime"],
-        body["startPoint"],
+        f'{body["startPoint"]["lat"]},{body["startPoint"]["lng"]}',
         body["startName"],
-        body["endPoint"],
+        f'{body["endPoint"]["lat"]},{body["endPoint"]["lng"]}',
         body["endName"],
         body["passengerCount"]))
 
@@ -101,6 +110,14 @@ async def post_passenger_order():
         "departureTime2",
         "passengerCount"]):
         return await make_response("Incorrect parameter format", 400)
+    if not utils.is_keys_in_body(body["startPoint"], [
+        "lat",
+        "lng"]):
+        return await make_response("Incorrect parameter format", 400)
+    if not utils.is_keys_in_body(body["endPoint"], [
+        "lat",
+        "lng"]):
+        return await make_response("Incorrect parameter format", 400)
 
     user_id = user_service.get_user_id(body["token"])
     if user_id is None:
@@ -109,9 +126,9 @@ async def post_passenger_order():
     ret = order_service.create_passenger_order(user_id, CreatePassengerOrderDto(
         body["departureTime1"],
         body["departureTime2"],
-        body["startPoint"],
+        f'{body["startPoint"]["lat"]},{body["startPoint"]["lng"]}',
         body["startName"],
-        body["endPoint"],
+        f'{body["endPoint"]["lat"]},{body["endPoint"]["lng"]}',
         body["endName"],
         body["passengerCount"]))
 
@@ -227,15 +244,18 @@ async def get_passenger_orders_from_spot(spotId):
 @order.route('/fee', methods=['GET'])
 async def get_order_fee():
     if not utils.is_keys_in_query(request, [
-        "startPoint",
-        "endPoint",
+        "startLat",
+        "startLng",
+        "endLat",
+        "endLng",
         "passengerCount", 
         "departureTime"]):
         return await make_response("Incorrect parameter format", 400)
-    start_point = request.args.get("startPoint")
-    end_point = request.args.get("endPoint")
+    start_point = f'{request.args.get("startLat")},{request.args.get("startLng")}'
+    end_point = f'{request.args.get("endLat")},{request.args.get("endLng")}'
     passenger_count = request.args.get("passengerCount")
     departure_time = request.args.get("departureTime")
+
     fee = order_service.get_fee(start_point, end_point, passenger_count, departure_time)
 
     if fee is None:
@@ -244,14 +264,19 @@ async def get_order_fee():
     return utils.to_json({"fee": fee})
 
 
+class PointVo:
+    def __init__(self, point):
+        self.lat, self.lng = map(float, point.split(','))
+
+
 class DriverOrderVo:
     def __init__(self, driver_order_dto):
         self.orderId = driver_order_dto.order_id
         self.userId = driver_order_dto.user_id
         self.departureTime = driver_order_dto.departure_time
-        self.startPoint = driver_order_dto.start_point
+        self.startPoint = PointVo(driver_order_dto.start_point)
         self.startName = driver_order_dto.start_name
-        self.endPoint = driver_order_dto.end_point
+        self.endPoint = PointVo(driver_order_dto.end_point)
         self.endName = driver_order_dto.end_name
         self.passengerCount = driver_order_dto.passenger_count
 
@@ -263,9 +288,9 @@ class PassengerOrderVo:
         self.departureTime1 = passenger_order_dto.departure_time1
         self.departureTime2 = passenger_order_dto.departure_time2
         self.passengerCount = passenger_order_dto.passenger_count
-        self.startPoint = passenger_order_dto.start_point
+        self.startPoint = PointVo(passenger_order_dto.start_point)
         self.startName = passenger_order_dto.start_name
-        self.endPoint = passenger_order_dto.end_point
+        self.endPoint = PointVo(passenger_order_dto.end_point)
         self.endName = passenger_order_dto.end_name
         self.fee = passenger_order_dto.fee
         self.arrivalTime = arrival_time
@@ -274,6 +299,6 @@ class PassengerOrderVo:
 class SpotWithCountVo:
     def __init__(self, spot_with_count_dto):
         self.spot_id = spot_with_count_dto.spot_id
-        self.point = spot_with_count_dto.point
+        self.point = PointVo(spot_with_count_dto.point)
         self.name = spot_with_count_dto.name
         self.order_count = spot_with_count_dto.order_count

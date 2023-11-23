@@ -70,7 +70,7 @@ const DriverInfo: React.FC = () => {
       
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>
       <div className="text-center w-screen fixed top-[120px] font-normal text-[18px] font-sans">2023年11月2日 星期三</div>
-      <div className="flex flex-col justify-between items-center rounded-t-[30px] rounded-l-[30px] bg-white w-screen max-h-[calc(100vh-370px)] relative top-[170px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
+      <div className="flex flex-col justify-between items-center rounded-t-[30px] rounded-l-[30px] bg-white w-screen max-h-[calc(100vh-350px)] relative top-[170px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {info.map((place: InfoItem) => {
           if (place.name===""){
             return (<Card1 key={place.id} {...place}/>);
@@ -81,7 +81,7 @@ const DriverInfo: React.FC = () => {
         })}
       </div>
 
-      <div className="flex flex-row justify-evenly items-center w-screen h-[100px] bottom-0 mb-[100px] fixed">
+      <div className="flex flex-row justify-evenly items-center w-screen h-[80px] bottom-0 mb-[86px] fixed">
         <button 
           className="w-[120px] h-[50px] bg-[#f3e779] rounded-[10px] text-[24px]"
           onClick={() => {

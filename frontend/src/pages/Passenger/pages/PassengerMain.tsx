@@ -2,7 +2,6 @@ import React from 'react'
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { Form, useNavigate } from "react-router-dom";
 import { useLoadScript } from '@react-google-maps/api';
-import { StyledEngineProvider } from '@mui/material/styles';
 import Places from '../components/PassengerPlace';
 import {
     GoogleMap,
@@ -94,14 +93,14 @@ export default function Home() {
                 <Form method="post" className='flex' >
                     <input
                         type="datetime-local"
-                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-150 hover:border-gray-400 placeholder-gray-400 mr-3"
+                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-400 mr-3"
                         placeholder="Select a time" required
                     />
 
                     <input type="number"
-                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-150 hover:border-gray-400 placeholder-gray-400 ml-3"
+                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-400 ml-3"
                         placeholder="How many pax?"
-                        defaultValue={1} required />
+                        required />
                 </Form>
 
                 <Places

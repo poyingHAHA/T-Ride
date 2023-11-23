@@ -1,9 +1,12 @@
 import React from 'react'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { MdFace } from "react-icons/md";
 
 export default function PassengerTripinfo() {
+
     const navigate = useNavigate();
+    const location = useLocation();
+    const { start, end } = location.state || {};
 
     return (
         <div className="flex flex-col w-full h-screen">
@@ -45,6 +48,7 @@ export default function PassengerTripinfo() {
                         <div className='flex-1 mx-1 my-1'>
                             <div className="text-base font-bold">
                                 竹北高鐵站
+                                
                             </div>
                             <div className="text-sm text-gray-600">
                                 新竹縣竹北市高鐵七路6號

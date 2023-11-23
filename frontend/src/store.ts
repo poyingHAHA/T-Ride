@@ -2,10 +2,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import loginReducer from "./slices/login";
 import locationReducer from "./slices/location";
 import { combineReducers } from "redux";
+import driverStartDestReducer from "./slices/driverStartDest";
 
 const reducers = combineReducers({
   loginReducer,
-  locationReducer
+  locationReducer,
+  driverStartDestReducer
 })
 
 const store = configureStore({

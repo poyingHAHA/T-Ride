@@ -7,6 +7,7 @@ import DriverRoute from './pages/DriverRoute';
 import DriverSetting from './pages/DriverSetting';
 import DriverInfo from './pages/DriverInfo';
 import DriverTrip from './pages/DriverTrip';
+import DriverPickup from './pages/DriverPickup';
 import DriverDetail from './pages/DriverDetail';
 import DriverContact from './pages/DriverContact';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -16,9 +17,7 @@ const Driver: React.FC = () => {
   const dispatch = useAppDispatch();
   
   // 取得使用者位置
-  console.log("Index")
   useEffect(() => {
-    console.log("Index: useEffect")
     const id = navigator.geolocation.watchPosition((position) => {
       console.log("Index: ", position)
       const { latitude, longitude } = position.coords;
@@ -29,7 +28,6 @@ const Driver: React.FC = () => {
     })
 
     return () => {
-      console.log("Index: clear")
       navigator.geolocation.clearWatch(id)
     }
   }, [])
@@ -44,5 +42,5 @@ const Driver: React.FC = () => {
   </>
 }
 
-export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverContact };
+export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverContact, DriverPickup};
 export default Driver;

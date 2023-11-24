@@ -4,46 +4,25 @@ import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView} from 
 import AdvMarker from "./AdvancedMarker"
 import { getNearLandMark } from "../../../services/nearLandMark";
 
-// 測試用
-const markers = [
-  {
-    id: 1,
-    name: "A",
-    position: {
-      lat: 25.0174525,
-      lng: 121.545246,
-    }
-  },
-  {
-    id: 2,
-    name: "B",
-    position: {
-      lat: 25.0374525,
-      lng: 121.565246,
-    }
-  },
-  {
-    id: 3,
-    name: "C",
-    position: {
-      lat: 25.0024525,
-      lng: 121.525246,
-    }
-  },
-]
+type LatLngLiteral = google.maps.LatLngLiteral;
+type DirectionsResult = google.maps.DirectionsResult;
+type DriverMapProps = {
+  isLoaded: boolean;
+  directions?: DirectionsResult;
+};
 
-const DriverMap = ({isLoaded, directions}) => {
+const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
+  const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
   const [activeMarker, setActiveMarker] = useState(null);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
-  
+  const mapRef = useRef<google.maps.Map | null>(null);
+
   useEffect(() => {
     // 取得附近地標
-    console.log("driverStartDestReducer: ", driverStartDestReducer)
-    console.log("directions: ", directions)
     async function fetchData(){
-      const nearLandMark = await getNearLandMark({lat: location.lat, lng: location.lng});
+      const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
       console.log(nearLandMark);
     }
     // try {
@@ -51,7 +30,7 @@ const DriverMap = ({isLoaded, directions}) => {
     // } catch (error) {
     //   console.log(error);
     // }
-  }, [directions]);
+  }, []);
 
   const defaultProps = {
     center: {
@@ -61,28 +40,23 @@ const DriverMap = ({isLoaded, directions}) => {
     zoom: 15
   };
 
-  const handleActiveMarker = (marker) => {
+  const handleActiveMarker = (marker: React.SetStateAction<null>) => {
     if (marker === activeMarker) {
       return;
     }
     setActiveMarker(marker);
   };
 
-  const overlayViewContainerStyle = {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    background: 'white',
-    padding: 10,
-    borderRadius: '5px',
-  };
-
-  const InfoOverlay = () => (
-    <div style={overlayViewContainerStyle}>
-      <p>Some Information</p>
-      {/* 添加其他信息或组件 */}
-    </div>
-  );
+  // 抓取地圖中心點
+  const centerChangeHandler = () => {
+    if(mapRef.current){
+        const center = mapRef.current?.getCenter();
+        // console.log(center?.toJSON())
+        // if(center!==null && center!==undefined){
+        //   setCurrentCenter(center.toJSON());
+        // }
+    }
+  }
 
   return <>
       <div className="h-screen w-full">
@@ -93,19 +67,21 @@ const DriverMap = ({isLoaded, directions}) => {
               <div>
                 <div className="absolute top-[80%] left-[70%] z-50 border border-amber-400 rounded-lg bg-white">
                   <div className="text-xs px-2 py-2 font-medium">
-                    距離：{directions.routes[0].legs[0].distance.text}
+                    距離：{directions.routes[0].legs[0].distance && directions.routes[0].legs[0].distance.text}
                     <br />
-                    時間：{directions.routes[0].legs[0].duration.text}
+                    時間：{directions.routes[0].legs[0].duration && directions.routes[0].legs[0].duration.text}
                   </div>
                 </div>
               </div>
             )
           }
           <GoogleMap
-            center={defaultProps.center}
+            onLoad={(map) => {mapRef.current = map}}
+            center={defaultProps.center as LatLngLiteral}
             zoom={defaultProps.zoom}
             onClick={() => {setActiveMarker(null)}}
             mapContainerStyle={{ height: "100vh", width: "100%" }}
+            onCenterChanged={centerChangeHandler}
             options={{
               mapId: "955417d2092c184d",
               disableDefaultUI: true,
@@ -136,7 +112,7 @@ const DriverMap = ({isLoaded, directions}) => {
             {
               !driverStartDestReducer.start.name && (
                 <MarkerF
-                  position={defaultProps.center}
+                  position={defaultProps.center as LatLngLiteral}
                   label={"Here"}
                 >
                 </MarkerF>
@@ -145,7 +121,7 @@ const DriverMap = ({isLoaded, directions}) => {
             {
               (driverStartDestReducer.start.name && !directions) &&  (
                 <MarkerF
-                  position={{lat: driverStartDestReducer.start.lat, lng: driverStartDestReducer.start.lng}}
+                  position={{lat: driverStartDestReducer.start.lat, lng: driverStartDestReducer.start.lng} as LatLngLiteral }
                   label={"Start"}
                 >
                 </MarkerF>
@@ -154,7 +130,7 @@ const DriverMap = ({isLoaded, directions}) => {
             {
               (driverStartDestReducer.dest.name && !directions ) &&  (
                 <MarkerF
-                  position={{lat: driverStartDestReducer.dest.lat, lng: driverStartDestReducer.dest.lng}}
+                  position={{lat: driverStartDestReducer.dest.lat, lng: driverStartDestReducer.dest.lng} as LatLngLiteral }
                   label={"Dest"}
                 >
                 </MarkerF>

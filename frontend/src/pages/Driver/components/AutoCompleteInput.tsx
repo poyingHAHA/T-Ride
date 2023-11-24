@@ -69,13 +69,13 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
   
   return <>
     <div>
-        <div className='relative w-[100%] p-2' >
+        <div className='relative w-[100%]' >
           <input
             ref={inputElement}
             value={value}
             placeholder="Search an address"
             type="text"
-            className='text-black bg-gray-50 border border-gray-300 p-2 rounded-md w-[80%]'
+            className='text-black bg-gray-50 border border-gray-300 p-2 rounded-md '
             onChange={(e) => {
               console.log(e.target.value)
               setValue(e.target.value);

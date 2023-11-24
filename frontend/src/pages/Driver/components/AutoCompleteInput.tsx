@@ -2,20 +2,21 @@ import React, {useEffect, useState} from 'react';
 import usePlacesAutoComplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 
+type LatLngLiteral = google.maps.LatLngLiteral;
 type actionType = {
   name?: string;
   placeId?: string;
   lat?: number;
   lng?: number;
 }
-
 type actionCreator = {
   type: string;
   setLocation: (action: actionType) => any;
+  setPoint?: (point: LatLngLiteral) => any;
 };
 
 
-export default function AutoCompleteInput({ type, setLocation }: actionCreator) {
+export default function AutoCompleteInput({ type, setLocation, setPoint }: actionCreator) {
   // 取得使用者目前位置
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
@@ -51,7 +52,9 @@ export default function AutoCompleteInput({ type, setLocation }: actionCreator) 
     const result = await getGeocode({address: val});
     const placeId = result[0].place_id;
     const {lat, lng} = await getLatLng(result[0]);
+    console.log({lat, lng})
 
+    if(setPoint) setPoint({lat, lng});
     dispatch(setLocation({name, placeId, lat, lng}));
   };
   

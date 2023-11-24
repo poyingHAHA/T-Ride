@@ -38,13 +38,13 @@ export const driverStartDest = createSlice({
       state.start.name = action.payload.name
       state.start.placeId = action.payload.placeId
       state.start.lat = action.payload.lat
-      state.start.lng = action.payload.getLatLng
+      state.start.lng = action.payload.lng
     },
     setDest: (state, action) => {
       state.dest.name = action.payload.name
       state.dest.placeId = action.payload.placeId
       state.dest.lat = action.payload.lat
-      state.dest.lng = action.payload.getLatLng
+      state.dest.lng = action.payload.lng
     }
   }
 })

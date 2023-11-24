@@ -161,24 +161,6 @@ const DriverMap = ({isLoaded, directions}) => {
               )
             }
             
-            {/* if(mapRef.current) {
-              console.log(mapRef.current)
-            } */}
-            
-            {/* <AdvMarker
-              position={defaultProps.center}
-              zIndex={100}
-              // onClick={()=>{setTest(42)}}
-            >
-              <div 
-                className="border-solid border-black h-5 w-6 text-white bg-black" 
-                onMouseEnter={() => {setTest(42)}}
-              >
-                {test}
-              </div>
-            </AdvMarker> */}
-
-
             {/* {
               markers.map(({id, name, position}) => {
                 return (

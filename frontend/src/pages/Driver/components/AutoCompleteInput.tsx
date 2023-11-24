@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import usePlacesAutoComplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 
@@ -20,6 +20,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
   // 取得使用者目前位置
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const inputElement = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
   let initValue: actionType | null;
   // 抓看看有沒有之前設定好的資料
@@ -46,6 +47,14 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
 
   const handleSelect = async (val: string) => {
     // false means we don't want to fetch more data
+    if(val === 'current' && locationReducer.lat && locationReducer.lng){
+      setValue('目前位置', false);
+      clearSuggestions();
+      if(setPoint) setPoint({lat: locationReducer.lat, lng: locationReducer.lng});
+      dispatch(setLocation({name: val, placeId: '', lat: locationReducer.lat, lng: locationReducer.lng}));
+      console.log("current")
+      return;
+    }
     setValue(val, false);
     clearSuggestions();
     const name = val;
@@ -62,8 +71,9 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
     <div>
         <div className='relative w-[100%] p-2' >
           <input
+            ref={inputElement}
+            value={value}
             placeholder="Search an address"
-            value={value || initValue.name}
             type="text"
             className='text-black bg-gray-50 border border-gray-300 p-2 rounded-md w-[80%]'
             onChange={(e) => {
@@ -74,6 +84,13 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
           {
             status === 'OK' && 
             <div className='absolute max-h-32 z-50 overflow-scroll w-[100%] bg-[white] text-black flex flex-col rounded-xl shadow-lg shadow-cyan-500/50'>
+              {
+                type === 'driverStart' && data.length > 0 && (
+                  <div className='px-2 py-2 hover:bg-[#ec7c7c]' onClick={() => {handleSelect('current')}} >
+                    目前位置
+                  </div>
+                )
+              }
               {data.map(({place_id, description}) => (
                 <div className='px-2 py-2 hover:bg-[#ec7c7c]' key={place_id} onClick={() => {handleSelect(description)}} >
                   {description}

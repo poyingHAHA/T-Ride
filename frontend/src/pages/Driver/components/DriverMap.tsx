@@ -65,7 +65,7 @@ const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
           {
             directions && (
               <div>
-                <div className="absolute top-[80%] left-[70%] z-50 border border-amber-400 rounded-lg bg-white">
+                <div className="absolute top-[80%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
                   <div className="text-xs px-2 py-2 font-medium">
                     距離：{directions.routes[0].legs[0].distance && directions.routes[0].legs[0].distance.text}
                     <br />

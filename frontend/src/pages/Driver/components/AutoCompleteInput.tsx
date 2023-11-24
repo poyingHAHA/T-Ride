@@ -23,17 +23,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
   const inputElement = useRef<HTMLInputElement>(null);
   const dispatch = useAppDispatch();
   let initValue: actionType | null;
-  // 抓看看有沒有之前設定好的資料
-  if (type === 'driverStart' && driverStartDestReducer.start) {
-    initValue = driverStartDestReducer.start;
-  }
-  else if (type === 'driverDest' && driverStartDestReducer.dest) {
-    initValue = driverStartDestReducer.dest;
-  }
-  else {
-    initValue = {name: '', placeId: '', lat: 0, lng: 0};
-  }
-
+  
   const {ready, value, setValue, suggestions: {status, data}, clearSuggestions} = usePlacesAutoComplete({
     requestOptions: {
       locationBias:{
@@ -44,6 +34,18 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
       region: 'tw',
     }
   });
+  // 抓看看有沒有之前設定好的資料
+  useEffect(() => {
+    if (type === 'driverStart' && driverStartDestReducer.start.name) {
+      setValue(driverStartDestReducer.start.name, false);
+    }
+    else if (type === 'driverDest' && driverStartDestReducer.dest.name) {
+      setValue(driverStartDestReducer.dest.name, false);
+    }
+    else {
+      initValue = {name: '', placeId: '', lat: 0, lng: 0};
+    }
+  },[])
 
   const handleSelect = async (val: string) => {
     // false means we don't want to fetch more data

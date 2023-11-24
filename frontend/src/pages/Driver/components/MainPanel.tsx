@@ -6,14 +6,15 @@ type MainPanelProps = {
   isLoaded: boolean;
   setStartPoint: (point: LatLngLiteral) => any;
   setDestPoint: (point: LatLngLiteral) => any;
+  setPickupPanel: (pickupPanel: boolean) => any;
 };
 
-const MainPanel = ({ isLoaded, setStartPoint, setDestPoint}: MainPanelProps) => {
+const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel}: MainPanelProps) => {
   return <>
     {
       isLoaded && (
         <>
-          <div className='flex flex-col justify-around items-center h-[30vh] bg-white rounded-t-3xl overflow-hidden z-10'>
+          <div className='flex flex-col justify-around items-center h-[35vh] bg-white rounded-t-3xl overflow-hidden z-10'>
             <div className='flex justify-between items-center w-[80vw] mt-4'>
               <div className='flex grow-[3] justify-start items-center'>
                 <label htmlFor="departureTime">出發</label>
@@ -39,7 +40,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint}: MainPanelProps) => 
 
             <button 
               className='rounded bg-cyan-800 w-[80vw] h-10  text-white text-xl'
-              // onClick={() => navigate('/driver/pickup')}
+              onClick={() => setPickupPanel(true)}
             >
               選擇乘客
             </button>

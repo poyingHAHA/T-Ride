@@ -4,6 +4,7 @@ import { useJsApiLoader, Libraries } from '@react-google-maps/api';
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { setLocation } from '../../../slices/location';
 import MainPanel from "../components/MainPanel";
+import PickupPanel from '../components/PickupPanel';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -13,7 +14,7 @@ const DriverMain = () => {
   const [directions, setDirections] = useState<DirectionsResult>()
   const [startPoint, setStartPoint] = useState<LatLngLiteral>()
   const [destPoint, setDestPoint] = useState<LatLngLiteral>()
-  const [pickupPage, setPickupPage] = useState<boolean>(false)
+  const [pickupPanel, setPickupPanel] = useState<boolean>(false)
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const dispatch = useAppDispatch();
@@ -69,8 +70,11 @@ const DriverMain = () => {
             <DriverMap isLoaded={isLoaded} directions={directions} />
           </div>
         </div>
-        
-        <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} />
+        {
+          pickupPanel 
+            ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} /> 
+            : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} />
+        }
       </>
     )
   }

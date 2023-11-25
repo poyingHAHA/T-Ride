@@ -1,6 +1,8 @@
 import { orderDTO } from "../../../DTO/orders";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import PickupCard from "./PickupCard";
+import { useState,useEffect } from "react";
+import { addOrder } from "../../../slices/tempOrder";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -11,6 +13,12 @@ type PickupPanelProps = {
 
 const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
+  const [tempOrders, setTempOrders] = useState<orderDTO[]>([]);
+  const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
+  }, [tempOrderReducer])
 
   return <>
     {
@@ -33,7 +41,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
             <div className="flex flex-col h-[80%] w-[100%] overflow-scroll">
               {
                 orders && orders.map((order) => (
-                  <PickupCard key={order.orderId} order={order} />
+                  <PickupCard key={order.orderId} order={order} setTempOrders={setTempOrders} tempOrders={tempOrders} />
                 ))
               }
             </div>
@@ -48,7 +56,10 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
 
               <button 
                 className='rounded bg-cyan-800 w-[60vw] h-10 text-white text-xl'
-                // onClick={() => navigate('/driver/pickup')}
+                onClick={() => {
+                  dispatch(addOrder({orders: tempOrders}));
+                  setPickupPanel(false);
+                }}
               >
                 確認
               </button>

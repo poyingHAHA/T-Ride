@@ -5,6 +5,7 @@ import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { setLocation } from '../../../slices/location';
 import MainPanel from "../components/MainPanel";
 import PickupPanel from '../components/PickupPanel';
+import { orderDTO } from '../../../DTO/orders';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -15,6 +16,7 @@ const DriverMain = () => {
   const [startPoint, setStartPoint] = useState<LatLngLiteral>()
   const [destPoint, setDestPoint] = useState<LatLngLiteral>()
   const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+  const [orders, setOrders] = useState<orderDTO[]>([])
   // showSpots: 顯示所有地標
   const [showSpots, setShowSpots] = useState<boolean>(false)
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
@@ -43,8 +45,6 @@ const DriverMain = () => {
 
   const fetchDirections = () => {
     if(!startPoint || ! destPoint) return;
-    console.log("fetch direction");
-    // eslint-disable-next-line no-undef
     const service = new google.maps.DirectionsService();
     service.route(
       {
@@ -66,16 +66,18 @@ const DriverMain = () => {
   {
     isLoaded && (
       <>
-        <div className='grow h-[55vh] scale-110'>
+        <div className='h-[60%]'>
           <div className="bg-gray-200 flex justify-center items-center h-full">
-            <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} />
+            <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} setOrders={setOrders} />
           </div>
         </div>
-        {
-          pickupPanel 
-            ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} /> 
-            : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
-        }
+        <div className='h-[45%] bottom-0 z-100 -translate-y-10'>
+          {
+            pickupPanel 
+              ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} /> 
+              : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
+          }
+        </div>
       </>
     )
   }

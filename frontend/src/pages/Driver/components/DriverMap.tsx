@@ -3,6 +3,7 @@ import { useAppSelector } from "../../../hooks";
 import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marker} from "@react-google-maps/api";
 import AdvMarker from "./AdvancedMarker"
 import { getSpots, getSpotOrders } from "../../../services/orderService";
+import { orderDTO } from "../../../DTO/orders";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -10,6 +11,7 @@ type DriverMapProps = {
   isLoaded: boolean;
   showSpots?: boolean;
   directions?: DirectionsResult;
+  setOrders?: (orders: orderDTO[]) => void;
 };
 type spot = {
   "spotId": string
@@ -21,7 +23,7 @@ type spot = {
   "passengerCount": number
 };
 
-const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
+const DriverMap = ({isLoaded, directions, showSpots, setOrders}: DriverMapProps) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
@@ -38,7 +40,7 @@ const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
       // const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
       const spots = await getSpots(Date.now());
       setSpots(spots.spots);
-      console.log("Spots: ", spots);
+      console.log("DriverMap Spots: ", spots);
     }
     try {
       fetchData();
@@ -64,6 +66,7 @@ const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
       return;
     }
     const orders = await getSpotOrders(marker, driverDepart.departureTime);
+    if (setOrders) setOrders(orders.orders);
     console.log("DriverMap: ", orders);
 
     setActiveMarker(marker);
@@ -82,13 +85,13 @@ const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
   }
 
   return <>
-      <div className="h-screen w-full">
+      <div className="h-[100%] w-full">
         {isLoaded && (
         <>
           {
             directions && (
               <div>
-                <div className="absolute top-[80%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
+                <div className="absolute top-[45%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
                   <div className="text-xs px-2 py-2 font-medium">
                     距離：{directions.routes[0].legs[0].distance && directions.routes[0].legs[0].distance.text}
                     <br />
@@ -103,7 +106,7 @@ const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
             center={(currentCenter && currentCenter) || defaultProps.center as LatLngLiteral}
             zoom={defaultProps.zoom}
             onClick={() => {setActiveMarker(null)}}
-            mapContainerStyle={{ height: "100vh", width: "100%" }}
+            mapContainerStyle={{ height: "100%", width: "100%" }}
             onCenterChanged={centerChangeHandler}
             options={{
               mapId: "955417d2092c184d",
@@ -171,51 +174,10 @@ const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
                         ) : null
                       }
                     </MarkerF>
-
-                    // <OverlayView
-                    //   position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral}
-                    //   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                    //   zIndex={100}
-                    // >
-                    //   <div className="flex flex-row w-[20vw]">
-                    //     <div>{spotName}</div>
-                    //     <div>{passengerCount} 人</div>
-                    //   </div>
-                    // </OverlayView> 
-
-                    // <AdvMarker
-                    //   key={spotId}
-                    //   position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
-                    //   onClick={()=>{}}
-                    // >
-                    //   <div className="border-solid border-black h-5 w-6 text-white bg-black"  >
-                    //     <h2>{spotName}</h2>
-                    //   </div>
-                    // </AdvMarker>
                   )
                 })
               )
             }
-            
-            {/* {
-              markers.map(({id, name, position}) => {
-                return (
-                <MarkerF
-                  key={id} 
-                  position={position} 
-                  onClick={() => {handleActiveMarker(id)}}
-                  label={"label"}
-                  title={"title"}
-                > 
-                  {activeMarker === id ? (
-                      <InfoWindowF onCloseClick={() => {setActiveMarker(null)}}>
-                        <div>{name}</div>
-                      </InfoWindowF>
-                    ) : null}
-                </MarkerF>
-                )
-              })
-            } */}
           </GoogleMap>
         </>
         )}

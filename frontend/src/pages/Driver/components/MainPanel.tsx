@@ -31,13 +31,14 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setS
     {
       isLoaded && (
         <>
-          <div className='flex flex-col justify-around items-center h-[35vh] bg-white rounded-t-3xl overflow-hidden z-10'>
+          <div className='flex flex-col justify-around items-center h-[100%] bg-white rounded-t-3xl overflow-hidden z-50'>
             <div className='flex justify-between items-center w-[80vw] mt-4'>
               <div className='flex grow-[3] justify-start items-center'>
                 <label htmlFor="departureTime">出發</label>
                 <input 
                   type="datetime-local" 
-                  id="departureTime" 
+                  id="departureTime"
+                  value={driverDepart.departureTime ? new Date(driverDepart.departureTime * 1000+8*60*60*1000).toISOString().slice(0, -8) : ""}
                   name="departureTime" 
                   className='bg-gray-200 rounded h-12 w-[12rem] ml-2 p-1' 
                   onChange={(e)=>handleChangeDepartureTime(e)} 
@@ -48,11 +49,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setS
                 <select name="passNumber" id="passNumber" className='h-12 rounded w-10 text-center ml-1' onChange={handleSelectPassengerCount} >
                   {
                     [...Array(10)].map((_, i) => 
-                      <option 
-                        value={i + 1}
-                      >
-                        {i + 1}
-                      </option>
+                      driverDepart.passengerCount === i + 1 ? <option value={i+1} selected>{i+1}</option> : <option value={i + 1}>{i + 1}</option>
                     )
                   }
                 </select>
@@ -73,10 +70,6 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setS
               className='rounded bg-cyan-800 w-[80vw] h-10  text-white text-xl'
               // disabled={driverStartDestReducer.start === undefined || driverStartDestReducer.dest===undefined || driverDepart.departureTime===undefined || driverDepart.passengerCount===0}
               onClick={() => {
-                console.log(driverStartDestReducer.start)
-                console.log(driverStartDestReducer.dest)
-                console.log(driverDepart.departureTime)
-                console.log(driverDepart.passengerCount)
                 if(driverStartDestReducer.start === undefined || driverStartDestReducer.dest===undefined || driverDepart.departureTime===undefined || driverDepart.passengerCount===0) {
                   alert("請填寫完整資料")
                   return;

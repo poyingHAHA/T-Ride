@@ -32,9 +32,11 @@ const Driver: React.FC = () => {
   }, [])
 
   return <>
-    <div className='flex flex-col justify-between'>
-      <Outlet />
-      <div className='grow-0 absolute inset-x-0 bottom-0'>
+    <div className='relative flex flex-col justify-between'>
+      <div className='h-[90vh]'>
+        <Outlet />
+      </div>
+      <div className='fixed grow-0 inset-x-0 bottom-0 h-[10vh]'>
         <DriverNavbar />
       </div>
     </div>

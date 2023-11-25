@@ -15,7 +15,8 @@ const DriverMain = () => {
   const [startPoint, setStartPoint] = useState<LatLngLiteral>()
   const [destPoint, setDestPoint] = useState<LatLngLiteral>()
   const [pickupPanel, setPickupPanel] = useState<boolean>(false)
-  const locationReducer = useAppSelector((state) => state.locationReducer);
+  // showSpots: 顯示所有地標
+  const [showSpots, setShowSpots] = useState<boolean>(false)
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const dispatch = useAppDispatch();
   
@@ -67,13 +68,13 @@ const DriverMain = () => {
       <>
         <div className='grow h-[55vh] scale-110'>
           <div className="bg-gray-200 flex justify-center items-center h-full">
-            <DriverMap isLoaded={isLoaded} directions={directions} />
+            <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} />
           </div>
         </div>
         {
           pickupPanel 
             ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} /> 
-            : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} />
+            : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
         }
       </>
     )

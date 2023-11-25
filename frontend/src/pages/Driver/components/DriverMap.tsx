@@ -1,36 +1,51 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "../../../hooks";
-import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView} from "@react-google-maps/api";
+import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marker} from "@react-google-maps/api";
 import AdvMarker from "./AdvancedMarker"
-import { getNearLandMark } from "../../../services/nearLandMark";
+import { getSpots, getSpotOrders } from "../../../services/orderService";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
 type DriverMapProps = {
   isLoaded: boolean;
+  showSpots?: boolean;
   directions?: DirectionsResult;
 };
+type spot = {
+  "spotId": string
+  "spotName": string,
+  "spotPoint": {
+    "lng": number,
+    "lat": number
+  },
+  "passengerCount": number
+};
 
-const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
+const DriverMap = ({isLoaded, directions, showSpots}: DriverMapProps) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
-  const [activeMarker, setActiveMarker] = useState(null);
+  const [spots, setSpots] = useState<spot[]>([]);
+  const [activeMarker, setActiveMarker] = useState<string|null>(null);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const mapRef = useRef<google.maps.Map | null>(null);
 
   useEffect(() => {
-    // 取得附近地標
+    // 取得所有地標
+    if(!showSpots) setSpots([]);
     async function fetchData(){
-      const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
-      console.log(nearLandMark);
+      // const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
+      const spots = await getSpots(Date.now());
+      setSpots(spots.spots);
+      console.log("Spots: ", spots);
     }
-    // try {
-    //   fetchData();
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  }, []);
+    try {
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [showSpots]);
 
   const defaultProps = {
     center: {
@@ -40,11 +55,19 @@ const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
     zoom: 15
   };
 
-  const handleActiveMarker = (marker: React.SetStateAction<null>) => {
+  const handleActiveMarker = async (marker: string, spotPoint?: LatLngLiteral) => {
     if (marker === activeMarker) {
       return;
     }
+    if (driverDepart.departureTime === 0 || driverDepart.departureTime === undefined) {
+      console.log("DriverMap: 請選擇出發時間")
+      return;
+    }
+    const orders = await getSpotOrders(marker, driverDepart.departureTime);
+    console.log("DriverMap: ", orders);
+
     setActiveMarker(marker);
+    if (spotPoint !== undefined) setCurrentCenter({lat: spotPoint.lat, lng: spotPoint.lng});
   };
 
   // 抓取地圖中心點
@@ -77,7 +100,7 @@ const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
           }
           <GoogleMap
             onLoad={(map) => {mapRef.current = map}}
-            center={defaultProps.center as LatLngLiteral}
+            center={(currentCenter && currentCenter) || defaultProps.center as LatLngLiteral}
             zoom={defaultProps.zoom}
             onClick={() => {setActiveMarker(null)}}
             mapContainerStyle={{ height: "100vh", width: "100%" }}
@@ -99,13 +122,6 @@ const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
                       strokeWeight: 4,
                     }
                   }} />
-                  {/* <OverlayView
-                    position={{lat: defaultProps.center.lat, lng: defaultProps.center.lng}}
-                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                    zIndex={100}
-                  >
-                    <InfoOverlay />
-                  </OverlayView> */}
                 </>
               )
             }
@@ -134,6 +150,50 @@ const DriverMap = ({isLoaded, directions}: DriverMapProps) => {
                   label={"Dest"}
                 >
                 </MarkerF>
+              )
+            }
+            {
+              showSpots && (
+                spots.map(({spotId, spotName, spotPoint, passengerCount}) => {
+                  return (
+                    <MarkerF
+                      key={spotId}
+                      position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                      label={passengerCount.toString()+'人'}
+                      title={spotName}
+                      onClick={()=>{handleActiveMarker(spotId, spotPoint)}}
+                    >
+                      {
+                        activeMarker === spotId ? (
+                          <InfoWindowF onCloseClick={() => {setActiveMarker(null)}}>
+                            <div>{spotName}</div>
+                          </InfoWindowF>
+                        ) : null
+                      }
+                    </MarkerF>
+
+                    // <OverlayView
+                    //   position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral}
+                    //   mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                    //   zIndex={100}
+                    // >
+                    //   <div className="flex flex-row w-[20vw]">
+                    //     <div>{spotName}</div>
+                    //     <div>{passengerCount} 人</div>
+                    //   </div>
+                    // </OverlayView> 
+
+                    // <AdvMarker
+                    //   key={spotId}
+                    //   position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                    //   onClick={()=>{}}
+                    // >
+                    //   <div className="border-solid border-black h-5 w-6 text-white bg-black"  >
+                    //     <h2>{spotName}</h2>
+                    //   </div>
+                    // </AdvMarker>
+                  )
+                })
               )
             }
             

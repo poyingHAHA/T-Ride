@@ -3,11 +3,13 @@ import loginReducer from "./slices/login";
 import locationReducer from "./slices/location";
 import { combineReducers } from "redux";
 import driverStartDestReducer from "./slices/driverStartDest";
+import driverDepartReducer from "./slices/driverDepart";
 
 const reducers = combineReducers({
   loginReducer,
   locationReducer,
-  driverStartDestReducer
+  driverStartDestReducer,
+  driverDepartReducer
 })
 
 const store = configureStore({

@@ -1,5 +1,4 @@
-import AutoCompleteInput from '../components/AutoCompleteInput';
-import { setStart, setDest } from "../../../slices/driverStartDest"
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -8,6 +7,8 @@ type PickupPanelProps = {
 };
 
 const PickupPanel = ({ isLoaded, setPickupPanel }: PickupPanelProps) => {
+  const driverDepart = useAppSelector((state) => state.driverDepartReducer);
+
   return <>
     {
       isLoaded && (
@@ -17,20 +18,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel }: PickupPanelProps) => {
             <div className='flex items-center justify-evenly w-[100vw] mt-4 '>
               <div>
                 <p>
-                  剩餘空位 
-                  <span className='ml-1 text-xl'>
-                    3
-                  </span>
-                  人
+                  乘客人數 <span className='ml-1 text-xl'>0</span> / <span>{driverDepart.passengerCount}</span> 人
                 </p>
               </div>
               <div>
                 <p>
-                  總金額
-                  <span className='ml-1 text-xl'>
-                    0
-                  </span>
-                  元
+                  總金額<span className='ml-1 text-xl'>0</span>元
                 </p>
               </div>
             </div>
@@ -40,16 +33,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel }: PickupPanelProps) => {
               <button 
                 className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl' 
                 onClick={() => setPickupPanel(false)}
-              >
-                返回
-              </button>
+              >返回</button>
 
               <button 
                 className='rounded bg-cyan-800 w-[60vw] h-10 text-white text-xl ml-4'
                 // onClick={() => navigate('/driver/pickup')}
-              >
-                確認
-              </button>
+              >確認</button>
             </div>
           </div>
         </>

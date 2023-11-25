@@ -41,6 +41,8 @@ const AdvancedMarker = ({ position, children, onClick }) => {
     const listener = markerRef.current.addListener("click", onClick);
     return () => listener.remove();
   }, [map, position, children, onClick]);
+
+  return <></>;
 };
 
 export default AdvancedMarker;

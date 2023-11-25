@@ -4,6 +4,7 @@ from services.matchService import *
 from services.userService import *
 from utils import utils
 
+
 match = Blueprint('match_page', __name__)
 
 match_service = MatchService()
@@ -42,6 +43,7 @@ async def match_driver_invitation():
 
     return await make_response("Invitation sent successfully", 200)
 
+
 @match.route('/driver/invitation/<int:driverOrderId>/<int:passengerOrderId>', methods=['DELETE'])
 async def delete_driver_invitation(driverOrderId, passengerOrderId):
     token = request.args.get('token')
@@ -50,17 +52,20 @@ async def delete_driver_invitation(driverOrderId, passengerOrderId):
 
     return jsonify({'message': 'NOT implemented'}), 200
 
+
 @match.route('/driver/invitation/total/<int:driverOrderId>', methods=['GET'])
 async def get_total_invitations(driverOrderId):
     # TODO: 實現邏輯，獲取司機訂單的總邀請數
 
     return jsonify({'message': 'NOT implemented'}), 200
 
+
 @match.route('/passenger/invitation/<int:passengerOrderId>', methods=['GET'])
-async def get_driver_orders_invited(passengerOrderId):
+async def get_driver_invited_orders(passengerOrderId):
     # TODO: 實現邏輯，獲取乘客訂單邀請的司機訂單詳細信息
 
     return jsonify({'message': 'NOT implemented'}), 200
+
 
 @match.route('/passenger/invitation/accept', methods=['POST'])
 async def accept_invitation():

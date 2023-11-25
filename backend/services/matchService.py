@@ -1,6 +1,7 @@
 from repository.orderRepository import *
 from repository.matchRepository import *
 from repository.userRepository import *
+from services.orderService import *
 
 
 class MatchService:
@@ -8,6 +9,7 @@ class MatchService:
         self.user_repository = UserRepository()
         self.order_repository = OrderRepository()
         self.match_repository = MatchRepository()
+        self.order_service = OrderService()
 
     def send_invitation(self, driver_id, driver_order_id, passenger_order_id):
         '''
@@ -48,3 +50,24 @@ class MatchService:
             return "already invited"
 
         self.match_repository.send_invitation(driver_order.order_id, passenger_order.order_id)
+
+    def get_driver_invitations(self, order_id):
+        '''
+        return "order not found"
+
+        return list of invitations
+        '''
+        order = self.order_repository.get_driver_order(order_id)
+        if order is None:
+            return "order not found"
+
+        invitations = self.match_repository.get_driver_invitations(order_id)
+
+        return [InvitationDto(invitation) for invitation in invitations]
+
+
+class InvitationDto():
+    def __init__(self, invited_order_entity):
+        self.order = PassengerOrderDto(invited_order_entity.order)
+        self.departure_time = invited_order_entity.departure_time
+        self.accepted = invited_order_entity.accepted

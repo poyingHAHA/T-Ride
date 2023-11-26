@@ -2,7 +2,7 @@ import React from "react";
 import DriverNavigate from "../components/DriverNavigate";
 import { useNavigate } from 'react-router-dom';
 import { useJsApiLoader, Libraries } from '@react-google-maps/api';
-import { FaUser } from "react-icons/fa6";
+import DriverDetailCard from "../components/DriverDetail";
 
 const libraries:Libraries = ["marker", "places"];
 
@@ -14,31 +14,6 @@ interface InfoItem {
   time: string; //starting time
   price: number;
   headcount: number;
-}
-const Card: React.FC<InfoItem> = (props) => {
-  return(
-    <div className="flex flex-row h-[220px] w-[calc(100%-80px) bg-[#F3E779] p-[20px] rounded-[30px] text-[18px] justify-between">
-      <div>
-        <p className="text-[24px]">{props.name}</p>
-        <span className=" whitespace-pre">人數        ：</span>
-        <span>{props.headcount}</span><br />
-        <span className="whitespace-pre">金額        ：</span>
-        <span>{props.price}</span><br />
-        <span className=" whitespace-pre">起點        ：</span>
-        <span>{props.start}</span><br />
-        <span className=" whitespace-pre">終點        ：</span>
-        <span>{props.end}</span><br />
-        <span className=" whitespace-pre">出發時間：</span>
-        <span>{props.time}</span>
-      </div>
-      <div className="flex flex-col mr-0 gap-[15px] justify-center">
-        <div className="w-[75px] h-[75px] bg-white rounded-full flex justify-center items-center">
-          <FaUser className="w-[40px] h-[40px]"/>
-        </div>
-        <p>查看資訊</p>
-      </div>
-    </div>
-  );
 }
 
 const DriverDetail = () => {
@@ -55,17 +30,18 @@ const DriverDetail = () => {
 
   const navigate = useNavigate();
 
+  if (!isLoaded) return <div>Loading...</div>;
   return (
     <div className="h-full w-screen">
       <div className="h-[calc(100vh-386px)]">
         <div className="h-full overflow-hidden">
-          <DriverNavigate isLoaded={isLoaded}/>
+          <DriverNavigate />
         </div>
       </div>
       <div className="bg-white w-full h-[260px] rounded-t-[30px] bottom-[156px] absolute z-1 overflow-auto">
         <div className="flex flex-col p-[30px] gap-[30px]">
           {info.map((passenger:InfoItem) => {
-            return(<Card key={passenger.id} {...passenger}/>);
+            return(<DriverDetailCard key={passenger.id} {...passenger}/>);
           })}
         </div>
       </div>

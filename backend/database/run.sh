@@ -18,4 +18,5 @@ docker cp create.sql $NAME:/create.sql
 echo "wait for a while"
 sleep 3
 docker exec -u postgres $NAME bash -c "psql < /create.sql"
+docker exec -u postgres $NAME bash -c "psql < /insert_spot.sql"
 echo "finish creating database"

@@ -1,33 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { IoIosInformationCircleOutline } from "react-icons/io";
+import { IoStarSharp } from "react-icons/io5";
+import DriverTripCard from "../components/DriverTripCard";
 
-interface PlaceProps {
+interface InfoItem {
+  id: number;
   type: string;
-  location: string; 
+  location: string;
   time: string;
-}
-const Place: React.FC<PlaceProps> = (props) => {
-  return(
-    <div className="bg-[#d9d9d9] flex flex-row justify-between p-[20px] rounded-[10px] w-[calc(100vw-80px)]">
-      <div className="flex flex-col">
-        <span className="justify-center text-[18px] font-sans">{props.type}</span>
-        <span className="justify-center text-[18px] font-sans">{props.location}</span>
-      </div>
-      <span className="text-[32px] font-sans">{props.time}</span>
-    </div>
-  );
 }
 
 const DriverTrip: React.FC =() => {
   const navigate = useNavigate();
-
-  interface InfoItem {
-    id: number;
-    type: string;
-    location: string;
-    time: string;
-  }
 
   const journey: InfoItem[] = [
     { id: 1, type: "起點", location: "竹北國小", time: "07:30" },
@@ -43,7 +28,7 @@ const DriverTrip: React.FC =() => {
       <div className="text-center w-screen fixed top-[120px] font-normal text-[18px] font-sans">2023年11月2日 星期三</div>
       <div className="flex flex-col justify-between items-center rounded-t-[30px] bg-white w-screen max-h-[calc(100vh-350px)] relative top-[170px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {journey.map((place) => {
-          return (<Place key={place.id} {...place} />);
+          return (<DriverTripCard key={place.id} {...place} />);
         })}
       </div>
       <div className="flex flex-row justify-evenly items-center w-screen h-[100px] fixed bottom-[86px]">
@@ -54,11 +39,17 @@ const DriverTrip: React.FC =() => {
             }}
           ><IoIosInformationCircleOutline className="w-[40px] h-[40px]"/></div>
           <button
-            className="w-[300px] h-[50px] rounded-[10px] bg-[#2e5a88] text-white text-[24px]"
+            className="w-[150px] h-[50px] rounded-[10px] bg-[#2e5a88] text-white text-[24px]"
             onClick={() => {
-              navigate("/driver/detail")
+              navigate("/driver/navigate")
             }}
           >開始導航</button>
+          <div 
+            className="w-[50px] h-[50px] rounded-[10px] bg-[#f3e779] flex justify-center items-center rounded-[25px]"
+            onClick={() => {
+              navigate("/driver/rating")
+            }}
+            ><IoStarSharp className="w-[30px] h-[30px]"/></div>
       </div>
     </div>
   );

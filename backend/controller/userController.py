@@ -43,7 +43,7 @@ async def user_login():
 
 
 @user.route('/<int:userId>', methods=['GET'])
-async def get_driver_data(userId):
+async def get_user_data(userId):
     user_dto = user_service.get_user(userId)
 
     if user_dto is None:

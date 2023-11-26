@@ -60,3 +60,10 @@ class SpotWithCountVo:
         self.point = PointVo(spot_with_count_dto.point)
         self.name = spot_with_count_dto.name
         self.order_count = spot_with_count_dto.order_count
+
+
+class InvitationVo:
+    def __init__(self, invitation_dto):
+        self.passengerOrder = PassengerOrderVo(invitation_dto.order, -1)
+        self.time = invitation_dto.departure_time
+        self.accepted = invitation_dto.accepted

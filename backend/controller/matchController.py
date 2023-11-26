@@ -6,21 +6,6 @@ from utils import utils
 from controller.models import *
 
 
-class MatchEntity():
-    def __init__(self, match_id, driver_order_id, passenger_order_id, departure_time):
-        self.match_id = match_id
-        self.driver_order_id = driver_order_id
-        self.passenger_order_id = passenger_order_id
-        self.departure_time = departure_time
-
-
-class InvitationEntity():
-    def __init__(self, order_entity, departure_time, accepted):
-        self.order = order_entity
-        self.departure_time = departure_time
-        self.accepted = accepted
-
-
 match = Blueprint('match_page', __name__)
 
 match_service = MatchService()
@@ -71,9 +56,12 @@ async def delete_driver_invitation(driverOrderId, passengerOrderId):
 
 @match.route('/driver/invitation/total/<int:driverOrderId>', methods=['GET'])
 async def get_total_invitations(driverOrderId):
-    # TODO: 實現邏輯，獲取司機訂單的總邀請數
+    ret = match_service.get_driver_invitations(driverOrderId)
 
-    return jsonify({'message': 'NOT implemented'}), 200
+    if ret == 'order not found':
+        return await make_response('Order not found', 404)
+
+    return utils.to_json([InvitationVo(invitation) for invitation in ret])
 
 
 @match.route('/passenger/invitation/<int:passengerOrderId>', methods=['GET'])

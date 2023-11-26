@@ -1,18 +1,29 @@
 import { IoMdPerson } from "react-icons/io";
 import { orderDTO } from "../../../DTO/orders";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type PickupCardProps = {
   order: orderDTO;
   tempOrders: orderDTO[];
   setTempOrders: (orders: orderDTO[]) => void;
+  markerOrderId: number|null;
 };
 
-const PickupCard = ({order, setTempOrders, tempOrders}: PickupCardProps) => {
-  const [selected, setSelected] = useState<boolean>(false);
+const PickupCard = ({order, setTempOrders, tempOrders, markerOrderId}: PickupCardProps) => {
+  const [pickupSelected, setPickupSelected] = useState<boolean>(false);
+  // 如果card相關的marker被點擊到就把邊框變紅
+  const [markerSelected, setMarkerSelected] = useState<boolean>(false)
+  useEffect(() => {
+    if(order.orderId === markerOrderId){
+      setMarkerSelected(true);
+    }
+    else{
+      setMarkerSelected(false)
+    }
+  }, [markerOrderId, order.orderId])
   const onCLickHandler = () => {
-    if (!selected) {
-      setSelected(true);
+    if (!pickupSelected) {
+      setPickupSelected(true);
       if(tempOrders?.length === 0){
         setTempOrders && setTempOrders([order]);
         console.log("PickupCard tempOrders bf: ", tempOrders)
@@ -30,7 +41,7 @@ const PickupCard = ({order, setTempOrders, tempOrders}: PickupCardProps) => {
       }
     } 
     else {
-      setSelected(false);
+      setPickupSelected(false);
       if(tempOrders!==undefined && tempOrders.length > 0){
         const index = tempOrders?.findIndex((tempOrder) => tempOrder.orderId === order.orderId);
         if(index !== -1){
@@ -42,7 +53,7 @@ const PickupCard = ({order, setTempOrders, tempOrders}: PickupCardProps) => {
     console.log("PickupCard tempOrders af: ", tempOrders)
   }
 
-  const wrapperClass = selected ? "flex border rounded-lg mx-4 my-2 bg-gray-200" : "flex border rounded-lg mx-4 my-2";
+  const wrapperClass = pickupSelected ? `flex border rounded-lg mx-4 my-2 bg-gray-200 ${markerSelected && "border-lime-500 border-4"}` : `flex border rounded-lg mx-4 my-2 ${markerSelected && "border-lime-500 border-4"} `;
 
   return <>
     <div 

@@ -12,6 +12,8 @@ type DriverMapProps = {
   showSpots?: boolean;
   directions?: DirectionsResult;
   setOrders?: (orders: orderDTO[]) => void;
+  orders?: orderDTO[];
+  setMarkerOrderId?: (orderId: number) => void
 };
 type spot = {
   "spotId": string
@@ -23,7 +25,7 @@ type spot = {
   "passengerCount": number
 };
 
-const DriverMap = ({isLoaded, directions, showSpots, setOrders}: DriverMapProps) => {
+const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarkerOrderId}: DriverMapProps) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
@@ -32,6 +34,14 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders}: DriverMapProps)
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const markerIcon = {
+    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+    fillColor: 'blue',
+    fillOpacity: 1,
+    scale: 10,
+    strokeColor: 'white',
+    strokeWeight: 2,
+  };
 
   useEffect(() => {
     // 取得所有地標
@@ -57,19 +67,22 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders}: DriverMapProps)
     zoom: 15
   };
 
-  const handleActiveMarker = async (marker: string, spotPoint?: LatLngLiteral) => {
-    if (marker === activeMarker) {
+  const handleActiveMarker = async (spotId: string, spotPoint?: LatLngLiteral) => {
+    if (spotId === activeMarker) {
       return;
     }
     if (driverDepart.departureTime === 0 || driverDepart.departureTime === undefined) {
       console.log("DriverMap: 請選擇出發時間")
       return;
     }
-    const orders = await getSpotOrders(marker, driverDepart.departureTime);
+    // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
+    const orders = await getSpotOrders(spotId, driverDepart.departureTime);
+    // 取得地標附近的訂單，並傳給父層，讓PickupPanel顯示
     if (setOrders) setOrders(orders.orders);
     console.log("DriverMap: ", orders);
 
-    setActiveMarker(marker);
+    setActiveMarker(spotId);
+    // 將中心點移至地標
     if (spotPoint !== undefined) setCurrentCenter({lat: spotPoint.lat, lng: spotPoint.lng});
   };
 
@@ -178,11 +191,26 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders}: DriverMapProps)
                 })
               )
             }
+            {
+              orders !== undefined && orders.length !== 0 && orders.map((order) => {
+                return (
+                  <MarkerF
+                    key={order.orderId}
+                    position={{lat: order.startPoint.lat, lng: order.startPoint.lng} as LatLngLiteral }
+                    label={order.userId.toString()}
+                    title={order.startName}
+                    icon={markerIcon}
+                    onClick={()=>{setMarkerOrderId && setMarkerOrderId(order.orderId)}}
+                  ></MarkerF>
+                )
+              })
+            }
           </GoogleMap>
         </>
         )}
       </div>
   </>
 }
+
 
 export default DriverMap;

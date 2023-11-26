@@ -9,9 +9,10 @@ type PickupPanelProps = {
   isLoaded: boolean;
   setPickupPanel: (pickupPanel: boolean) => any;
   orders?: orderDTO[];
+  markerOrderId: number | null;
 };
 
-const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => {
+const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId }: PickupPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const [tempOrders, setTempOrders] = useState<orderDTO[]>([]);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
@@ -41,7 +42,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
             <div className="flex flex-col h-[80%] w-[100%] overflow-scroll">
               {
                 orders && orders.map((order) => (
-                  <PickupCard key={order.orderId} order={order} setTempOrders={setTempOrders} tempOrders={tempOrders} />
+                  <PickupCard key={order.orderId} order={order} setTempOrders={setTempOrders} tempOrders={tempOrders} markerOrderId={markerOrderId} />
                 ))
               }
             </div>

@@ -16,6 +16,8 @@ const DriverMain = () => {
   const [startPoint, setStartPoint] = useState<LatLngLiteral>()
   const [destPoint, setDestPoint] = useState<LatLngLiteral>()
   const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+  const [markerOrderId, setMarkerOrderId] = useState<number | null>(null)
+  // 紀錄使用者點選marker後，該地標附近的訂單
   const [orders, setOrders] = useState<orderDTO[]>([])
   // showSpots: 顯示所有地標
   const [showSpots, setShowSpots] = useState<boolean>(false)
@@ -68,13 +70,13 @@ const DriverMain = () => {
       <>
         <div className='h-[60%]'>
           <div className="bg-gray-200 flex justify-center items-center h-full">
-            <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} setOrders={setOrders} />
+            <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} setOrders={setOrders} orders={orders} setMarkerOrderId={setMarkerOrderId} />
           </div>
         </div>
         <div className='h-[45%] bottom-0 z-100 -translate-y-10'>
           {
             pickupPanel 
-              ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} /> 
+              ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} markerOrderId={markerOrderId} /> 
               : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
           }
         </div>

@@ -116,8 +116,8 @@ const getSpotOrders = async (spotId: string, departtureTime: number) => {
           "orderId": 1,
           "userId": 2,
           "startPoint": {
-            "lng": 120.99777403377531,
-            "lat": 24.787707214648197
+            "lng": 120.4780952,
+            "lat": 24.0922934
           },
           "startName": "Seven XX門市",
           "endPoint": {
@@ -135,8 +135,8 @@ const getSpotOrders = async (spotId: string, departtureTime: number) => {
           "orderId": 2,
           "userId": 3,
           "startPoint": {
-            "lng": 120.99777403377531,
-            "lat": 24.787707214648197
+            "lng": 120.4788952,
+            "lat": 24.0923034
           },
           "startName": "全家 XX門市",
           "endPoint": {

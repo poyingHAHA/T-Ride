@@ -3,6 +3,7 @@ import pandas as pd
 from utils.config import ConfigUtil
 from utils import utils
 import hashlib
+from repository.models import *
 
 
 class UserRepository:
@@ -200,26 +201,3 @@ class UserRepository:
         with self.conn.cursor() as cur:
             cur.execute(sql)
             self.conn.commit()
-
-class LoginEntity:
-    def __init__(self, token, user_id):
-        self.token = token
-        self.user_id = user_id
-
-class UserEntity:
-    def __init__(self, user_id, user_name, password_salt, password_hash, driver_data_id, total_order_count, abandon_order_count):
-        self.user_id = user_id
-        self.user_name = user_name
-        self.password_salt = password_salt
-        self.password_hash = password_hash
-        self.driver_data_id = driver_data_id
-        self.total_order_count = total_order_count
-        self.abandon_order_count = abandon_order_count
-
-
-class DriverDataEntity:
-    def __init__(self, data_id, vehicle_name, vehicle_plate, passenger_count):
-        self.data_id = data_id
-        self.vehicle_name = vehicle_name
-        self.vehicle_plate = vehicle_plate
-        self.passenger_count = passenger_count

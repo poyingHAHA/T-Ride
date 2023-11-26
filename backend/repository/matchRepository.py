@@ -1,6 +1,6 @@
 import psycopg2
 from utils.config import ConfigUtil
-from repository.orderRepository import *
+from repository.models import *
 
 
 class MatchRepository:
@@ -12,7 +12,6 @@ class MatchRepository:
             password=config.get('password'),
             host=config.get('host'),
             port=config.get('port'))
-        self.order_repository = OrderRepository()
 
     def send_invitation(self, driver_order_id, passenger_order_id):
         '''
@@ -85,17 +84,3 @@ class MatchRepository:
                 False) for row in rows])
 
         return ret
-
-class MatchEntity():
-    def __init__(self, match_id, driver_order_id, passenger_order_id, departure_time):
-        self.match_id = match_id
-        self.driver_order_id = driver_order_id
-        self.passenger_order_id = passenger_order_id
-        self.departure_time = departure_time
-
-
-class InvitationEntity():
-    def __init__(self, order_entity, departure_time, accepted):
-        self.order = order_entity
-        self.departure_time = departure_time
-        self.accepted = accepted

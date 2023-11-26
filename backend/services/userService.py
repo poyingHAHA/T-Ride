@@ -1,4 +1,5 @@
 from repository.userRepository import *
+from services.models import *
 
 
 class UserService:
@@ -59,22 +60,3 @@ class UserService:
         return None if token is invalid
         '''
         return self.user_repository.get_user_id(token)
-
-class LoginDto:
-    def __init__(self, login_entity):
-        self.token = login_entity.token
-        self.user_id = login_entity.user_id
-
-class UserDto:
-    def __init__(self, user_entity, driver_data_dto):
-        self.user_name = user_entity.user_name
-        self.total_order_count = user_entity.total_order_count
-        self.abandon_order_count = user_entity.abandon_order_count
-        self.driver_data = driver_data_dto
-
-
-class DriverDataDto:
-    def __init__(self, driver_data_entity):
-        self.vehicle_name = driver_data_entity.vehicle_name
-        self.vehicle_plate = driver_data_entity.vehicle_plate
-        self.passenger_count = driver_data_entity.passenger_count

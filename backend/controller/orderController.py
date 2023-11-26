@@ -3,6 +3,7 @@ from quart import Blueprint, request, make_response
 from services.orderService import *
 from services.userService import *
 from utils import utils
+from controller.models import *
 
 
 order = Blueprint('order_page', __name__)
@@ -266,43 +267,3 @@ async def get_order_fee():
         return await make_response("Incorrect parameter format", 400)
 
     return utils.to_json({"fee": fee})
-
-
-class PointVo:
-    def __init__(self, point):
-        self.lat, self.lng = map(float, point.split(','))
-
-
-class DriverOrderVo:
-    def __init__(self, driver_order_dto):
-        self.orderId = driver_order_dto.order_id
-        self.userId = driver_order_dto.user_id
-        self.departureTime = driver_order_dto.departure_time
-        self.startPoint = PointVo(driver_order_dto.start_point)
-        self.startName = driver_order_dto.start_name
-        self.endPoint = PointVo(driver_order_dto.end_point)
-        self.endName = driver_order_dto.end_name
-        self.passengerCount = driver_order_dto.passenger_count
-
-
-class PassengerOrderVo:
-    def __init__(self, passenger_order_dto, arrival_time):
-        self.orderId = passenger_order_dto.order_id
-        self.userId = passenger_order_dto.user_id
-        self.departureTime1 = passenger_order_dto.departure_time1
-        self.departureTime2 = passenger_order_dto.departure_time2
-        self.passengerCount = passenger_order_dto.passenger_count
-        self.startPoint = PointVo(passenger_order_dto.start_point)
-        self.startName = passenger_order_dto.start_name
-        self.endPoint = PointVo(passenger_order_dto.end_point)
-        self.endName = passenger_order_dto.end_name
-        self.fee = passenger_order_dto.fee
-        self.arrivalTime = arrival_time
-
-
-class SpotWithCountVo:
-    def __init__(self, spot_with_count_dto):
-        self.spot_id = spot_with_count_dto.spot_id
-        self.point = PointVo(spot_with_count_dto.point)
-        self.name = spot_with_count_dto.name
-        self.order_count = spot_with_count_dto.order_count

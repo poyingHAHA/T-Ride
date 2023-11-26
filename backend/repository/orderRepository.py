@@ -1,5 +1,6 @@
 import psycopg2
 from utils.config import ConfigUtil
+from repository.models import *
 
 
 class OrderRepository:
@@ -358,47 +359,3 @@ class OrderRepository:
             row[f2i['fee']],
             row[f2i['spot_id']],
             row[f2i['finished']]) for row in rows]
-
-
-class DriverOrderEntity:
-    def __init__(self, order_id, user_id, departure_time, start_point, start_name, end_point, end_name, passenger_count, finished):
-        self.order_id = order_id
-        self.user_id = user_id
-        self.departure_time = departure_time
-        self.start_point = start_point
-        self.start_name = start_name
-        self.end_point = end_point
-        self.end_name = end_name
-        self.passenger_count = passenger_count
-        self.finished = finished
-
-
-class PassengerOrderEntity:
-    def __init__(self, order_id, user_id, departure_time1, departure_time2, passenger_count, start_point, start_name, end_point, end_name, fee, spot_id, finished):
-        self.order_id = order_id
-        self.user_id = user_id
-        self.departure_time1 = departure_time1
-        self.departure_time2 = departure_time2
-        self.passenger_count = passenger_count
-        self.start_point = start_point
-        self.start_name = start_name
-        self.end_point = end_point
-        self.end_name = end_name
-        self.fee = fee
-        self.spot_id = spot_id
-        self.finished = finished
-
-
-class SpotEntity:
-    def __init__(self, spot_id, point, name):
-        self.spot_id = spot_id
-        self.point = point
-        self.name = name
-
-
-class SpotWithCountEntity:
-    def __init__(self, spot_id, point, name, order_count):
-        self.spot_id = spot_id
-        self.point = point
-        self.name = name
-        self.order_count = order_count

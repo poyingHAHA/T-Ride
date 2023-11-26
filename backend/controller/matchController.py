@@ -3,6 +3,22 @@ from quart import Blueprint, request, make_response
 from services.matchService import *
 from services.userService import *
 from utils import utils
+from controller.models import *
+
+
+class MatchEntity():
+    def __init__(self, match_id, driver_order_id, passenger_order_id, departure_time):
+        self.match_id = match_id
+        self.driver_order_id = driver_order_id
+        self.passenger_order_id = passenger_order_id
+        self.departure_time = departure_time
+
+
+class InvitationEntity():
+    def __init__(self, order_entity, departure_time, accepted):
+        self.order = order_entity
+        self.departure_time = departure_time
+        self.accepted = accepted
 
 
 match = Blueprint('match_page', __name__)

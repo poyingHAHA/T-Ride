@@ -1,12 +1,14 @@
 # TODO: token validation should be in service
-from quart import Blueprint, request, make_response
+from quart import Blueprint, request, make_response, websocket
 from services.userService import *
 from utils import utils
+from controller.models import *
 
 
 user = Blueprint('user_page', __name__)
 
 user_service = UserService()
+
 
 @user.route('/register', methods=['POST'])
 async def register():
@@ -74,22 +76,17 @@ async def post_driver_data():
         return await make_response("註冊成功", 200)
 
 
-class LoginVo:
-    def __init__(self, login_dto):
-        self.token = login_dto.token
-        self.userId = login_dto.user_id
-
-
-class UserVo:
-    def __init__(self, user_dto):
-        self.userName = user_dto.user_name
-        self.totalOrderCount = user_dto.total_order_count
-        self.abandonOrderCount = user_dto.abandon_order_count
-        self.driverData = DriverDataVo(user_dto.driver_data) if user_dto.driver_data is not None else None
-
-
-class DriverDataVo:
-    def __init__(self, driver_data_dto):
-        self.vehicleName = driver_data_dto.vehicle_name
-        self.vehiclePlate = driver_data_dto.vehicle_plate
-        self.passengerCount = driver_data_dto.passenger_count
+import time
+import asyncio
+@user.websocket('/test')
+async def websocket_test():
+    try:
+        while True:
+            time.sleep(1)
+            await websocket.send('hihihi')
+            print('in loop')
+        print('out loop')
+    except Exception as e:
+        print('close connection')
+        print(e)
+    print('return')

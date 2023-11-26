@@ -117,7 +117,7 @@ paths:
           description: ID of the user
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: Successful response

@@ -52,13 +52,7 @@ CREATE TABLE "matches" (
   "id" serial PRIMARY KEY,
   "driver_order_id" integer,
   "passenger_order_id" integer,
-  "time" integer
-);
-
-CREATE TABLE "match_invitations" (
-  "id" serial PRIMARY KEY,
-  "driver_order_id" integer,
-  "passenger_order_id" integer
+  "accepted" bool
 );
 
 CREATE TABLE "spots" (
@@ -80,7 +74,3 @@ ALTER TABLE "passenger_orders" ADD FOREIGN KEY ("spot_id") REFERENCES "spots" ("
 ALTER TABLE "matches" ADD FOREIGN KEY ("driver_order_id") REFERENCES "driver_orders" ("id");
 
 ALTER TABLE "matches" ADD FOREIGN KEY ("passenger_order_id") REFERENCES "passenger_orders" ("id");
-
-ALTER TABLE "match_invitations" ADD FOREIGN KEY ("driver_order_id") REFERENCES "driver_orders" ("id");
-
-ALTER TABLE "match_invitations" ADD FOREIGN KEY ("passenger_order_id") REFERENCES "passenger_orders" ("id");

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "../../../hooks";
-import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marker} from "@react-google-maps/api";
+import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marker, Circle} from "@react-google-maps/api";
 import AdvMarker from "./AdvancedMarker"
 import { getSpots, getSpotOrders } from "../../../services/orderService";
 import { orderDTO } from "../../../DTO/orders";
@@ -31,6 +31,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
   const location = { ...locationReducer}
   const [spots, setSpots] = useState<spot[]>([]);
   const [activeMarker, setActiveMarker] = useState<string|null>(null);
+  const [activeMarkerPoint, setActiveMarkerPoint] = useState<LatLngLiteral|null>(null);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -82,6 +83,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     console.log("DriverMap: ", orders);
 
     setActiveMarker(spotId);
+    setActiveMarkerPoint(spotPoint || null);
     // 將中心點移至地標
     if (spotPoint !== undefined) setCurrentCenter({lat: spotPoint.lat, lng: spotPoint.lng});
   };
@@ -192,6 +194,11 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }
             {
+              activeMarkerPoint && (
+                <Circle center={activeMarkerPoint} radius={1000} options={closeOptions} />
+              )
+            }
+            {
               orders !== undefined && orders.length !== 0 && orders.map((order) => {
                 return (
                   <MarkerF
@@ -212,5 +219,20 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
   </>
 }
 
+const defaultOptions = {
+  strokeOpacity: 0.5,
+  strokeWeight: 2,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  visible: true,
+};
+const closeOptions = {
+  ...defaultOptions,
+  zIndex: 3,
+  fillOpacity: 0.05,
+  strokeColor: "#8BC34A",
+  fillColor: "#8BC34A",
+};
 
 export default DriverMap;

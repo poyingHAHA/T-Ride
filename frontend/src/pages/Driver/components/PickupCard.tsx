@@ -11,7 +11,7 @@ type PickupCardProps = {
 
 const PickupCard = ({order, setTempOrders, tempOrders, markerOrderId}: PickupCardProps) => {
   const [pickupSelected, setPickupSelected] = useState<boolean>(false);
-  // 如果card相關的marker被點擊到就把邊框變紅
+  // 如果card相關的marker被點擊到就把邊框變綠
   const [markerSelected, setMarkerSelected] = useState<boolean>(false)
   useEffect(() => {
     if(order.orderId === markerOrderId){
@@ -21,6 +21,7 @@ const PickupCard = ({order, setTempOrders, tempOrders, markerOrderId}: PickupCar
       setMarkerSelected(false)
     }
   }, [markerOrderId, order.orderId])
+
   const onCLickHandler = () => {
     if (!pickupSelected) {
       setPickupSelected(true);

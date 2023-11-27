@@ -43,5 +43,5 @@ const Driver: React.FC = () => {
   </>
 }
 
-export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail };
+export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverRating };
 export default Driver;

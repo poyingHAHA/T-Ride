@@ -66,9 +66,12 @@ async def get_driver_total_invitations(driverOrderId):
 
 @match.route('/passenger/invitation/total/<int:passengerOrderId>', methods=['GET'])
 async def get_passenger_total_invitations(passengerOrderId):
-    # TODO: 實現邏輯，獲取乘客訂單邀請的司機訂單詳細信息
+    ret = match_service.get_passenger_invitation_orders(passengerOrderId)
 
-    return jsonify({'message': 'NOT implemented'}), 200
+    if ret == 'order not found':
+        return await make_response('Order not found', 404)
+
+    return utils.to_json([DriverOrderVo(order) for order in ret])
 
 
 @match.route('/passenger/accepted/<int:passengerOrderId>', methods=['GET'])

@@ -340,6 +340,30 @@ class OrderRepository:
             row[f2i['passenger_count']],
             row[f2i['finished']])
 
+    def get_passenger_invitation_orders(self, order_id):
+        '''
+        order exists
+        '''
+        sql = f'''SELECT driver_orders.* FROM match_invitations
+                  JOIN driver_orders ON driver_orders.id = match_invitations.driver_order_id
+                  WHERE passenger_order_id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            rows = cur.fetchall()
+
+        return [DriverOrderEntity(
+            row[f2i['id']],
+            row[f2i['user_id']],
+            row[f2i['time']],
+            row[f2i['start_point']],
+            row[f2i['start_name']],
+            row[f2i['end_point']],
+            row[f2i['end_name']],
+            row[f2i['passenger_count']],
+            row[f2i['finished']]) for row in rows]
+
     def __sql_get_passenger_orders(self, sql):
         with self.conn.cursor() as cur:
             cur.execute(sql)

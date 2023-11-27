@@ -859,21 +859,19 @@ components:
     DriverTotalInvitations:
       type: object
       properties:
-        orders:
+        passengerOrders:
           type: array
           items:
             type: object
             properties:
-              passengerOrder:
+              invitations:
                 $ref: '#/components/schemas/PassengerOrderDetails'
-              time:  
-                type: integer
               accepted:
                 type: boolean  
     PassengerTotalInvitations:
       type: object
       properties:
-        orders:
+        driverOrders:
           type: array
           items:
             $ref: '#/components/schemas/DriverOrderDetails'

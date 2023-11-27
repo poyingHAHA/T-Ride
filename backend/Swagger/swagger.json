@@ -677,7 +677,7 @@ paths:
           description: Invitation not sent or order completed
   /match/driver/invitation/total/{driverOrderId}:
     get:
-      summary: Get Total Invitations for a Driver Order
+      summary: Get Invitations Sent by a Driver Order
       tags:
         - match
       parameters:
@@ -693,12 +693,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TotalInvitations'
+                $ref: '#/components/schemas/DriverTotalInvitations'
         '404':
           description: Order not found
-  /match/passenger/invitation/{passengerOrderId}:
+  /match/passenger/invitation/total/{passengerOrderId}:
     get:
-      summary: Get Driver Orders Invited to a Passenger Order
+      summary: Get Driver Orders Inviting a Passenger Order
       tags:
         - match
       parameters:
@@ -714,7 +714,32 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DriverOrderDetails'
+                $ref: '#/components/schemas/PassengerTotalInvitations'
+        '404':
+          description: Order not found
+
+  /match/passenger/accepted/{passengerOrderId}:
+    get:
+      summary: Get the Accepted Driver Order
+      tags:
+        - match
+      parameter:
+        - name: passengerOrderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  driverOrder:
+                    $ref: '#/components/schemas/DriverOrderDetails'
         '404':
           description: Order not found
 
@@ -831,7 +856,7 @@ components:
               type: string
             passenger_count:
               type: integer
-    TotalInvitations:
+    DriverTotalInvitations:
       type: object
       properties:
         orders:
@@ -845,6 +870,13 @@ components:
                 type: integer
               accepted:
                 type: boolean  
+    PassengerTotalInvitations:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriverOrderDetails'
     
     AcceptInvitationRequest:
       type: object

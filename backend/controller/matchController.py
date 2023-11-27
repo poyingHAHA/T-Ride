@@ -55,7 +55,7 @@ async def delete_driver_invitation(driverOrderId, passengerOrderId):
 
 
 @match.route('/driver/invitation/total/<int:driverOrderId>', methods=['GET'])
-async def get_total_invitations(driverOrderId):
+async def get_driver_total_invitations(driverOrderId):
     ret = match_service.get_driver_invitations(driverOrderId)
 
     if ret == 'order not found':
@@ -64,11 +64,16 @@ async def get_total_invitations(driverOrderId):
     return utils.to_json([InvitationVo(invitation) for invitation in ret])
 
 
-@match.route('/passenger/invitation/<int:passengerOrderId>', methods=['GET'])
-async def get_driver_invited_orders(passengerOrderId):
+@match.route('/passenger/invitation/total/<int:passengerOrderId>', methods=['GET'])
+async def get_passenger_total_invitations(passengerOrderId):
     # TODO: 實現邏輯，獲取乘客訂單邀請的司機訂單詳細信息
 
     return jsonify({'message': 'NOT implemented'}), 200
+
+
+@match.route('/passenger/accepted/<int:passengerOrderId>', methods=['GET'])
+async def get_passenger_accepted(passengerOrderId):
+    pass
 
 
 @match.route('/passenger/invitation/accept', methods=['POST'])

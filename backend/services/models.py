@@ -86,5 +86,4 @@ class SpotWithCountDto:
 class InvitationDto():
     def __init__(self, invited_order_entity):
         self.order = PassengerOrderDto(invited_order_entity.order)
-        self.departure_time = invited_order_entity.departure_time
         self.accepted = invited_order_entity.accepted

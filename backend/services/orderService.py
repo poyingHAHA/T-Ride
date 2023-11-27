@@ -1,7 +1,6 @@
 from repository.orderRepository import *
 from repository.userRepository import *
 from repository.gmapsRepository import *
-from repository.matchRepository import *
 from services.models import *
 
 
@@ -10,7 +9,6 @@ class OrderService:
         self.order_repository = OrderRepository()
         self.user_repository = UserRepository()
         self.gmaps_repository = GmapsRepository()
-        self.match_repository = MatchRepository()
 
     def get_unfinished_driver_orders(self, user_id):
         '''
@@ -209,6 +207,7 @@ class OrderService:
         return [PassengerOrderDto(entity) for entity in self.order_repository.get_spot_passenger_orders(spot_id, departure_time)]
 
     def get_estimated_arrival_time(self, point1, point2, departure_time):
+        # TODO: 傳過去時間要回傳最近一次預估的結果？=>存db？
         if not self.is_valid_point(point1) or not self.is_valid_point(point2):
             return -1
         try:

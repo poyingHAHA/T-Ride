@@ -2,6 +2,7 @@
 from quart import Blueprint, request, make_response
 from services.matchService import *
 from services.userService import *
+from services.orderService import *
 from utils import utils
 from controller.models import *
 
@@ -10,6 +11,7 @@ match = Blueprint('match_page', __name__)
 
 match_service = MatchService()
 user_service = UserService()
+order_service = OrderService()
 
 
 @match.route('/driver/invitation', methods=['POST'])
@@ -61,7 +63,11 @@ async def get_driver_total_invitations(driverOrderId):
     if ret == 'order not found':
         return await make_response('Order not found', 404)
 
-    return utils.to_json([InvitationVo(invitation) for invitation in ret])
+    # TODO: arrival time跟排序都在service就算好才丟出來
+    return utils.to_json({'invitations': sorted([InvitationVo(invitation, order_service.get_estimated_arrival_time(
+        invitation.order.start_point,
+        invitation.order.end_point,
+        invitation.order.departure_time1)) for invitation in ret], key=lambda invitation: invitation.passengerOrder.departureTime1)})
 
 
 @match.route('/passenger/invitation/total/<int:passengerOrderId>', methods=['GET'])
@@ -71,7 +77,7 @@ async def get_passenger_total_invitations(passengerOrderId):
     if ret == 'order not found':
         return await make_response('Order not found', 404)
 
-    return utils.to_json([DriverOrderVo(order) for order in ret])
+    return utils.to_json({'driverOrders': [DriverOrderVo(order) for order in ret]})
 
 
 @match.route('/passenger/accepted/<int:passengerOrderId>', methods=['GET'])

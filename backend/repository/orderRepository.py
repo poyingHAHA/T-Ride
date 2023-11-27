@@ -244,12 +244,9 @@ class OrderRepository:
                         WHERE id = {order_id};'''
         match_sql = f'''DELETE FROM matches
                         WHERE passenger_order_id = {order_id};'''
-        invitation_sql = f'''DELETE FROM match_invitations
-                             WHERE passenger_order_id = {order_id}'''
 
         with self.conn.cursor() as cur:
             cur.execute(match_sql);
-            cur.execute(invitation_sql);
             cur.execute(order_sql);
             self.conn.commit()
 
@@ -295,9 +292,10 @@ class OrderRepository:
         order exists
         '''
         sql = f'''SELECT passenger_orders.*
-                  FROM passenger_orders JOIN match_invitations
-                  ON passenger_orders.id = match_invitations.passenger_order_id
-                  WHERE match_invitations.driver_order_id = {order_id};'''
+                  FROM passenger_orders JOIN matches
+                  ON passenger_orders.id = matches.passenger_order_id
+                  WHERE matches.driver_order_id = {order_id}
+                  AND NOT matches.accepted;'''
 
         return self.__sql_get_passenger_orders(sql)
 
@@ -307,7 +305,8 @@ class OrderRepository:
         '''
         sql = f'''SELECT passenger_orders.* FROM passenger_orders
                   JOIN matches ON passenger_orders.id = matches.passenger_order_id
-                  WHERE matches.driver_order_id = {order_id};'''
+                  WHERE matches.driver_order_id = {order_id}
+                  AND matches.accepted;'''
 
         return self.__sql_get_passenger_orders(sql)
 
@@ -319,7 +318,8 @@ class OrderRepository:
         '''
         sql = f'''SELECT driver_orders.* FROM driver_orders
                   JOIN matches ON driver_orders.id = matches.driver_order_id
-                  WHERE matches.passenger_order_id = {order_id};'''
+                  WHERE matches.passenger_order_id = {order_id}
+                  AND matches.accepted;'''
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -344,9 +344,10 @@ class OrderRepository:
         '''
         order exists
         '''
-        sql = f'''SELECT driver_orders.* FROM match_invitations
-                  JOIN driver_orders ON driver_orders.id = match_invitations.driver_order_id
-                  WHERE passenger_order_id = {order_id};'''
+        sql = f'''SELECT driver_orders.* FROM matches
+                  JOIN driver_orders ON driver_orders.id = matches.driver_order_id
+                  WHERE passenger_order_id = {order_id}
+                  AND NOT matches.accepted;'''
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -363,35 +364,6 @@ class OrderRepository:
             row[f2i['end_name']],
             row[f2i['passenger_count']],
             row[f2i['finished']]) for row in rows]
-
-    def get_passenger_accepted_order(self, order_id):
-        '''
-        order exists
-
-        return None if no driver order is accetped
-        '''
-        sql = f'''SELECT driver_orders.* FROM matches
-                  JOIN driver_orders ON driver_orders.id = matches.driver_order_id
-                  WHERE passenger_order_id = {order_id};'''
-
-        with self.conn.cursor() as cur:
-            cur.execute(sql)
-            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-            row = cur.fetchone()
-
-            if row is None:
-                return None
-
-        return DriverOrderEntity(
-            row[f2i['id']],
-            row[f2i['user_id']],
-            row[f2i['time']],
-            row[f2i['start_point']],
-            row[f2i['start_name']],
-            row[f2i['end_point']],
-            row[f2i['end_name']],
-            row[f2i['passenger_count']],
-            row[f2i['finished']])
 
     def __sql_get_passenger_orders(self, sql):
         with self.conn.cursor() as cur:

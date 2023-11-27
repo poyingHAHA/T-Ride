@@ -88,7 +88,7 @@ class MatchService:
         if order is None:
             return "order not found"
 
-        driver_order = self.order_repository.get_passenger_accepted_order(order_id)
+        driver_order = self.order_repository.get_passenger_related_order(order_id)
 
         if driver_order is None:
             return None

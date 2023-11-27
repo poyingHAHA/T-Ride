@@ -55,6 +55,7 @@ export default function AutoCompleteInput({ type, setLocation, placeholderText }
 
         dispatch(setLocation({ name, placeId, lat, lng }));
         console.log(name, placeId, lat, lng);
+
     };
 
     return <>

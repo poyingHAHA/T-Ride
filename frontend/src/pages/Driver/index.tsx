@@ -7,9 +7,8 @@ import DriverRoute from './pages/DriverRoute';
 import DriverSetting from './pages/DriverSetting';
 import DriverInfo from './pages/DriverInfo';
 import DriverTrip from './pages/DriverTrip';
-import DriverPickup from './pages/DriverPickup';
 import DriverDetail from './pages/DriverDetail';
-import DriverContact from './pages/DriverContact';
+import DriverRating from './pages/DriverRating';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { setLocation } from '../../slices/location';
 
@@ -33,14 +32,16 @@ const Driver: React.FC = () => {
   }, [])
 
   return <>
-    <div className='flex flex-col justify-between'>
-      <Outlet />
-      <div className='grow-0 absolute inset-x-0 bottom-0'>
+    <div className='relative flex flex-col justify-between'>
+      <div className='h-[90vh]'>
+        <Outlet />
+      </div>
+      <div className='fixed grow-0 inset-x-0 bottom-0 h-[10vh]'>
         <DriverNavbar />
       </div>
     </div>
   </>
 }
 
-export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverContact, DriverPickup};
+export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverRating };
 export default Driver;

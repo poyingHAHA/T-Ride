@@ -126,12 +126,12 @@ const PassengerMain = () => {
                 <Form method="post" className='flex' >
                     <input
                         type="datetime-local"
-                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-400 mr-3"
+                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300 mr-3"
                         placeholder="Select a time" required
                     />
 
                     <input type="number"
-                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-400 ml-3"
+                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300 ml-3"
                         placeholder="How many pax?"
                         required />
                 </Form>
@@ -154,20 +154,30 @@ const PassengerMain = () => {
                 /> */}
 
                 <AutoCompleteInput type='passengerStart'
-                    // setLocation={setStart}
-                    setLocation={(position) => {
-                        if (position.lat !== undefined && position.lng !== undefined) {
-                            setStart({ lat: position.lat, lng: position.lng });
-                            mapRef.current?.panTo({ lat: position.lat, lng: position.lng });
+                    setLocation={setStart}
+                    // setLocation={(position) => {
+                    //     if (position.lat !== undefined && position.lng !== undefined) {
+                    //         // setStart({ lat: position.lat, lng: position.lng });
+                    //         // Call the action creator with the expected payload
+                    //         dispatch(setStart({
+                    //             name: position.name,
+                    //             placeId: position.placeId,
+                    //             lat: position.lat,
+                    //             lng: position.lng
+                    //         }));
 
-                            if (dest && dest.lat !== undefined && dest.lng !== undefined) {
-                                fetchDirections(
-                                    { lat: dest.lat, lng: dest.lng },
-                                    { lat: position.lat, lng: position.lng }
-                                );
-                            }
-                        }
-                    }}
+                    //         // Assuming mapRef is a ref to the GoogleMap instance
+                    //         mapRef.current?.panTo({ lat: position.lat, lng: position.lng });
+
+                    //         // If there's a destination set, fetch directions
+                    //         if (dest && dest.lat !== undefined && dest.lng !== undefined) {
+                    //             fetchDirections(
+                    //                 { lat: position.lat, lng: position.lng },
+                    //                 { lat: dest.lat, lng: dest.lng }
+                    //             );
+                    //         }
+                    //     }
+                    // }}
                     placeholderText="Pickup location"
                 />
 
@@ -204,8 +214,6 @@ const PassengerMain = () => {
                     // }}
                     placeholderText="Where to?"
                 />
-
-
 
                 {/* <input type="text" id="location-input"
                     className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-6"

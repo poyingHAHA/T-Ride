@@ -364,6 +364,35 @@ class OrderRepository:
             row[f2i['passenger_count']],
             row[f2i['finished']]) for row in rows]
 
+    def get_passenger_accepted_order(self, order_id):
+        '''
+        order exists
+
+        return None if no driver order is accetped
+        '''
+        sql = f'''SELECT driver_orders.* FROM matches
+                  JOIN driver_orders ON driver_orders.id = matches.driver_order_id
+                  WHERE passenger_order_id = {order_id};'''
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            row = cur.fetchone()
+
+            if row is None:
+                return None
+
+        return DriverOrderEntity(
+            row[f2i['id']],
+            row[f2i['user_id']],
+            row[f2i['time']],
+            row[f2i['start_point']],
+            row[f2i['start_name']],
+            row[f2i['end_point']],
+            row[f2i['end_name']],
+            row[f2i['passenger_count']],
+            row[f2i['finished']])
+
     def __sql_get_passenger_orders(self, sql):
         with self.conn.cursor() as cur:
             cur.execute(sql)

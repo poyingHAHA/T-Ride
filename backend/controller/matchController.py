@@ -76,7 +76,12 @@ async def get_passenger_total_invitations(passengerOrderId):
 
 @match.route('/passenger/accepted/<int:passengerOrderId>', methods=['GET'])
 async def get_passenger_accepted(passengerOrderId):
-    pass
+    ret = match_service.get_passenger_accepted_order(passengerOrderId)
+
+    if ret == 'order not found':
+        return await make_response('Order not found', 404)
+
+    return utils.to_json({"driverOrder": ret})
 
 
 @match.route('/passenger/invitation/accept', methods=['POST'])

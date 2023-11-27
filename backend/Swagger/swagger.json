@@ -723,7 +723,7 @@ paths:
       summary: Get the Accepted Driver Order
       tags:
         - match
-      parameter:
+      parameters:
         - name: passengerOrderId
           in: path
           description: ID of the passenger order

@@ -77,3 +77,20 @@ class MatchService:
         driver_orders = self.order_repository.get_passenger_invitation_orders(order_id)
 
         return [DriverOrderDto(order) for order in driver_orders]
+
+    def get_passenger_accepted_order(self, order_id):
+        '''
+        return "order not found"
+
+        return None if no driver order is accepted
+        '''
+        order = self.order_repository.get_passenger_order(order_id)
+        if order is None:
+            return "order not found"
+
+        driver_order = self.order_repository.get_passenger_accepted_order(order_id)
+
+        if driver_order is None:
+            return None
+
+        return DriverOrderDto(driver_order)

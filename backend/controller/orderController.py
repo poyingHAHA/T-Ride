@@ -227,8 +227,12 @@ async def get_spots():
 
     departure_time = int(query["departureTime"])
 
+    with_passenger = True
+    if 'withPassenger' in query:
+        with_passenger = bool(int(query['withPassenger']))
+
     return utils.to_json([SpotWithCountVo(spot)
-        for spot in order_service.get_spots_with_passenger(departure_time)])
+        for spot in order_service.get_all_spots(departure_time, with_passenger)])
 
 @order.route('/passenger/spot/<int:spotId>', methods=['GET'])
 async def get_passenger_orders_from_spot(spotId):

@@ -191,9 +191,9 @@ class OrderService:
 
         self.order_repository.delete_passenger_order(order_id)
 
-    def get_spots_with_passenger(self, departure_time):
+    def get_all_spots(self, departure_time, with_passenger):
         return [SpotWithCountDto(spot)
-            for spot in self.order_repository.get_spots_with_passenger(departure_time)]
+            for spot in self.order_repository.get_all_spots(departure_time, with_passenger)]
 
     def get_spot_passenger_orders(self, spot_id, departure_time):
         '''

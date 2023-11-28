@@ -399,7 +399,7 @@ paths:
           description: Incorrect parameter format
   /order/passenger/spot/all:
     get:
-      summary: Get Spots with Passengers for a Departure Time Range
+      summary: Get Spots Information with Passengers for a Departure Time Range
       tags:
         - order
       parameters:
@@ -407,6 +407,12 @@ paths:
           in: query
           description: Departure time in Unix timestamp format
           required: true
+          schema:
+            type: integer
+        - name: withPassenger
+          in: query
+          description: 是否只回傳有乘客的spot，預設為1，要回傳所有spot請帶0
+          required: false
           schema:
             type: integer
       responses:

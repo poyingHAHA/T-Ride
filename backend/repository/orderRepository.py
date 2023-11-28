@@ -250,16 +250,26 @@ class OrderRepository:
             cur.execute(order_sql);
             self.conn.commit()
 
-    def get_spots_with_passenger(self, departure_time):
+    def get_all_spots(self, departure_time, with_passenger):
         # TODO: use config to set time range
         time_range = 3600
-        sql = f'''SELECT spots.*, COUNT(spot_id) AS order_count
-                  FROM spots JOIN passenger_orders
-                  ON spots.id = spot_id
-                  WHERE NOT (time1 > {departure_time + time_range}
-                  OR time2 < {departure_time - time_range})
-                  AND NOT finished
-                  GROUP BY spots.id;'''
+
+        if with_passenger:
+            sql = f'''SELECT spots.*, COUNT(spot_id) AS order_count
+                      FROM spots JOIN passenger_orders
+                      ON spots.id = spot_id
+                      WHERE NOT (time1 > {departure_time + time_range}
+                      OR time2 < {departure_time - time_range})
+                      AND NOT finished
+                      GROUP BY spots.id;'''
+        else:
+            sql = f'''SELECT spots.*, COUNT(spot_id) AS order_count
+                      FROM spots LEFT JOIN passenger_orders
+                      ON spots.id = spot_id
+                      AND NOT (time1 > {departure_time + time_range}
+                      OR time2 < {departure_time - time_range})
+                      AND NOT finished
+                      GROUP BY spots.id;'''
 
         with self.conn.cursor() as cur:
             cur.execute(sql)

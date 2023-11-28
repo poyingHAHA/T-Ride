@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import usePlacesAutoComplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
-import { InputBase } from '@mui/material';
+import { useAppSelector, useAppDispatch } from "../../../hooks";
+
 
 type PlacesProps = {
   setStart: (position: google.maps.LatLngLiteral) => void;
@@ -76,9 +77,9 @@ export default function Places({ setStart, setEnd }: PlacesProps) {
 
   return <div>
     <div>
-      <InputBase
+      <input
         value={startvalue}
-        className="block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-150 hover:border-gray-400 placeholder-gray-300 mt-6"
+        className="block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300 mt-6"
         placeholder="Pickup location"
         onChange={(e) => {
           setStartValue(e.target.value);
@@ -94,9 +95,9 @@ export default function Places({ setStart, setEnd }: PlacesProps) {
           ))}
         </div>
       }
-      <InputBase
+      <input
         value={endvalue}
-        className="block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-150 hover:border-gray-400 placeholder-gray-300 mt-6"
+        className="block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300 mt-6"
         placeholder="Where to?"
         onChange={(e) => {
           setEndValue(e.target.value);

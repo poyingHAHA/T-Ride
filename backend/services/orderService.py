@@ -208,6 +208,7 @@ class OrderService:
 
     def get_estimated_arrival_time(self, point1, point2, departure_time):
         # TODO: 傳過去時間要回傳最近一次預估的結果？=>存db？
+        # TODO: 有配對造成抵達時間延後怎麼辦？有配對的話就單純撈db？
         if not self.is_valid_point(point1) or not self.is_valid_point(point2):
             return -1
         try:

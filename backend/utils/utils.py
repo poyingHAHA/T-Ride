@@ -4,7 +4,7 @@ import random,string
 
 
 def to_json(obj):
-    return json.dumps(obj, default=lambda o: o.__dict__, sort_keys=True, indent=2)
+    return json.dumps(obj, default=lambda o: o.__dict__, sort_keys=True, indent=2, ensure_ascii=False)
 
 
 def is_keys_in_dict(d, keys):

@@ -129,16 +129,18 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               clickableIcons: false,
             }}
           >
-            {directions && 
+            {directions &&
               (
                 <>
-                  <DirectionsRenderer directions={directions} options={{
-                    polylineOptions: {
-                      // zIndex: 50,
-                      strokeColor: "#1976D2",
-                      strokeOpacity: 0.8,
-                      strokeWeight: 4,
-                    }
+                  <DirectionsRenderer 
+                    directions={directions} 
+                    options={{
+                      polylineOptions: {
+                        // zIndex: 50,
+                        strokeColor: "#1976D2",
+                        strokeOpacity: 0.8,
+                        strokeWeight: 4,
+                      }
                   }} />
                 </>
               )
@@ -183,7 +185,9 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                     >
                       {
                         activeMarker === spotId ? (
-                          <InfoWindowF onCloseClick={() => {setActiveMarker(null)}}>
+                          <InfoWindowF 
+                            position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                            onCloseClick={() => {setActiveMarker(null)}}>
                             <div>{spotName}</div>
                           </InfoWindowF>
                         ) : null

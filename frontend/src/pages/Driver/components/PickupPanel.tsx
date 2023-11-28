@@ -10,9 +10,10 @@ type PickupPanelProps = {
   setPickupPanel: (pickupPanel: boolean) => any;
   orders?: orderDTO[];
   markerOrderId: number | null;
+  setShowSpots?: (showSpots: boolean) => void;
 };
 
-const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId }: PickupPanelProps) => {
+const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId, setShowSpots }: PickupPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const [tempOrders, setTempOrders] = useState<orderDTO[]>([]);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
@@ -50,7 +51,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId }: Pickup
             <div className='fixed bottom-4 flex justify-center w-[100%]'>
               <button 
                 className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl mr-4' 
-                onClick={() => setPickupPanel(false)}
+                onClick={() => {
+                  setPickupPanel(false);
+                  setShowSpots && setShowSpots(false);
+                  // 返回就清空tempOrders
+                  setTempOrders([]);
+                }}
               >
                 返回
               </button>
@@ -60,6 +66,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId }: Pickup
                 onClick={() => {
                   dispatch(addOrder({orders: tempOrders}));
                   setPickupPanel(false);
+                  setShowSpots && setShowSpots(false);
                 }}
               >
                 確認

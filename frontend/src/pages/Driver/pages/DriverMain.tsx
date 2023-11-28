@@ -22,6 +22,7 @@ const DriverMain = () => {
   // showSpots: 顯示所有地標
   const [showSpots, setShowSpots] = useState<boolean>(false)
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const dispatch = useAppDispatch();
   
   // useJsApiLoader hook to load the Google Maps API
@@ -43,14 +44,51 @@ const DriverMain = () => {
 
     if(!driverStartDestReducer.start || !driverStartDestReducer.dest) return;
     fetchDirections();
-  }, [startPoint, destPoint, isLoaded])
+  }, [startPoint, destPoint, isLoaded, tempOrderReducer])
 
   const fetchDirections = () => {
     if(!startPoint || ! destPoint) return;
+    let waypts: google.maps.DirectionsWaypoint[] = []
+    if(tempOrderReducer.orders.length > 0){
+      console.log("DriverMain tempOrderReducer.orders: ", tempOrderReducer.orders)
+      tempOrderReducer.orders.forEach((order) => {
+        waypts.push({
+          location: { lat: order.startPoint.lat, lng: order.startPoint.lng },
+          stopover: true,
+        })
+      })
+      // 根據起點與終點進行waypoints的排序,如果是南下則由北往南排序,反之則由南往北排序
+      if(startPoint.lat >= destPoint.lat){
+        waypts.sort((a, b) => {
+          if(a.location !== undefined && b.location !== undefined){
+            a.location = a.location as LatLngLiteral
+            b.location = b.location as LatLngLiteral
+            return a.location.lat - b.location.lat
+          }
+          else{
+            return 0
+          }
+        })
+      }
+      else{
+        waypts.sort((a, b) => {
+          if(a.location !== undefined && b.location !== undefined){
+            a.location = a.location as LatLngLiteral
+            b.location = b.location as LatLngLiteral
+            return b.location.lat - a.location.lat
+          }
+          else{
+            return 0
+          }
+        })
+      }
+
+    }
     const service = new google.maps.DirectionsService();
     service.route(
       {
         origin: {lat: startPoint.lat, lng: startPoint.lng},
+        waypoints: waypts,
         destination: {lat: destPoint.lat, lng: destPoint.lng},
         travelMode: google.maps.TravelMode.DRIVING,
       },
@@ -76,7 +114,7 @@ const DriverMain = () => {
         <div className='h-[45%] bottom-0 z-100 -translate-y-10'>
           {
             pickupPanel 
-              ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} markerOrderId={markerOrderId} /> 
+              ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} markerOrderId={markerOrderId} setShowSpots={setShowSpots} /> 
               : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
           }
         </div>

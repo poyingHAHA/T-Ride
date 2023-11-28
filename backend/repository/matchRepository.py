@@ -5,13 +5,13 @@ from repository.models import *
 
 class MatchRepository:
     def __init__(self):
-        config = ConfigUtil.get('database')
+        self.config = ConfigUtil.get('database')
         self.conn = psycopg2.connect(
-            database=config.get('name'),
-            user=config.get('user'),
-            password=config.get('password'),
-            host=config.get('host'),
-            port=config.get('port'))
+            database=self.config.get('name'),
+            user=self.config.get('user'),
+            password=self.config.get('password'),
+            host=self.config.get('host'),
+            port=self.config.get('port'))
 
     def send_invitation(self, driver_order_id, passenger_order_id):
         '''
@@ -26,6 +26,18 @@ class MatchRepository:
                       {passenger_order_id},
                       false);'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             self.conn.commit()
@@ -38,6 +50,18 @@ class MatchRepository:
                   FROM matches JOIN passenger_orders
                   ON matches.passenger_order_id = passenger_orders.id
                   WHERE matches.driver_order_id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)

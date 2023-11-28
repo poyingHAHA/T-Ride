@@ -8,13 +8,13 @@ from repository.models import *
 
 class UserRepository:
     def __init__(self):
-        config = ConfigUtil.get('database')
+        self.config = ConfigUtil.get('database')
         self.conn = psycopg2.connect(
-            database=config.get('name'),
-            user=config.get('user'),
-            password=config.get('password'),
-            host=config.get('host'),
-            port=config.get('port'))
+            database=self.config.get('name'),
+            user=self.config.get('user'),
+            password=self.config.get('password'),
+            host=self.config.get('host'),
+            port=self.config.get('port'))
 
     def register(self, user_name, password):
         '''
@@ -23,6 +23,19 @@ class UserRepository:
         '''
         sql = f'''SELECT * FROM users
                            WHERE username = '{user_name}';'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             row = cur.fetchone()
@@ -45,6 +58,19 @@ class UserRepository:
         '''
         sql = f'''SELECT * FROM users
                            WHERE username = '{user_name}';'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
@@ -70,7 +96,6 @@ class UserRepository:
                 self.conn.commit()
                 return LoginEntity(token,row[f2i["id"]])
 
-        
 
     def get_user(self, user_id):
         '''
@@ -78,6 +103,18 @@ class UserRepository:
         '''
         sql = f'''SELECT * FROM users
                            WHERE id = {user_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -105,6 +142,18 @@ class UserRepository:
         delete_token_sql = f'''DELETE FROM session
                                WHERE token = '{token}';'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(get_id_sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
@@ -129,6 +178,18 @@ class UserRepository:
         sql = f'''SELECT * FROM driver_datas
                   WHERE id = {driver_data_id};'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
@@ -145,6 +206,18 @@ class UserRepository:
         return "Invalid passenger count"
         return None on success
         '''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         sql = f'''INSERT INTO driver_datas (vehicle_name, vehicle_plate, passenger_count)
                   VALUES (%s, %s, %s)
@@ -170,6 +243,19 @@ class UserRepository:
         sql = f'''UPDATE driver_datas
                   SET vehicle_name = %s, vehicle_plate = %s, passenger_count = %s
                   WHERE id = {data_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         if passenger_count < 1:
             return None
         else:
@@ -186,6 +272,18 @@ class UserRepository:
                   SET total_order_count = total_order_count + {num}
                   WHERE id = {user_id};'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             self.conn.commit()
@@ -197,6 +295,18 @@ class UserRepository:
         sql = f'''UPDATE users
                   SET abandon_order_count = abandon_order_count + {num}
                   WHERE id = {user_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)

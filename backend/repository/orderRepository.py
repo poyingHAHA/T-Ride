@@ -1,4 +1,3 @@
-# TODO: 資料庫斷線重連
 import psycopg2
 from utils.config import ConfigUtil
 from repository.models import *
@@ -6,13 +5,13 @@ from repository.models import *
 
 class OrderRepository:
     def __init__(self):
-        config = ConfigUtil.get('database')
+        self.config = ConfigUtil.get('database')
         self.conn = psycopg2.connect(
-            database=config.get('name'),
-            user=config.get('user'),
-            password=config.get('password'),
-            host=config.get('host'),
-            port=config.get('port'))
+            database=self.config.get('name'),
+            user=self.config.get('user'),
+            password=self.config.get('password'),
+            host=self.config.get('host'),
+            port=self.config.get('port'))
 
     def get_unfinished_driver_orders(self, user_id):
         '''
@@ -21,6 +20,18 @@ class OrderRepository:
         sql = f'''SELECT * FROM driver_orders
                   WHERE user_id = {user_id}
                   AND NOT finished;'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -46,6 +57,18 @@ class OrderRepository:
                   WHERE user_id = {user_id}
                   AND NOT finished;'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         return self.__sql_get_passenger_orders(sql)
 
     def create_driver_order(self, driver_order_entity):
@@ -64,6 +87,18 @@ class OrderRepository:
                       finished)
                   VALUES (%s, %s, %s, %s, %s ,%s, %s, %s)
                   RETURNING id;'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql, (
@@ -100,6 +135,18 @@ class OrderRepository:
                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                   RETURNING id;'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql, (
                 passenger_order_entity.user_id,
@@ -121,6 +168,18 @@ class OrderRepository:
     def _get_all_spots(self):
         sql = '''SELECT * FROM spots;'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
@@ -137,6 +196,18 @@ class OrderRepository:
         '''
         sql = f'''SELECT * FROM spots
                   WHERE id = {spot_id}'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -157,6 +228,18 @@ class OrderRepository:
         '''
         sql = f'''SELECT * FROM driver_orders
                   WHERE id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -183,6 +266,18 @@ class OrderRepository:
         '''
         sql = f'''SELECT * FROM passenger_orders
                   WHERE id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -217,6 +312,18 @@ class OrderRepository:
                          SET finished = true
                          WHERE id = {order_id};'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             self.conn.commit()
@@ -230,6 +337,18 @@ class OrderRepository:
         sql = f'''UPDATE passenger_orders
                   SET finished = true
                   WHERE id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -245,6 +364,18 @@ class OrderRepository:
                         WHERE id = {order_id};'''
         match_sql = f'''DELETE FROM matches
                         WHERE passenger_order_id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(match_sql);
@@ -271,6 +402,18 @@ class OrderRepository:
                       OR time2 < {departure_time - time_range})
                       AND NOT finished
                       GROUP BY spots.id;'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
             cur.execute(sql)
@@ -332,6 +475,18 @@ class OrderRepository:
                   WHERE matches.passenger_order_id = {order_id}
                   AND matches.accepted;'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
@@ -360,6 +515,18 @@ class OrderRepository:
                   WHERE passenger_order_id = {order_id}
                   AND NOT matches.accepted;'''
 
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
@@ -377,6 +544,18 @@ class OrderRepository:
             row[f2i['finished']]) for row in rows]
 
     def __sql_get_passenger_orders(self, sql):
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
         with self.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}

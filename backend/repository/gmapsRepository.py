@@ -41,9 +41,11 @@ class GmapsRepository:
 
 
     def get_distance(self, point1, point2, departure_time = None):
+        import random
+        return random.randint(1000, 2000)
         '''
         points are valid
-        return in meters(string format)
+        return in meters
         '''
         
         lat1, long1 = map(float, point1.split(','))
@@ -58,7 +60,9 @@ class GmapsRepository:
 
             # 檢查回傳結果 
             if result['status'] == 'OK':
-                distance = result['rows'][0]['elements'][0]['distance']['value']
+                # TODO: eval裡面是什麼
+                distance = eval(result['rows'][0]['elements'][0]['distance']['value'])
+                return -1
                 
                 return distance
             else:

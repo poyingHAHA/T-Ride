@@ -12,28 +12,29 @@ class GmapsRepository:
         if not self.test:
             self.gmaps = googlemaps.Client(key=config.get('api_key'))
 
-# TODO: review
+# TODO: 使用的人檢查None
     def get_estimate_time(self, point1, point2, departure_time = None):
         '''
         points are valid
-        return in meters(string format)
+
+        return None if can't estimate
+        return in seconds
         '''
-        
-        lat1, long1 = map(float, point1.split(','))
-        lat2, long2 = map(float, point2.split(','))
-        
         if self.test: 
-            return 1005
+            return self.get_distance(point1, point2, departure_time) * 10
     
         # 使用 Distance Matrix API 計算行車預計時間
         try:
-            result = self.gmaps.distance_matrix(point1, point2, mode="driving", units="metric", departure_time=departure_time)
+            result = self.gmaps.distance_matrix(
+                point1,
+                point2,
+                mode="driving",
+                units="metric",
+                departure_time=departure_time)
 
             # 檢查回傳結果 
             if result['status'] == 'OK':
-                duration = result['rows'][0]['elements'][0]['duration']['value']
-                
-                return duration
+                return result['rows'][0]['elements'][0]['duration']['value']
             else:
                 return None 
 
@@ -41,32 +42,32 @@ class GmapsRepository:
             return None 
 
 
-# TODO: review
+# TODO: 使用的人檢查None
     def get_distance(self, point1, point2, departure_time = None):
-        import random
-        return random.randint(1000, 2000)
         '''
         points are valid
+
+        return None if can't get distance
         return in meters
         '''
-        
-        lat1, long1 = map(float, point1.split(','))
-        lat2, long2 = map(float, point2.split(','))
-        
+        lat1, lng1 = map(float, point1.split(','))
+        lat2, lng2 = map(float, point2.split(','))
+
         if self.test: 
-            return self.haversine(lat1, long1, lat2, long2) 
-    
+            return self.haversine(lat1, lng1, lat2, lng2) 
+
         # 使用 Distance Matrix API 計算距離
         try:
-            result = self.gmaps.distance_matrix(point1, point2, mode="driving", units="metric", departure_time=departure_time)
+            result = self.gmaps.distance_matrix(
+                point1,
+                point2,
+                mode="driving",
+                units="metric",
+                departure_time=departure_time)
 
             # 檢查回傳結果 
             if result['status'] == 'OK':
-                # TODO: eval裡面是什麼
-                distance = eval(result['rows'][0]['elements'][0]['distance']['value'])
-                return -1
-                
-                return distance
+                return result['rows'][0]['elements'][0]['distance']['value']
             else:
                 return None 
 
@@ -74,18 +75,18 @@ class GmapsRepository:
             return None 
 
 
-    def haversine(self, lat1, lon1, lat2, lon2):
+    def haversine(self, lat1, lng1, lat2, lng2):
         '''
         使用球面三角法（Haversine公式）來估算兩個地點之間的距離
         '''
         # 將經緯度轉換為弧度
        
-        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+        lat1, lng1, lat2, lng2 = map(math.radians, [lat1, lng1, lat2, lng2])
       
         # Haversine 公式
         dlat = lat2 - lat1
-        dlon = lon2 - lon1
-        a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+        dlng = lng2 - lng1
+        a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng / 2) ** 2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
         # 地球半徑（公里），可以根據需要更改

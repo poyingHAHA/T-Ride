@@ -257,7 +257,7 @@ class OrderService:
         point is valid
         return None if no spots at all
         '''
-        spots = self.order_repository.get_all_spots()
+        spots = self.order_repository._get_all_spots()
 
         if len(spots) == 0:
             return None

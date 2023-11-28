@@ -1,3 +1,4 @@
+# TODO: 資料庫斷線重連
 import psycopg2
 from utils.config import ConfigUtil
 from repository.models import *
@@ -117,7 +118,7 @@ class OrderRepository:
 
         return order_id
 
-    def get_all_spots(self):
+    def _get_all_spots(self):
         sql = '''SELECT * FROM spots;'''
 
         with self.conn.cursor() as cur:

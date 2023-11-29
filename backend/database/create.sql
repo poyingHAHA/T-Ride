@@ -44,6 +44,7 @@ CREATE TABLE "passenger_orders" (
   "end_point" varchar,
   "end_name" varchar,
   "fee" integer,
+  "arrival_time" integer,
   "spot_id" integer,
   "finished" bool
 );

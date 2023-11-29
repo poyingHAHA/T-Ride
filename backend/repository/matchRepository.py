@@ -45,11 +45,14 @@ class MatchRepository:
     def get_driver_invitations(self, order_id):
         '''
         order exists
+
+        passenger orders are sorted by departure time
         '''
         sql = f'''SELECT passenger_orders.*, matches.accepted
                   FROM matches JOIN passenger_orders
                   ON matches.passenger_order_id = passenger_orders.id
-                  WHERE matches.driver_order_id = {order_id};'''
+                  WHERE matches.driver_order_id = {order_id}
+                  ORDER BY passenger_orders.departure_time1 ASC;'''
 
         # check connection
         try:
@@ -80,6 +83,7 @@ class MatchRepository:
                 row[f2i['end_point']],
                 row[f2i['end_name']],
                 row[f2i['fee']],
+                row[f2i['arrival_time']],
                 row[f2i['spot_id']],
                 row[f2i['finished']]),
             row[f2i['accepted']]) for row in rows]

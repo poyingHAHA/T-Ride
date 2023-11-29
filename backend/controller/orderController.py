@@ -178,8 +178,7 @@ async def get_passenger_order_details(orderId):
     if order is None:
         return await make_response("Order not found", 404)
 
-    return utils.to_json(PassengerOrderVo(order, order_service.get_estimated_arrival_time(
-        order.start_point, order.end_point, order.departure_time1)))
+    return utils.to_json(PassengerOrderVo(order))
 
 
 @order.route('/passenger/finish', methods=['POST'])
@@ -215,8 +214,7 @@ async def get_passenger_order_unfinished(userId):
     if orders is None:
         return await make_response("User not found", 404)
 
-    return utils.to_json([PassengerOrderVo(order, order_service.get_estimated_arrival_time(
-        order.start_point, order.end_point, order.departure_time1)) for order in orders])
+    return utils.to_json([PassengerOrderVo(order) for order in orders])
 
 
 @order.route('/passenger/spot/all', methods=['GET'])
@@ -245,8 +243,7 @@ async def get_passenger_orders_from_spot(spotId):
     if ret == "spot not found":
         return await make_response("Spot not found", 404)
 
-    return utils.to_json([PassengerOrderVo(order, order_service.get_estimated_arrival_time(
-        order.start_point, order.end_point, order.departure_time1)) for order in ret])
+    return utils.to_json([PassengerOrderVo(order) for order in ret])
 
 
 @order.route('/fee', methods=['GET'])

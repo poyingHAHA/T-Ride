@@ -26,7 +26,8 @@ class OrderService:
         if self.user_repository.get_user(user_id) is None:
             return None
 
-        return [PassengerOrderDto(entity) for entity in self.order_repository.get_unfinished_passenger_orders(user_id)]
+        return [PassengerOrderDto(entity, self.__get_estimated_arrival_time(entity))
+            for entity in self.order_repository.get_unfinished_passenger_orders(user_id)]
 
     def create_driver_order(self, user_id, create_driver_order_dto):
         '''
@@ -72,6 +73,12 @@ class OrderService:
         if nearest_spot is None:
             return "no spots in database"
 
+        trip_time = self.gmaps_repository.get_estimate_time(
+            create_passenger_order_dto.start_point,
+            create_passenger_order_dto.end_point,
+            create_passenger_order_dto.departure_time2)
+        trip_time = trip_time if trip_time is not None else 0
+
         return self.order_repository.create_passenger_order(PassengerOrderEntity(
             None,
             user_id,
@@ -82,7 +89,8 @@ class OrderService:
             create_passenger_order_dto.start_name,
             create_passenger_order_dto.end_point,
             create_passenger_order_dto.end_name,
-            self.get_fee(create_passenger_order_dto.start_point, nearest_spot.point, create_passenger_order_dto.passenger_count, create_passenger_order_dto.departure_time1),
+            self.get_fee(create_passenger_order_dto.start_point, create_passenger_order_dto.end_point, create_passenger_order_dto.passenger_count, create_passenger_order_dto.departure_time1),
+            create_passenger_order_dto.departure_time2 + trip_time,
             nearest_spot.spot_id,
             False))
 
@@ -104,7 +112,7 @@ class OrderService:
         if order_entity is None:
             return None
 
-        return PassengerOrderDto(order_entity)
+        return PassengerOrderDto(order_entity, self.__get_estimated_arrival_time(order_entity))
 
     def finish_driver_order(self, user_id, order_id):
         '''
@@ -204,27 +212,8 @@ class OrderService:
         if self.order_repository.get_spot(spot_id) is None:
             return "spot not found"
 
-        return [PassengerOrderDto(entity) for entity in self.order_repository.get_spot_passenger_orders(spot_id, departure_time)]
-
-    def get_estimated_arrival_time(self, point1, point2, departure_time):
-        # TODO: 傳過去時間要回傳最近一次預估的結果？=>存db？
-        # TODO: 有配對造成抵達時間延後怎麼辦？有配對的話就單純撈db？
-        if not self.is_valid_point(point1) or not self.is_valid_point(point2):
-            return -1
-        try:
-            departure_time = int(departure_time)
-            if departure_time < 0:
-                return -1 
-        except ValueError:
-            return -1 
-
-        time = self.gmaps_repository.get_estimate_time(point1, point2, departure_time)
-
-        if time == None:   
-            return   -1 
-        
-        return departure_time + time 
-
+        return [PassengerOrderDto(entity, self.__get_estimated_arrival_time(entity))
+            for entity in self.order_repository.get_spot_passenger_orders(spot_id, departure_time)]
 
     def get_fee(self, point1, point2, passenger_count, departure_time):
         if not self.is_valid_point(point1) or not self.is_valid_point(point2):
@@ -272,3 +261,33 @@ class OrderService:
                 nearest_distance = candidate
 
         return nearest_spot
+
+    def __get_estimated_arrival_time(self, passenger_order_entity):
+        '''
+        return data stored in entity if departure time is in the past
+        '''
+        if passenger_order_entity.departure_time2 < utils.get_time():
+            # the passenger order is in the past, can't estimate
+            return passenger_order_entity.arrival_time
+
+        if self.order_repository.get_passenger_related_order(
+            passenger_order_entity.order_id) is not None:
+            # the passenger order is matched, don't estimate
+            # TODO: 要把其他order也一起重估？待定
+            return passenger_order_entity.arrival_time
+
+        trip_time = self.gmaps_repository.get_estimate_time(
+            passenger_order_entity.start_point,
+            passenger_order_entity.end_point,
+            passenger_order_entity.departure_time2)
+        if trip_time is None:
+            # something went wrong or race condition
+            # causes the order be in the past
+            return passenger_order_entity.arrival_time
+
+        self.order_repository.update_passenger_arrival_time(
+            passenger_order_entity.order_id,
+            passenger_order_entity.departure_time2 + trip_time)
+
+        return passenger_order_entity.departure_time2 + trip_time
+

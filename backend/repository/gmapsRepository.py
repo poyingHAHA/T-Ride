@@ -13,7 +13,7 @@ class GmapsRepository:
             self.gmaps = googlemaps.Client(key=config.get('api_key'))
 
 # TODO: 使用的人檢查None
-    def get_estimate_time(self, point1, point2, departure_time = None):
+    def get_estimate_time(self, point1, point2, departure_time=None):
         '''
         points are valid
 
@@ -21,7 +21,7 @@ class GmapsRepository:
         return in seconds
         '''
         if self.test: 
-            return self.get_distance(point1, point2, departure_time) * 10
+            return self.get_distance(point1, point2, departure_time) // 10
     
         # 使用 Distance Matrix API 計算行車預計時間
         try:
@@ -43,7 +43,7 @@ class GmapsRepository:
 
 
 # TODO: 使用的人檢查None
-    def get_distance(self, point1, point2, departure_time = None):
+    def get_distance(self, point1, point2, departure_time=None):
         '''
         points are valid
 
@@ -94,4 +94,4 @@ class GmapsRepository:
 
         # 計算距離
         distance =  radius * 1000 * c
-        return distance
+        return int(distance)

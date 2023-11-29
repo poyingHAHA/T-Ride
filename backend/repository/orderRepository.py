@@ -130,9 +130,10 @@ class OrderRepository:
                       end_point,
                       end_name,
                       fee,
+                      arrival_time,
                       spot_id,
                       finished)
-                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                   RETURNING id;'''
 
         # check connection
@@ -158,6 +159,7 @@ class OrderRepository:
                 passenger_order_entity.end_point,
                 passenger_order_entity.end_name,
                 passenger_order_entity.fee,
+                passenger_order_entity.arrival_time,
                 passenger_order_entity.spot_id,
                 passenger_order_entity.finished))
             order_id = cur.fetchone()[0]
@@ -298,6 +300,7 @@ class OrderRepository:
                 row[f2i['end_point']],
                 row[f2i['end_name']],
                 row[f2i['fee']],
+                row[f2i['arrival_time']],
                 row[f2i['spot_id']],
                 row[f2i['finished']])
 
@@ -543,6 +546,30 @@ class OrderRepository:
             row[f2i['passenger_count']],
             row[f2i['finished']]) for row in rows]
 
+    def update_passenger_arrival_time(self, order_id, arrival_time):
+        '''
+        order exists
+        '''
+        sql = f'''UPDATE passenger_orders
+                  SET arrival_time = {arrival_time}
+                  WHERE id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            self.conn.commit()
+
     def __sql_get_passenger_orders(self, sql):
         # check connection
         try:
@@ -572,5 +599,6 @@ class OrderRepository:
             row[f2i['end_point']],
             row[f2i['end_name']],
             row[f2i['fee']],
+            row[f2i['arrival_time']],
             row[f2i['spot_id']],
             row[f2i['finished']]) for row in rows]

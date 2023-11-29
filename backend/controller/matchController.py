@@ -63,11 +63,7 @@ async def get_driver_total_invitations(driverOrderId):
     if ret == 'order not found':
         return await make_response('Order not found', 404)
 
-    # TODO: arrival time跟排序都在service就算好才丟出來
-    return utils.to_json({'invitations': sorted([InvitationVo(invitation, order_service.get_estimated_arrival_time(
-        invitation.order.start_point,
-        invitation.order.end_point,
-        invitation.order.departure_time1)) for invitation in ret], key=lambda invitation: invitation.passengerOrder.departureTime1)})
+    return utils.to_json({'invitations': [InvitationVo(invitation) for invitation in ret]})
 
 
 @match.route('/passenger/invitation/total/<int:passengerOrderId>', methods=['GET'])

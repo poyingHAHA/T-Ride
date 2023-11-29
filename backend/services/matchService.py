@@ -65,9 +65,8 @@ class MatchService:
         if order is None:
             return "order not found"
 
-        invitations = self.match_repository.get_driver_invitations(order_id)
-
-        return [InvitationDto(invitation) for invitation in invitations]
+        return [InvitationDto(invitation) for invitation in
+            self.match_repository.get_driver_invitations(order_id)]
 
     def get_passenger_invitation_orders(self, order_id):
         '''

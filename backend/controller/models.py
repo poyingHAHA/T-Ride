@@ -40,7 +40,7 @@ class DriverOrderVo:
 
 
 class PassengerOrderVo:
-    def __init__(self, passenger_order_dto, arrival_time):
+    def __init__(self, passenger_order_dto):
         self.orderId = passenger_order_dto.order_id
         self.userId = passenger_order_dto.user_id
         self.departureTime1 = passenger_order_dto.departure_time1
@@ -51,7 +51,7 @@ class PassengerOrderVo:
         self.endPoint = PointVo(passenger_order_dto.end_point)
         self.endName = passenger_order_dto.end_name
         self.fee = passenger_order_dto.fee
-        self.arrivalTime = arrival_time
+        self.arrivalTime = passenger_order_dto.arrival_time
 
 
 class SpotWithCountVo:

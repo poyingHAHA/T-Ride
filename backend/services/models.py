@@ -55,7 +55,7 @@ class DriverOrderDto:
 
 
 class PassengerOrderDto:
-    def __init__(self, passenger_order_entity):
+    def __init__(self, passenger_order_entity, arrival_time):
         self.order_id = passenger_order_entity.order_id
         self.user_id = passenger_order_entity.user_id
         self.departure_time1 = passenger_order_entity.departure_time1
@@ -66,6 +66,7 @@ class PassengerOrderDto:
         self.end_point = passenger_order_entity.end_point
         self.end_name = passenger_order_entity.end_name
         self.fee = passenger_order_entity.fee
+        self.arrival_time = arrival_time
 
 
 class SpotDto:

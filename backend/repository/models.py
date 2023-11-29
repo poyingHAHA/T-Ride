@@ -36,7 +36,7 @@ class DriverOrderEntity:
 
 
 class PassengerOrderEntity:
-    def __init__(self, order_id, user_id, departure_time1, departure_time2, passenger_count, start_point, start_name, end_point, end_name, fee, spot_id, finished):
+    def __init__(self, order_id, user_id, departure_time1, departure_time2, passenger_count, start_point, start_name, end_point, end_name, fee, arrival_time, spot_id, finished):
         self.order_id = order_id
         self.user_id = user_id
         self.departure_time1 = departure_time1
@@ -47,6 +47,7 @@ class PassengerOrderEntity:
         self.end_point = end_point
         self.end_name = end_name
         self.fee = fee
+        self.arrival_time = arrival_time
         self.spot_id = spot_id
         self.finished = finished
 

@@ -296,7 +296,7 @@ class OrderService:
         if self.order_repository.get_passenger_related_order(
             passenger_order_entity.order_id) is not None:
             # the passenger order is matched, don't estimate
-            # TODO: 要把其他order也一起重估？待定
+            # TODO: 若要估的話要遞迴把其他order也一起重估？
             return passenger_order_entity.arrival_time
 
         trip_time = self.gmaps_repository.get_estimate_time(

@@ -1,6 +1,7 @@
 from repository.orderRepository import *
 from repository.matchRepository import *
 from repository.userRepository import *
+from services.orderService import *
 from services.models import *
 
 
@@ -12,7 +13,7 @@ class MatchService:
 
     def send_invitation(self, token, driver_order_id, passenger_order_id):
         '''
-        return "Invalid token"
+        return "Invalid token",
                "user not found",
                "user incorrect",
                "driver order not found",
@@ -98,3 +99,49 @@ class MatchService:
             return None
 
         return DriverOrderDto(driver_order)
+
+    def accept_invitation(self, token, driver_order_id, passenger_order_id):
+        '''
+        return "invalid token",
+               "user not found",
+               "user incorrect",
+               "driver order not found",
+               "driver order is finished",
+               "passenger order not found",
+               "passenger order is finished",
+               "not invited",
+               "already matched"
+
+        return None on success
+        '''
+        passenger_id = self.user_repository.get_user_id(token)
+        if passenger_id is None:
+            return "invalid token"
+
+        if self.user_repository.get_user(passenger_id) is None:
+            return "user not found"
+
+        driver_order = self.order_repository.get_driver_order(driver_order_id)
+        if driver_order is None:
+            return "driver order not found"
+        if driver_order.finished:
+            return "driver order is finished"
+
+        passenger_order = self.order_repository.get_passenger_order(passenger_order_id)
+        if passenger_order is None:
+            return "passenger order not found"
+        if passenger_order.finished:
+            return "passenger order is finished"
+
+        if passenger_id != passenger_order.user_id:
+            return "user incorrect"
+
+        if passenger_order_id in [order.order_id for order in\
+            self.order_repository.get_driver_related_orders(driver_order_id)]:
+            return "already matched"
+        if passenger_order_id not in [order.order_id for order in\
+            self.order_repository.get_invited_orders(driver_order_id)]:
+            return "not invited"
+
+        self.match_repository.accept_invitation(driver_order_id, passenger_order_id)
+        self.match_repository.delete_other_invitations(driver_order_id, passenger_order_id)

@@ -85,7 +85,30 @@ async def get_passenger_accepted(passengerOrderId):
 
 @match.route('/passenger/invitation/accept', methods=['POST'])
 async def accept_invitation():
-    data = await request.get_json()
-    # TODO: 實現邏輯，處理接受邀請的情況
+    body = await request.json
+    if not utils.is_keys_in_dict(body, [
+        "token",
+        "driverOrderId",
+        "passengerOrderId"]):
+        return await make_response("Incorrect parameter format", 400)
 
-    return jsonify({'message': 'NOT implemented'}), 200
+    ret = match_service.accept_invitation(
+        body['token'],
+        body['driverOrderId'],
+        body['passengerOrderId'])
+
+    if ret == "invalid token":
+        return await make_response("Invalid token", 401)
+    if ret == "user not found":
+        return await make_response("Invalid token", 401)
+    if ret == "user incorrect":
+        return await make_response("Not the passenger's own order", 403)
+    if ret == "driver order not found" or ret == "passenger order not found":
+        return await make_response("Order not found", 404)
+    if ret == "driver order is finished" or\
+        ret == "passenger order is finished" or\
+        ret == "already matched" or\
+        ret == "not invited":
+        return await make_response("Invitation not received or order already accepted/completed", 409)
+
+    return await make_response("Successfully accepted invitation", 200)

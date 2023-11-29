@@ -86,5 +86,7 @@ class SpotWithCountDto:
 
 class InvitationDto():
     def __init__(self, invited_order_entity):
-        self.order = PassengerOrderDto(invited_order_entity.order)
+        # TODO: 這裡取乘客訂單不會更新arrival time
+        # 他媽要怎麼寫，就只回id再去get order不好嗎，回整坨訂單就耦合啊
+        self.order = PassengerOrderDto(invited_order_entity.order, invited_order_entity.order.arrival_time)
         self.accepted = invited_order_entity.accepted

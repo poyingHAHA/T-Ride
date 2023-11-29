@@ -762,6 +762,8 @@ paths:
       responses:
         '200':
           description: Successfully accepted invitation
+        '400':
+          description: Incorrect parameter format
         '401':
           description: Invalid token
         '403':

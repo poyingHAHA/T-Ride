@@ -52,7 +52,7 @@ class MatchRepository:
                   FROM matches JOIN passenger_orders
                   ON matches.passenger_order_id = passenger_orders.id
                   WHERE matches.driver_order_id = {order_id}
-                  ORDER BY passenger_orders.departure_time1 ASC;'''
+                  ORDER BY passenger_orders.time1 ASC;'''
 
         # check connection
         try:
@@ -87,3 +87,53 @@ class MatchRepository:
                 row[f2i['spot_id']],
                 row[f2i['finished']]),
             row[f2i['accepted']]) for row in rows]
+
+    def accept_invitation(self, driver_order_id, passenger_order_id):
+        '''
+        the invitation exists and isn't accepted
+
+        return None on success
+        '''
+        sql = f'''UPDATE matches SET accepted = true
+                  WHERE driver_order_id = {driver_order_id}
+                  AND passenger_order_id = {passenger_order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            self.conn.commit()
+
+    def delete_other_invitations(self, driver_order_id, passenger_order_id):
+        '''
+        delete invitations sent to the passenger order but not by the driver order
+        '''
+        sql = f'''DELETE FROM matches
+                  WHERE driver_order_id != {driver_order_id}
+                  AND passenger_order_id = {passenger_order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            self.conn.commit()

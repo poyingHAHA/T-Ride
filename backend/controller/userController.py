@@ -1,4 +1,3 @@
-# TODO: token validation should be in service
 from quart import Blueprint, request, make_response, websocket
 from services.userService import *
 from utils import utils
@@ -62,12 +61,9 @@ async def post_driver_data():
         "passengerCount"]):
         return await make_response("Incorrect parameter format", 400)
     
-    user_id = user_service.get_user_id(body["token"])
-    if user_id is None:
+    ret = user_service.set_driver_data(body["token"], body["vehicleName"], body["vehiclePlate"], body["passengerCount"])
+    if ret == "無效token":
         return await make_response("無效token", 401)
-    
-    ret = user_service.set_driver_data(user_id, body["vehicleName"], body["vehiclePlate"], body["passengerCount"])
-
     if ret == "Invalid passenger count":
         return await make_response("乘客數為無效參數", 404)
     if ret == "data already exist":

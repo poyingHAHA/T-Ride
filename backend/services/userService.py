@@ -23,12 +23,17 @@ class UserService:
         else:
             return LoginDto(login_entity)
     
-    def set_driver_data(self, user_id, vehicle_name, vehicle_plate, passenger_count):
+    def set_driver_data(self, token, vehicle_name, vehicle_plate, passenger_count):
         '''
-        return "Invalid passenger count"
+        return "無效token"
+               "Invalid passenger count"
                "data already exist"
         return None on success
         '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "無效token"
+        
         user_entity = self.user_repository.get_user(user_id)
         data_id = user_entity.driver_data_id
         if data_id is None:

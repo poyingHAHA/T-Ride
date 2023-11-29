@@ -1,4 +1,3 @@
-# TODO: token validation should be in service
 from quart import Blueprint, request, make_response
 from services.orderService import *
 from services.userService import *
@@ -33,12 +32,7 @@ async def post_driver_order():
         "lng"]):
         return await make_response("Incorrect parameter format", 400)
 
-
-    user_id = user_service.get_user_id(body["token"])
-    if user_id is None:
-        return await make_response("Invalid token", 401)
-
-    ret = order_service.create_driver_order(user_id, CreateDriverOrderDto(
+    ret = order_service.create_driver_order(body["token"], CreateDriverOrderDto(
         body["departureTime"],
         f'{body["startPoint"]["lat"]},{body["startPoint"]["lng"]}',
         body["startName"],
@@ -46,6 +40,8 @@ async def post_driver_order():
         body["endName"],
         body["passengerCount"]))
 
+    if ret == "Invalid token":
+        return await make_response("Invalid token", 401)
     if ret == "user not found":
         # should not happen, unless user is deleted but token still exists
         return await make_response("Invalid token", 401)
@@ -80,12 +76,9 @@ async def post_driver_order_finished():
         "orderId"]):
         return await make_response("Incorrect parameter format", 400)
 
-    user_id = user_service.get_user_id(body["token"])
-    if user_id is None:
+    ret = order_service.finish_driver_order(body["token"], body["orderId"])
+    if ret == "Invalid token":
         return await make_response("Invalid token", 401)
-
-    ret = order_service.finish_driver_order(user_id, body["orderId"])
-
     if ret == "user not found":
         # should not happen, unless user is deleted but token still exists
         return await make_response("Invalid token", 401)
@@ -120,11 +113,7 @@ async def post_passenger_order():
         "lng"]):
         return await make_response("Incorrect parameter format", 400)
 
-    user_id = user_service.get_user_id(body["token"])
-    if user_id is None:
-        return await make_response("Invalid token", 401)
-
-    ret = order_service.create_passenger_order(user_id, CreatePassengerOrderDto(
+    ret = order_service.create_passenger_order(body["token"], CreatePassengerOrderDto(
         body["departureTime1"],
         body["departureTime2"],
         f'{body["startPoint"]["lat"]},{body["startPoint"]["lng"]}',
@@ -150,12 +139,10 @@ async def delete_passenger_order(orderId):
     if not utils.is_keys_in_dict(query, ["token"]):
         return await make_response("Incorrect parameter format", 400)
 
-    user_id = user_service.get_user_id(query["token"])
-    if user_id is None:
+    ret = order_service.delete_passenger_order(query["token"], orderId)
+
+    if ret == "Invalid token":
         return await make_response("Invalid token", 401)
-
-    ret = order_service.delete_passenger_order(user_id, orderId)
-
     if ret == "user not found":
         # should not happen, unless user is deleted but token still exists
         return await make_response("Invalid token", 401)
@@ -166,6 +153,7 @@ async def delete_passenger_order(orderId):
     if ret == "order is finished":
         return await make_response("Order already completed", 409)
 
+    user_id = user_service.get_user_id(query["token"])
     user = user_service.get_user(user_id)
 
     return utils.to_json({
@@ -190,12 +178,10 @@ async def post_passenger_order_finished():
         "orderId"]):
         return await make_response("Incorrect parameter format", 400)
 
-    user_id = user_service.get_user_id(body["token"])
-    if user_id is None:
+    ret = order_service.finish_passenger_order(body["token"], body["orderId"])
+
+    if ret == "Invalid token":
         return await make_response("Invalid token", 401)
-
-    ret = order_service.finish_passenger_order(user_id, body["orderId"])
-
     if ret == "user not found":
         # should not happen, unless user is deleted but token still exists
         return await make_response("Invalid token", 401)

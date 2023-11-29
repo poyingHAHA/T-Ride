@@ -28,12 +28,16 @@ class OrderService:
 
         return [PassengerOrderDto(entity) for entity in self.order_repository.get_unfinished_passenger_orders(user_id)]
 
-    def create_driver_order(self, user_id, create_driver_order_dto):
+    def create_driver_order(self, token, create_driver_order_dto):
         '''
+        return "Invalid token" if token is invalid
         return "user not found" if user doesn't exist
         return "invalid order" if order is invalid
         return order_id
         '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "Invalid token"
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
         if not self.is_valid_point(create_driver_order_dto.start_point) or\
@@ -52,7 +56,7 @@ class OrderService:
             create_driver_order_dto.passenger_count,
             False))
 
-    def create_passenger_order(self, user_id, create_passenger_order_dto):
+    def create_passenger_order(self, token, create_passenger_order_dto):
         '''
         return "user not found",
                "invalid order",
@@ -60,6 +64,9 @@ class OrderService:
 
         return order_id
         '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "Invalid token"
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
         if not self.is_valid_point(create_passenger_order_dto.start_point) or\
@@ -106,9 +113,10 @@ class OrderService:
 
         return PassengerOrderDto(order_entity)
 
-    def finish_driver_order(self, user_id, order_id):
+    def finish_driver_order(self, token, order_id):
         '''
-        return "user not found",
+        return "Invalid token"
+               "user not found",
                "user incorrect",
                "order not found",
                "order is finished",
@@ -116,6 +124,10 @@ class OrderService:
 
         return None on success
         '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "Invalid token"
+        
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
 
@@ -139,15 +151,21 @@ class OrderService:
 
         self.order_repository.finish_driver_order(order_id)
 
-    def finish_passenger_order(self, user_id, order_id):
+    def finish_passenger_order(self, token, order_id):
         '''
-        return "user not found",
+        return "invalid token",
+               "user not found",
                "user incorrect",
                "order not found",
                "order is finished"
 
         return None on success
         '''
+        user_id = self.user_repository.get_user_id(token)
+        print(user_id)
+        if user_id is None:
+            return "Invalid token"
+        
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
 
@@ -165,15 +183,20 @@ class OrderService:
 
         self.order_repository.finish_passenger_order(order_id)
 
-    def delete_passenger_order(self, user_id, order_id):
+    def delete_passenger_order(self, token, order_id):
         '''
-        return "user not found",
+        return "Invalid token",
+               "user not found",
                "user incorrect",
                "order not found",
                "order is finished"
 
         return None on success
         '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "Invalid token"
+        
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
 

@@ -10,9 +10,10 @@ class MatchService:
         self.order_repository = OrderRepository()
         self.match_repository = MatchRepository()
 
-    def send_invitation(self, driver_id, driver_order_id, passenger_order_id):
+    def send_invitation(self, token, driver_order_id, passenger_order_id):
         '''
-        return "user not found",
+        return "Invalid token"
+               "user not found",
                "user incorrect",
                "driver order not found",
                "driver order is finished",
@@ -23,6 +24,10 @@ class MatchService:
 
         return None on success
         '''
+        driver_id = self.user_repository.get_user_id(token)
+        if driver_id is None:
+            return "Invalid token"
+        
         if self.user_repository.get_user(driver_id) is None:
             return "user not found"
 

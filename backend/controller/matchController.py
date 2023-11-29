@@ -1,4 +1,3 @@
-# TODO: token validation should be in service
 from quart import Blueprint, request, make_response
 from services.matchService import *
 from services.userService import *
@@ -23,15 +22,13 @@ async def match_driver_invitation():
         "passengerOrderId"]):
         return await make_response("Incorrect parameter format", 400)
 
-    user_id = user_service.get_user_id(body["token"])
-    if user_id is None:
-        return await make_response("Invalid token", 401)
-
     ret = match_service.send_invitation(
-        user_id,
+        body["token"],
         body["driverOrderId"],
         body["passengerOrderId"])
 
+    if ret == "Invalid token":
+        return await make_response("Invalid token", 401)
     if ret == "user not found":
         return await make_response("Invalid token", 401)
     if ret == "user incorrect":

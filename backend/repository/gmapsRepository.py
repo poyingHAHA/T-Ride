@@ -12,7 +12,6 @@ class GmapsRepository:
         if not self.test:
             self.gmaps = googlemaps.Client(key=config.get('api_key'))
 
-# TODO: 使用的人檢查None
     def get_estimate_time(self, point1, point2, departure_time=None):
         '''
         points are valid
@@ -42,7 +41,6 @@ class GmapsRepository:
             return None 
 
 
-# TODO: 使用的人檢查None
     def get_distance(self, point1, point2, departure_time=None):
         '''
         points are valid

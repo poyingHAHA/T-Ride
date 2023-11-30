@@ -2,6 +2,7 @@ from repository.orderRepository import *
 from repository.userRepository import *
 from repository.gmapsRepository import *
 from services.models import *
+import math
 
 
 class OrderService:
@@ -86,6 +87,10 @@ class OrderService:
             create_passenger_order_dto.departure_time2)
         trip_time = trip_time if trip_time is not None else 0
 
+        fee = self.get_fee(create_passenger_order_dto.start_point, create_passenger_order_dto.end_point, create_passenger_order_dto.passenger_count, create_passenger_order_dto.departure_time2)
+        if fee is None:
+            return "invalid order"
+
         return self.order_repository.create_passenger_order(PassengerOrderEntity(
             None,
             user_id,
@@ -96,7 +101,7 @@ class OrderService:
             create_passenger_order_dto.start_name,
             create_passenger_order_dto.end_point,
             create_passenger_order_dto.end_name,
-            self.get_fee(create_passenger_order_dto.start_point, create_passenger_order_dto.end_point, create_passenger_order_dto.passenger_count, create_passenger_order_dto.departure_time1),
+            fee,
             create_passenger_order_dto.departure_time2 + trip_time,
             nearest_spot.spot_id,
             False))
@@ -276,9 +281,14 @@ class OrderService:
             return None
 
         nearest_spot = SpotDto(spots[0])
+
         nearest_distance = self.gmaps_repository.get_distance(point, spots[0].point)
+        nearest_distance = nearest_distance if nearest_distance is not None else math.inf
+
         for spot in spots[1:]:
             candidate = self.gmaps_repository.get_distance(point, spot.point)
+            candidate = candidate if candidate is not None else math.inf
+
             if candidate < nearest_distance:
                 nearest_spot = SpotDto(spot)
                 nearest_distance = candidate
@@ -287,6 +297,9 @@ class OrderService:
 
     def __get_estimated_arrival_time(self, passenger_order_entity):
         '''
+        this method is used when getting passenger order
+        this is not used when creating passenger order
+
         return data stored in entity if departure time is in the past
         '''
         if passenger_order_entity.departure_time2 < utils.get_time():

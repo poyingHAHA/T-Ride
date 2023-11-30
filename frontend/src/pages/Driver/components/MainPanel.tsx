@@ -11,7 +11,7 @@ type MainPanelProps = {
   setPanel: (panel: number) => any;
   setShowSpots: (showSpots: boolean) => any;
 };
-const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpots}: MainPanelProps) => {
+const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpots }: MainPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const dispatch = useAppDispatch();
@@ -35,21 +35,21 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
             <div className='flex justify-between items-center w-[80vw] mt-4'>
               <div className='flex grow-[3] justify-start items-center'>
                 <label htmlFor="departureTime">出發</label>
-                <input 
-                  type="datetime-local" 
+                <input
+                  type="datetime-local"
                   id="departureTime"
-                  value={driverDepart.departureTime ? new Date(driverDepart.departureTime * 1000+8*60*60*1000).toISOString().slice(0, -8) : ""}
-                  name="departureTime" 
-                  className='bg-gray-200 rounded h-12 w-[12rem] ml-2 p-1' 
-                  onChange={(e)=>handleChangeDepartureTime(e)} 
+                  value={driverDepart.departureTime ? new Date(driverDepart.departureTime * 1000 + 8 * 60 * 60 * 1000).toISOString().slice(0, -8) : ""}
+                  name="departureTime"
+                  className='bg-gray-200 rounded h-12 w-[12rem] ml-2 p-1'
+                  onChange={(e) => handleChangeDepartureTime(e)}
                 />
               </div>
               <div className='flex grow-0 justify-between items-center'>
                 <label htmlFor="passNumber">人數</label>
                 <select name="passNumber" id="passNumber" className='h-12 rounded w-10 text-center ml-1' onChange={handleSelectPassengerCount} >
                   {
-                    [...Array(10)].map((_, i) => 
-                      driverDepart.passengerCount === i + 1 ? <option value={i+1} selected>{i+1}</option> : <option value={i + 1}>{i + 1}</option>
+                    [...Array(10)].map((_, i) =>
+                      driverDepart.passengerCount === i + 1 ? <option value={i + 1} selected>{i + 1}</option> : <option value={i + 1}>{i + 1}</option>
                     )
                   }
                 </select>
@@ -66,11 +66,11 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
               <AutoCompleteInput type='driverDest' setLocation={setDest} setPoint={setDestPoint} />
             </div>
 
-            <button 
+            <button
               className='rounded bg-cyan-800 w-[80vw] h-10  text-white text-xl'
               // disabled={driverStartDestReducer.start === undefined || driverStartDestReducer.dest===undefined || driverDepart.departureTime===undefined || driverDepart.passengerCount===0}
               onClick={() => {
-                if(driverStartDestReducer.start === undefined || driverStartDestReducer.dest===undefined || driverDepart.departureTime===undefined || driverDepart.passengerCount===0) {
+                if (driverStartDestReducer.start === undefined || driverStartDestReducer.dest === undefined || driverDepart.departureTime === undefined || driverDepart.passengerCount === 0) {
                   alert("請填寫完整資料")
                   return;
                 }

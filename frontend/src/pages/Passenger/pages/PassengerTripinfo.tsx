@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from 'react'
 import { MdFace } from "react-icons/md";
 import { useAppSelector, useAppDispatch } from "../../../hooks";
-import PassengerMap from '../components/PassengerMap';
+// import PassengerMap from '../components/PassengerMap';
 import { useJsApiLoader, Libraries } from '@react-google-maps/api';
 import { IoMdArrowRoundBack } from "react-icons/io";
 

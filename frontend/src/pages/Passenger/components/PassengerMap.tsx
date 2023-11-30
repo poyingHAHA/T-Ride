@@ -8,11 +8,11 @@ type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
 type PassengerMapProps = {
   isLoaded: boolean;
-  showSpots?: boolean;
   directions?: DirectionsResult;
-  setOrders?: (orders: orderDTO[]) => void;
-  orders?: orderDTO[];
-  setMarkerOrderId?: (orderId: number) => void
+  // showSpots?: boolean;
+  // setOrders?: (orders: orderDTO[]) => void;
+  // orders?: orderDTO[];
+  // setMarkerOrderId?: (orderId: number) => void
 };
 type spot = {
   "spotId": string,
@@ -24,7 +24,7 @@ type spot = {
   "passengerCount": number
 };
 
-const PassengerMap = ({ isLoaded, directions, showSpots, setOrders, orders, setMarkerOrderId }: PassengerMapProps) => {
+const PassengerMap = ({ isLoaded, directions }: PassengerMapProps) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({ lat: locationReducer.lat || 0, lng: locationReducer.lng || 0 });
   const location = { ...locationReducer }
@@ -44,21 +44,21 @@ const PassengerMap = ({ isLoaded, directions, showSpots, setOrders, orders, setM
   };
 
 
-  useEffect(() => {
-    // 取得所有地標
-    if (!showSpots) setSpots([]);
-    async function fetchData() {
-      // const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
-      const spots = await getSpots(Date.now());
-      setSpots(spots.spots);
-      console.log("PassengerMap Spots: ", spots);
-    }
-    try {
-      fetchData();
-    } catch (error) {
-      console.log(error);
-    }
-  }, [showSpots]);
+  // useEffect(() => {
+  //   // 取得所有地標
+  //   if (!showSpots) setSpots([]);
+  //   async function fetchData() {
+  //     // const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
+  //     const spots = await getSpots(Date.now());
+  //     setSpots(spots.spots);
+  //     console.log("PassengerMap Spots: ", spots);
+  //   }
+  //   try {
+  //     fetchData();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }, [showSpots]);
 
   const defaultProps = {
     center: {
@@ -76,11 +76,11 @@ const PassengerMap = ({ isLoaded, directions, showSpots, setOrders, orders, setM
       console.log("PassengerMap: 請選擇出發時間")
       return;
     }
-    // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
-    const orders = await getSpotOrders(spotId, passengerDepart.departureTime);
-    // 取得地標附近的訂單，並傳給父層，讓PickupPanel顯示
-    if (setOrders) setOrders(orders.orders);
-    console.log("PassengerMap: ", orders);
+    // // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
+    // const orders = await getSpotOrders(spotId, passengerDepart.departureTime);
+    // // 取得地標附近的訂單，並傳給父層，讓PickupPanel顯示
+    // if (setOrders) setOrders(orders.orders);
+    // console.log("PassengerMap: ", orders);
 
     setActiveMarker(spotId);
     setActiveMarkerPoint(spotPoint || null);
@@ -169,7 +169,7 @@ const PassengerMap = ({ isLoaded, directions, showSpots, setOrders, orders, setM
                 </MarkerF>
               )
             }
-            {
+            {/* {
               showSpots && (
                 spots.map(({ spotId, spotName, spotPoint, passengerCount }) => {
                   return (
@@ -191,13 +191,13 @@ const PassengerMap = ({ isLoaded, directions, showSpots, setOrders, orders, setM
                   )
                 })
               )
-            }
+            } */}
             {
               activeMarkerPoint && (
                 <Circle center={activeMarkerPoint} radius={1000} options={closeOptions} />
               )
             }
-            {
+            {/* {
               orders !== undefined && orders.length !== 0 && orders.map((order) => {
                 return (
                   <MarkerF
@@ -210,7 +210,7 @@ const PassengerMap = ({ isLoaded, directions, showSpots, setOrders, orders, setM
                   ></MarkerF>
                 )
               })
-            }
+            } */}
           </GoogleMap>
         </>
       )}

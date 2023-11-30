@@ -5,6 +5,7 @@ import { combineReducers } from "redux";
 import driverStartDestReducer from "./slices/driverStartDest";
 import passengerStartDestReducer from "./slices/passengerStartDest";
 import driverDepartReducer from "./slices/driverDepart";
+import passengerDepartReducer from "./slices/passengerDepart";
 import tempOrderReducer from "./slices/tempOrder";
 
 const reducers = combineReducers({
@@ -13,6 +14,7 @@ const reducers = combineReducers({
   driverStartDestReducer,
   passengerStartDestReducer,
   driverDepartReducer,
+  passengerDepartReducer,
   tempOrderReducer
 })
 

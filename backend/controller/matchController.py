@@ -1,4 +1,5 @@
 from quart import Blueprint, request, make_response
+from quart_cors import cors
 from services.matchService import *
 from services.userService import *
 from services.orderService import *
@@ -7,6 +8,7 @@ from controller.models import *
 
 
 match = Blueprint('match_page', __name__)
+match = cors(match, allow_origin='*')
 
 match_service = MatchService()
 user_service = UserService()

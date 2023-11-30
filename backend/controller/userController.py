@@ -1,10 +1,12 @@
 from quart import Blueprint, request, make_response, websocket
+from quart_cors import cors
 from services.userService import *
 from utils import utils
 from controller.models import *
 
 
 user = Blueprint('user_page', __name__)
+user = cors(user, allow_origin='*')
 
 user_service = UserService()
 

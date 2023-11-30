@@ -1,4 +1,5 @@
 from quart import Blueprint, request, make_response
+from quart_cors import cors
 from services.orderService import *
 from services.userService import *
 from utils import utils
@@ -6,6 +7,7 @@ from controller.models import *
 
 
 order = Blueprint('order_page', __name__)
+order = cors(order, allow_origin='*')
 
 order_service = OrderService()
 user_service = UserService()

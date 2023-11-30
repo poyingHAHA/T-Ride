@@ -6,7 +6,7 @@ from controller.orderController import order
 from controller.userController import user
 
 app = Quart(__name__)
-app = cors(app, allow_origin="*")
+app = cors(app, allow_origin='*')
 
 @app.route('/github-webhook', methods=['POST'])
 async def github_webhook():

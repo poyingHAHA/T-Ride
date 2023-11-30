@@ -7,7 +7,6 @@ from controller.models import *
 
 
 order = Blueprint('order_page', __name__)
-order = cors(order, allow_origin='*')
 
 order_service = OrderService()
 user_service = UserService()

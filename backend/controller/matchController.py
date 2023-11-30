@@ -8,7 +8,6 @@ from controller.models import *
 
 
 match = Blueprint('match_page', __name__)
-match = cors(match, allow_origin='*')
 
 match_service = MatchService()
 user_service = UserService()

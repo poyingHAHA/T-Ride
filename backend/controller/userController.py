@@ -6,7 +6,6 @@ from controller.models import *
 
 
 user = Blueprint('user_page', __name__)
-user = cors(user, allow_origin='*')
 
 user_service = UserService()
 

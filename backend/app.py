@@ -1,10 +1,12 @@
 from quart import Quart, send_from_directory
+from quart_cors import cors
 import subprocess
 from controller.matchController import match
 from controller.orderController import order
 from controller.userController import user
 
 app = Quart(__name__)
+app = cors(app, allow_origin="*")
 
 @app.route('/github-webhook', methods=['POST'])
 async def github_webhook():

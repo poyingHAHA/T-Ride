@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface passengerDepartState {
-  departureTime?: number
+  departureTime1?: number
+  departureTime2?: number
   passengerCount?: number
 }
 
 const initialState: passengerDepartState = {
-  departureTime: Date.now(),
+  departureTime1: Date.now(),
+  departureTime2: Date.now(),
   passengerCount: 1
 }
 
@@ -14,8 +16,11 @@ export const passengerDepart = createSlice({
   name: 'passengerStartDest',
   initialState,
   reducers: {
-    setDepartureTime: (state, action) => {
-      state.departureTime = action.payload
+    setDepartureTime1: (state, action) => {
+      state.departureTime1 = action.payload
+    },
+    setDepartureTime2: (state, action) => {
+      state.departureTime2 = action.payload
     },
     setPassengerCount: (state, action) => {
       state.passengerCount = action.payload
@@ -23,6 +28,6 @@ export const passengerDepart = createSlice({
   }
 })
 
-export const { setDepartureTime, setPassengerCount } = passengerDepart.actions;
+export const { setDepartureTime1, setDepartureTime2, setPassengerCount } = passengerDepart.actions;
 export default passengerDepart.reducer;
 

@@ -17,13 +17,13 @@ export default function PassengerHistory() {
                         onClick={() => {
                             navigate("/passenger/Tripinfo")
                         }}>
-                        <div className="bg-cover bg-center h-40 rounded-lg" style={{ backgroundImage: `url('path_to_image.jpg')` }}>
+                        <div className="bg-cover bg-center h-[120px] rounded-lg" style={{ backgroundImage: `url('path_to_image.jpg')` }}>
                             <div className="p-4 flex justify-between items-end h-full bg-gradient-to-t from-black to-transparent rounded-lg">
                                 <div>
                                     <h3 className="text-white font-bold">Los Angeles trip</h3>
                                     <p className="text-gray-300">3 days away</p>
                                 </div>
-                                <p className="text-sm text-white">Mon 16 - Sat 21</p>
+                                <p className="text-white">Feb 16</p>
                             </div>
                         </div>
                     </button>
@@ -39,13 +39,13 @@ export default function PassengerHistory() {
                         onClick={() => {
                             navigate("/passenger/Tripinfo")
                         }}>
-                        <div className="bg-cover bg-center h-40 rounded-lg" style={{ backgroundImage: `url('path_to_image.jpg')` }}>
+                        <div className="bg-cover bg-center h-[120px] rounded-lg" style={{ backgroundImage: `url('path_to_image.jpg')` }}>
                             <div className="p-4 flex justify-between items-end h-full bg-gradient-to-t from-black to-transparent rounded-lg">
                                 <div>
                                     <h3 className="text-white font-bold">Los Angeles trip</h3>
                                     <p className="text-gray-300">3 days away</p>
                                 </div>
-                                <p className="text-sm text-white">Mon 16 - Sat 21</p>
+                                <p className="text-white">Jan 21</p>
                             </div>
                         </div>
                     </button>

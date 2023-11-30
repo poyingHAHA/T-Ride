@@ -34,31 +34,7 @@ const PassengerMap = ({ isLoaded, directions }: PassengerMapProps) => {
   const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
   const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markerIcon = {
-    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-    fillColor: 'blue',
-    fillOpacity: 1,
-    scale: 10,
-    strokeColor: 'white',
-    strokeWeight: 2,
-  };
 
-
-  // useEffect(() => {
-  //   // 取得所有地標
-  //   if (!showSpots) setSpots([]);
-  //   async function fetchData() {
-  //     // const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
-  //     const spots = await getSpots(Date.now());
-  //     setSpots(spots.spots);
-  //     console.log("PassengerMap Spots: ", spots);
-  //   }
-  //   try {
-  //     fetchData();
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }, [showSpots]);
 
   const defaultProps = {
     center: {
@@ -68,12 +44,29 @@ const PassengerMap = ({ isLoaded, directions }: PassengerMapProps) => {
     zoom: 15
   };
 
+  useEffect(() => {
+    // Check if the start location has been set and is not null
+    if (passengerStartDestReducer.start && passengerStartDestReducer.start.lat && passengerStartDestReducer.start.lng) {
+      setCurrentCenter({
+        lat: passengerStartDestReducer.start.lat,
+        lng: passengerStartDestReducer.start.lng
+      });
+    }
+    // Check if the destination location has been set and is not null
+    else if (passengerStartDestReducer.dest && passengerStartDestReducer.dest.lat && passengerStartDestReducer.dest.lng) {
+      setCurrentCenter({
+        lat: passengerStartDestReducer.dest.lat,
+        lng: passengerStartDestReducer.dest.lng
+      });
+    }
+  }, [passengerStartDestReducer.start, passengerStartDestReducer.dest]);
+
   const handleActiveMarker = async (spotId: string, spotPoint?: LatLngLiteral) => {
     if (spotId === activeMarker) {
       return;
     }
-    if (passengerDepart.departureTime === 0 || passengerDepart.departureTime === undefined) {
-      console.log("PassengerMap: 請選擇出發時間")
+    if (passengerDepart.departureTime1 === 0 || passengerDepart.departureTime1 === undefined || passengerDepart.departureTime2 === 0 || passengerDepart.departureTime2 === undefined) {
+      console.log("PassengerMap: 請選擇出發區間")
       return;
     }
     // // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
@@ -169,48 +162,7 @@ const PassengerMap = ({ isLoaded, directions }: PassengerMapProps) => {
                 </MarkerF>
               )
             }
-            {/* {
-              showSpots && (
-                spots.map(({ spotId, spotName, spotPoint, passengerCount }) => {
-                  return (
-                    <MarkerF
-                      key={spotId}
-                      position={{ lat: spotPoint.lat, lng: spotPoint.lng } as LatLngLiteral}
-                      label={passengerCount.toString() + '人'}
-                      title={spotName}
-                      onClick={() => { handleActiveMarker(spotId, spotPoint) }}
-                    >
-                      {
-                        activeMarker === spotId ? (
-                          <InfoWindowF onCloseClick={() => { setActiveMarker(null) }}>
-                            <div>{spotName}</div>
-                          </InfoWindowF>
-                        ) : null
-                      }
-                    </MarkerF>
-                  )
-                })
-              )
-            } */}
-            {
-              activeMarkerPoint && (
-                <Circle center={activeMarkerPoint} radius={1000} options={closeOptions} />
-              )
-            }
-            {/* {
-              orders !== undefined && orders.length !== 0 && orders.map((order) => {
-                return (
-                  <MarkerF
-                    key={order.orderId}
-                    position={{ lat: order.startPoint.lat, lng: order.startPoint.lng } as LatLngLiteral}
-                    label={order.userId.toString()}
-                    title={order.startName}
-                    icon={markerIcon}
-                    onClick={() => { setMarkerOrderId && setMarkerOrderId(order.orderId) }}
-                  ></MarkerF>
-                )
-              })
-            } */}
+
           </GoogleMap>
         </>
       )}

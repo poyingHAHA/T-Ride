@@ -11,11 +11,9 @@ type PickupPanelProps = {
     isLoaded: boolean;
     setPickupPanel: (pickupPanel: boolean) => any;
     orders?: orderDTO[];
-    markerOrderId: number | null;
-    setShowSpots?: (showSpots: boolean) => void;
 };
 
-const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId, setShowSpots }: PickupPanelProps) => {
+const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => {
 
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
@@ -28,10 +26,15 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId, setShowS
         console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
     }, [tempOrderReducer])
 
-    const formatUnixTimestamp = (timestamp: number) => {
+    const formatUnixDateTimestamp = (timestamp: number) => {
         const date = new Date(timestamp * 1000);
         return `${date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })} 
                 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+    };
+
+    const formatUnixTimestamp = (timestamp: number) => {
+        const date = new Date(timestamp * 1000);
+        return `${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     };
 
     return <>
@@ -45,9 +48,8 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId, setShowS
                             </div>
                             {/* Trip Information */}
                             <div className="mx-2 flex">
-                                <div className="flex-1 text-base ml-3">
-                                    {/* 2023/11/2 6:45am */}
-                                    {passengerDepart.departureTime ? formatUnixTimestamp(passengerDepart.departureTime) : '未設定時間'}
+                                <div className="w-3/4 text-base ml-3 font-bold">
+                                    {passengerDepart.departureTime1 ? formatUnixDateTimestamp(passengerDepart.departureTime1) : '未設定時間'}~{passengerDepart.departureTime2 ? formatUnixTimestamp(passengerDepart.departureTime2) : '未設定時間'}
                                 </div>
                                 <div className="flex-1 text-right text-lg mr-5">
                                     $200
@@ -56,9 +58,6 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId, setShowS
 
                             {/* Address */}
                             <div className="mx-2 flex-col mb-3">
-
-
-
                                 <div className="flex">
                                     <div className='w-1/10 flex flex-col my-5 mr-1'>
                                         <img className='h-3 w-3 brightness-0 ml-0.5' src='https://img.icons8.com/ios-filled/50/9CA3AF/filled-circle.png' alt="Filled Circle" />
@@ -142,13 +141,13 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, markerOrderId, setShowS
                                     >Cancel</button>
                                 </div>
 
-                                <div className="px-3 bg-white shadow-lg border-gray border-t-2 border-solid">
+                                <div className="px-3">
                                     <div className="flex">
                                         <div className="flex-1 group">
                                             <div className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"
                                             >
                                                 <span className="block px-1 pt-1 pb-1">
-                                                    <span className="block text-xs pb-2 mx-auto">Home</span>
+                                                    <span className="block text-xs text-white pb-2 mx-auto">Home</span>
                                                     <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
                                                 </span>
                                             </div>

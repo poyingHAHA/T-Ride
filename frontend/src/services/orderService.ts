@@ -1,5 +1,4 @@
 import {get, post, put, remove} from './APIHelper';
-import axios from 'axios';
 
 interface NearLandMarkRequest {
   lat: number;

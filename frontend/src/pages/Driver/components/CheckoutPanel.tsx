@@ -2,21 +2,19 @@ import { orderDTO } from "../../../DTO/orders";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import PickupCard from "./PickupCard";
 import { useState,useEffect } from "react";
-import { addTempOrder } from "../../../slices/tempOrder";
+import { removeTempOrder } from "../../../slices/tempOrder";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
-type PickupPanelProps = {
+type CheckoutPanelProps = {
   isLoaded: boolean;
   setPanel: (panel: number) => any;
-  orders?: orderDTO[];
-  markerOrderId: number | null;
   setShowSpots?: (showSpots: boolean) => void;
 };
 
-const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }: PickupPanelProps) => {
+const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
-  // tempOrderReducer.orders: 紀錄使用者點擊確認後的訂單
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const dispatch = useAppDispatch();
 
   return <>
     {
@@ -36,10 +34,21 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
               </div>
             </div>
 
-            <div className="flex flex-col h-[80%] w-[100%] overflow-scroll">
+            <div className="flex flex-col h-[80%] w-[100%] overflow-scroll mt-4">
               {
-                orders && orders.map((order) => (
-                  <PickupCard key={order.orderId} order={order} markerOrderId={markerOrderId} />
+                tempOrderReducer.orders && tempOrderReducer.orders.map((order) => (
+                  <div className="flex justify-center w-[100%] h-[15%] mt-4">
+                    <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
+                      <div>{order.startName}</div>
+                      <div>{order.pickTime1}-{order.pickTime2}</div>
+                    </div>                   
+                    <button 
+                      className="rounded-lg bg-cyan-800 w-[15%] text-white ml-2"
+                      onClick={() => dispatch(removeTempOrder(order))}
+                    >
+                      移除
+                    </button>
+                  </div>
                 ))
               }
             </div>
@@ -48,8 +57,8 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
               <button 
                 className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl mr-4' 
                 onClick={() => {
-                  setPanel(0);
-                  setShowSpots && setShowSpots(false);
+                  setPanel(1);
+                  setShowSpots && setShowSpots(true);
                 }}
               >
                 返回
@@ -58,11 +67,11 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
               <button 
                 className='rounded bg-cyan-800 w-[60vw] h-10 text-white text-xl'
                 onClick={() => {
-                  setPanel(2);
-                  setShowSpots && setShowSpots(false);
+                  // dispatch(addOrder({orders: tempOrders}));
+                  // setShowSpots && setShowSpots(false);
                 }}
               >
-                確認
+                送出邀請
               </button>
             </div>
           </div>
@@ -72,4 +81,4 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   </>;
 }
 
-export default PickupPanel;
+export default CheckoutPanel;

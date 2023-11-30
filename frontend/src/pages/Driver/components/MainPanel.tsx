@@ -8,10 +8,10 @@ type MainPanelProps = {
   isLoaded: boolean;
   setStartPoint: (point: LatLngLiteral) => any;
   setDestPoint: (point: LatLngLiteral) => any;
-  setPickupPanel: (pickupPanel: boolean) => any;
+  setPanel: (panel: number) => any;
   setShowSpots: (showSpots: boolean) => any;
 };
-const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setShowSpots}: MainPanelProps) => {
+const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpots}: MainPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const dispatch = useAppDispatch();
@@ -74,7 +74,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setS
                   alert("請填寫完整資料")
                   return;
                 }
-                setPickupPanel(true)
+                setPanel(1)
                 setShowSpots(true)
               }}
             >

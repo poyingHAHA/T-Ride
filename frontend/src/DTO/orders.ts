@@ -1,6 +1,7 @@
 export interface orderDTO {
   "orderId": number,
   "userId": number,
+  "spotId": number,
   "startPoint": {
     "lng": number,
     "lat": number

@@ -5,6 +5,7 @@ import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { setLocation } from '../../../slices/location';
 import MainPanel from "../components/MainPanel";
 import PickupPanel from '../components/PickupPanel';
+import CheckoutPanel from '../components/CheckoutPanel';
 import { orderDTO } from '../../../DTO/orders';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
@@ -15,7 +16,9 @@ const DriverMain = () => {
   const [directions, setDirections] = useState<DirectionsResult>()
   const [startPoint, setStartPoint] = useState<LatLngLiteral>()
   const [destPoint, setDestPoint] = useState<LatLngLiteral>()
-  const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+  // 0: mainPanel, 1: pickupPanel, 2: checkoutPanel
+  const [panel, setPanel] = useState<number>(0)
+  // 如果有點選marker，就把marker的orderId記錄下來，這樣可以把PickupCard的邊框變綠，表示這個card是被點選的
   const [markerOrderId, setMarkerOrderId] = useState<number | null>(null)
   // 紀錄使用者點選marker後，該地標附近的訂單
   const [orders, setOrders] = useState<orderDTO[]>([])
@@ -113,9 +116,17 @@ const DriverMain = () => {
         </div>
         <div className='h-[45%] bottom-0 z-100 -translate-y-10'>
           {
-            pickupPanel 
-              ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} markerOrderId={markerOrderId} setShowSpots={setShowSpots} /> 
-              : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
+            (() => {
+              switch(panel){
+                case 0:
+                  return <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPanel={setPanel} setShowSpots={setShowSpots} />
+                case 1:
+                  return <PickupPanel isLoaded={isLoaded} setPanel={setPanel} orders={orders} markerOrderId={markerOrderId} setShowSpots={setShowSpots} /> 
+                case 2:
+                  return <CheckoutPanel isLoaded={isLoaded} setPanel={setPanel} setShowSpots={setShowSpots} />
+              }
+
+            })()
           }
         </div>
       </>

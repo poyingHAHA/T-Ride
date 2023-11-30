@@ -16,7 +16,7 @@ type DriverMapProps = {
   setMarkerOrderId?: (orderId: number) => void
 };
 type spot = {
-  "spotId": string
+  "spotId": number
   "spotName": string,
   "spotPoint": {
     "lng": number,
@@ -26,13 +26,15 @@ type spot = {
 };
 
 const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarkerOrderId}: DriverMapProps) => {
+  const [tempOrderSpots, setTempOrderSpots] = useState<number[]>([]);
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
   const [spots, setSpots] = useState<spot[]>([]);
-  const [activeMarker, setActiveMarker] = useState<string|null>(null);
+  const [activeMarker, setActiveMarker] = useState<number|null>(null);
   const [activeMarkerPoint, setActiveMarkerPoint] = useState<LatLngLiteral|null>(null);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerIcon = {
@@ -43,6 +45,22 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     strokeColor: 'white',
     strokeWeight: 2,
   };
+  const markerWithOrderIcon = {
+    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+    fillColor: 'green',
+    fillOpacity: 1,
+    scale: 10,
+    strokeColor: 'white',
+    strokeWeight: 2,
+  };
+
+  // 取得所有有tempOrder的地標
+  useEffect(() => {
+    if(tempOrderReducer.orders){
+      const tempOrderSpots = tempOrderReducer.orders.map((order) => order.spotId);
+      setTempOrderSpots(tempOrderSpots);
+    }
+  }, [tempOrderReducer.orders]);
 
   useEffect(() => {
     // 取得所有地標
@@ -68,10 +86,9 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     zoom: 15
   };
 
-  const handleActiveMarker = async (spotId: string, spotPoint?: LatLngLiteral) => {
-    if (spotId === activeMarker) {
-      return;
-    }
+  const handleActiveMarker = async (spotId: number, spotPoint?: LatLngLiteral) => {
+    // 重新取得該地標的訂單
+    setOrders && setOrders([]);
     if (driverDepart.departureTime === 0 || driverDepart.departureTime === undefined) {
       console.log("DriverMap: 請選擇出發時間")
       return;
@@ -175,25 +192,48 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
             {
               showSpots && (
                 spots.map(({spotId, spotName, spotPoint, passengerCount}) => {
-                  return (
-                    <MarkerF
-                      key={spotId}
-                      position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
-                      label={passengerCount.toString()+'人'}
-                      title={spotName}
-                      onClick={()=>{handleActiveMarker(spotId, spotPoint)}}
-                    >
-                      {
-                        activeMarker === spotId ? (
-                          <InfoWindowF 
-                            position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
-                            onCloseClick={() => {setActiveMarker(null)}}>
-                            <div>{spotName}</div>
-                          </InfoWindowF>
-                        ) : null
-                      }
-                    </MarkerF>
-                  )
+                  if(tempOrderSpots.includes(spotId)){
+                    return (
+                      <MarkerF
+                        key={spotId}
+                        position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                        label={passengerCount.toString()+'人'}
+                        title={spotName}
+                        icon={markerWithOrderIcon}
+                        onClick={()=>{handleActiveMarker(spotId, spotPoint)}}
+                      >
+                        {
+                          activeMarker === spotId ? (
+                            <InfoWindowF 
+                              position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                              onCloseClick={() => {setActiveMarker(null)}}>
+                              <div>{spotName}</div>
+                            </InfoWindowF>
+                          ) : null
+                        }
+                      </MarkerF>
+                    )
+                  }else{
+                    return (
+                      <MarkerF
+                        key={spotId}
+                        position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                        label={passengerCount.toString()+'人'}
+                        title={spotName}
+                        onClick={()=>{handleActiveMarker(spotId, spotPoint)}}
+                      >
+                        {
+                          activeMarker === spotId ? (
+                            <InfoWindowF 
+                              position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                              onCloseClick={() => {setActiveMarker(null)}}>
+                              <div>{spotName}</div>
+                            </InfoWindowF>
+                          ) : null
+                        }
+                      </MarkerF>
+                    )
+                  }
                 })
               )
             }

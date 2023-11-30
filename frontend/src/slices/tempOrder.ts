@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { orderDTO } from "../DTO/orders";
-import { WritableDraft } from "immer/dist/internal";
 
 interface tempOrderState {
   orders: orderDTO[]
@@ -14,21 +13,21 @@ export const tempOrder = createSlice({
   name: 'driverStartDest',
   initialState,
   reducers: {
-    addOrder: (state, action) => {
-      // 去掉重複的order
+    addTempOrder: (state, action) => {
       if(state.orders.length===0){
-        state.orders = [...state.orders, ...action.payload.orders]
+        state.orders = [...state.orders, action.payload]
       }else{
+        // 去掉重複的order
         state.orders = state.orders.filter(order => order.orderId !== action.payload.orderId)
-        state.orders = [...state.orders, ...action.payload]
+        state.orders = [...state.orders, action.payload]
       }
     },
-    removeOrder: (state, action) => {
+    removeTempOrder: (state, action) => {
       state.orders = state.orders.filter(order => order.orderId !== action.payload.orderId)
     }
   }
 })
 
-export const { addOrder, removeOrder } = tempOrder.actions;
+export const { addTempOrder, removeTempOrder } = tempOrder.actions;
 export default tempOrder.reducer;
   

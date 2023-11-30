@@ -28,7 +28,8 @@ const getSpots = async (departureTime: number) => {
     return {
       spots: [
         {
-          "spotId": "ChIJxYu9PP1GaTQRExEbhFYJNWA",
+          // "spotId": "ChIJxYu9PP1GaTQRExEbhFYJNWA",
+          "spotId": 1,
           "spotName": "萊爾富便利商店 彰縣彰鼎店",
           "spotPoint": {
             "lng": 120.4796447,
@@ -37,7 +38,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJP_zSGB1HaTQR8IcLesVv3vo",
+          // "spotId": "ChIJP_zSGB1HaTQR8IcLesVv3vo",
+          "spotId": 2,
           "spotName": "萊爾富便利商店 彰縣鹿和店",
           "spotPoint": {
             "lng": 120.484256,
@@ -46,7 +48,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJSS6m1_hGaTQRqbLFH1YWnts",
+          // "spotId": "ChIJSS6m1_hGaTQRqbLFH1YWnts",
+          "spotId": 3,
           "spotName": "7-ELEVEn 鹿棋門市",
           "spotPoint": {
             "lng": 120.4754899,
@@ -55,7 +58,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJFacMLe9HaTQRfVH0anPB3zY",
+          // "spotId": "ChIJFacMLe9HaTQRfVH0anPB3zY",
+          "spotId": 4,
           "spotName": "7-11 頂王門市",
           "spotPoint": {
             "lng": 120.4770952,
@@ -64,7 +68,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJ5fFgDvVHaTQRXHX-HDBzp2o",
+          // "spotId": "ChIJ5fFgDvVHaTQRXHX-HDBzp2o",
+          "spotId": 5,
           "spotName": "全家便利商店 鹿港柑仔店",
           "spotPoint": {
             "lng": 120.4756607,
@@ -73,7 +78,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJSS6m1_hGaTQRBjnuoeZF44Y",
+          // "spotId": "ChIJSS6m1_hGaTQRBjnuoeZF44Y",
+          "spotId": 6,
           "spotName": "7-ELEVEn 頂番門市",
           "spotPoint": {
             "lng": 120.4801416,
@@ -82,7 +88,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJvbZnsdtHaTQRlM-tw62EPic",
+          // "spotId": "ChIJvbZnsdtHaTQRlM-tw62EPic",
+          "spotId": 7,
           "spotName": "7-ELEVEn 鳴人門市",
           "spotPoint": {
             "lng": 120.4856189,
@@ -91,7 +98,8 @@ const getSpots = async (departureTime: number) => {
           "passengerCount": 2
         },
         {
-          "spotId": "ChIJo7c_l_1GaTQRzcDUc-Wh06E",
+          // "spotId": "ChIJo7c_l_1GaTQRzcDUc-Wh06E",
+          "spotId": 8,
           "spotName": "全家便利商店 鹿港金寶店",
           "spotPoint": {
             "lng": 120.4806387,
@@ -107,12 +115,13 @@ const getSpots = async (departureTime: number) => {
   }
 }
 
-const getSpotOrders = async (spotId: string, departtureTime: number) => {
+const getSpotOrders = async (spotId: number, departtureTime: number) => {
   try {
     // const response = await get(`/order/passenger/spot/${spotId}?departureTime=${departtureTime}`);
     return {
       orders: [
         {
+          "spotId": 3,
           "orderId": 1,
           "userId": 2,
           "startPoint": {
@@ -132,6 +141,7 @@ const getSpotOrders = async (spotId: string, departtureTime: number) => {
           "fee": 100
         },
         {
+          "spotId": 3,
           "orderId": 2,
           "userId": 3,
           "startPoint": {

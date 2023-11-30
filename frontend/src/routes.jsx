@@ -5,6 +5,7 @@ import Passenger, { PassengerMain, PassengerRoute, PassengerHistory, PassengerAc
 import Login from "./pages/Login";
 import SelectRole from "./pages/SelectRole";
 import DriverRegister from "./pages/DriverRegister";
+import PassengerSetting from "./pages/Passenger/pages/PassengerSetting";
 
 const router = createBrowserRouter([
   {
@@ -69,11 +70,16 @@ const router = createBrowserRouter([
       },
       {
         path: "account",
-        element: <PassengerAccount />
+        element: <PassengerAccount />,
+
       },
       {
         path: "tripinfo",
         element: <PassengerTripinfo />
+      },
+      {
+        path: "setting",
+        element: <PassengerSetting />
       },
     ]
   },

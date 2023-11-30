@@ -1,58 +1,70 @@
-import AutoCompleteInput from '../components/AutoCompleteInput';
 import PassengerMap from '../components/PassengerMap';
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
-import { Form, useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react'
+import { useNavigate } from "react-router-dom";
 import { useJsApiLoader, Libraries } from '@react-google-maps/api';
-import { useAppSelector } from "../../../hooks";
-import { setStart, setDest } from "../../../slices/passengerStartDest"
-import { useAppDispatch } from '../../../hooks';
-
-import {
-    GoogleMap,
-    Marker,
-    DirectionsRenderer
-} from '@react-google-maps/api';
-
+import { useAppSelector, useAppDispatch } from "../../../hooks";
+import { setStart, setDest, resetStart, resetDest } from "../../../slices/passengerStartDest"
+import { setLocation } from '../../../slices/location';
+import MainPanel from "../components/MainPanel";
+import PickupPanel from '../components/PickupPanel';
+import { orderDTO } from '../../../DTO/orders';
 
 const libraries: Libraries = ["marker", "places"];
-
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
-type MapOptions = google.maps.MapOptions;
 
 const PassengerMain = () => {
     const navigate = useNavigate();
-    // const [start, setStart] = useState<LatLngLiteral>()
-    // const [end, setEnd] = useState<LatLngLiteral>()
-    const locationReducer = useAppSelector((state) => state.locationReducer);
-    const location = { ...locationReducer }
-
-    // Redux state selectors
-    const start = useAppSelector((state) => state.passengerStartDestReducer.start);
-    const dest = useAppSelector((state) => state.passengerStartDestReducer.dest);
-
+    const [directions, setDirections] = useState<DirectionsResult>()
+    const [startPoint, setStartPoint] = useState<LatLngLiteral>()
+    const [destPoint, setDestPoint] = useState<LatLngLiteral>()
+    const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+    const [showSpots, setShowSpots] = useState<boolean>(false)
+    const [markerOrderId, setMarkerOrderId] = useState<number | null>(null)
+    // 紀錄使用者點選marker後，該地標附近的訂單
+    const [orders, setOrders] = useState<orderDTO[]>([])
+    // // Redux state selectors
+    const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
+    const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     // Dispatch hook from Redux
     const dispatch = useAppDispatch();
 
-    const [userCenter, setUserCenter] = useState<LatLngLiteral>({ lat: 25.0476133, lng: 121.5174062 })
-    const [directions, setDirections] = useState<DirectionsResult>()
+    // useJsApiLoader hook to load the Google Maps API
+    const { isLoaded } = useJsApiLoader({
+        googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API_KEY || "",
+        version: "beta",
+        libraries,
+    });
 
-    const mapRef = useRef<GoogleMap>();
+    useEffect(() => {
+        // Reset start and destination when the component mounts
+        dispatch(resetStart());
+        dispatch(resetDest());
+    }, [dispatch]);
 
-    // useEffect(() => {
-    //     navigator.geolocation.getCurrentPosition((position) => {
-    //         const { latitude, longitude } = position.coords;
-    //         setUserCenter({ lat: latitude, lng: longitude });
-    //     });
-    // }, [])
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            const timestamp = position.timestamp;
+            console.log("Index: ", position)
 
-    const fetchDirections = (start: LatLngLiteral, end: LatLngLiteral) => {
-        if (!start || !end) return;
+            dispatch(setLocation({ lat: latitude, lng: longitude, timestamp }));
+        }, (error) => {
+            console.log("Index: ", error)
+        })
+
+        if (!passengerStartDestReducer.start || !passengerStartDestReducer.dest) return;
+        fetchDirections();
+    }, [startPoint, destPoint, isLoaded])
+
+
+    const fetchDirections = () => {
+        if (!startPoint || !destPoint) return;
         const service = new google.maps.DirectionsService();
         service.route(
             {
-                origin: start,
-                destination: end,
+                origin: { lat: startPoint.lat, lng: startPoint.lng },
+                destination: { lat: destPoint.lat, lng: destPoint.lng },
                 travelMode: google.maps.TravelMode.DRIVING,
             },
             (result, status) => {
@@ -65,174 +77,82 @@ const PassengerMain = () => {
         );
     }
 
-    useEffect(() => {
-        if (dest.lat !== undefined && dest.lng !== undefined) {
-            // Pan the map to the new destination
-            console.log(dest.lat, dest.lng);
-            mapRef.current?.panTo({ lat: dest.lat, lng: dest.lng });
-
-            // Check if you also have a start location to fetch directions
-            if (start.lat !== undefined && start.lng !== undefined) {
-                // fetchDirections(start, dest);
-                fetchDirections(
-                    { lat: start.lat, lng: start.lng },
-                    { lat: dest.lat, lng: dest.lng }
-                );
-            }
-        }
-    }, [dest, start, fetchDirections]);
-
-    const options = useMemo<MapOptions>(() => ({
-        mapId: "d7d7b1b4a6aea68" || "",
-        disableDefaultUI: true,
-        clickableIcons: false,
-    }), [])
-
-    const defaultProps = {
-        center: { lat: location.lat, lng: location.lng },
-        zoom: 15
-    };
-
-    const onLoad = useCallback((map: any) => (mapRef.current = map), [])
-
-
-    // useJsApiLoader hook to load the Google Maps API
-    const { isLoaded } = useJsApiLoader({
-        googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API_KEY || "",
-        version: "beta",
-        libraries,
-    });
-
 
     return <>{isLoaded && (
 
-        <main className="bg-gray-300 flex flex-col items-center h-screen">
+        <main className="flex flex-col items-center h-screen">
 
-            <div className="flex-2 w-full h-full">
-                {/* <PassengerMap isLoaded={isLoaded} /> */}
-                <GoogleMap
-                    zoom={defaultProps.zoom}
-                    center={{ lat: 25.0476133, lng: 121.5174062 }}
-                    mapContainerClassName='w-full h-full'
-                    options={options}
-                    onLoad={onLoad}
-                >
-
-                </GoogleMap>
-
+            <div className="h-2/5 w-full h-full">
+                <PassengerMap isLoaded={isLoaded} directions={directions} />
             </div>
-            <div className="flex-1 bg-white flex w-full h-screen flex-col px-10 pb-20 pt-10">
+            <div className="h-3/5 w-full h-full overflow-auto overscroll-y-contain ">
+                {/* <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} /> */}
+
+                {
+                    pickupPanel
+                        ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} markerOrderId={markerOrderId} setShowSpots={setShowSpots} />
+                        : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} setShowSpots={setShowSpots} />
+                }
+            </div>
+            {/* <div className="flex-1 bg-white flex w-full h-screen flex-col px-10 pb-20 pt-10">
 
                 <Form method="post" className='flex' >
-                    <input
-                        type="datetime-local"
-                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300 mr-3"
-                        placeholder="Select a time" required
-                    />
-
-                    <input type="number"
-                        className="flex-1 block w-full h-[50px] p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300 ml-3"
-                        placeholder="How many pax?"
-                        required />
+                    <div className="flex-1 block w-full h-[50px] flex justify-between items-center mr-3">
+                        <label htmlFor="departureTime">出發</label>
+                        <input
+                            type="datetime-local"
+                            id="departureTime"
+                            value={passengerDepart.departureTime ? new Date(passengerDepart.departureTime * 1000 + 8 * 60 * 60 * 1000).toISOString().slice(0, -8) : ""}
+                            name="departureTime"
+                            className=" w-[130px] h-[50px] text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300"
+                            onChange={(e) => handleChangeDepartureTime(e)}
+                        />
+                    </div>
+                    <div className="flex-1 block w-full h-[50px] flex justify-between items-center">
+                        <label htmlFor="passNumber">人數</label>
+                        <select
+                            className=" w-[130px] h-[50px] text-gray-900 border border-gray-300 rounded-lg bg-gray-50 placeholder-gray-300"
+                            name="passNumber"
+                            id="passNumber"
+                            onChange={handleSelectPassengerCount}
+                        >
+                            {
+                                [...Array(5)].map((_, i) =>
+                                    passengerDepart.passengerCount === i + 1 ? <option value={i + 1} selected>{i + 1}</option> : <option value={i + 1}>{i + 1}</option>
+                                )
+                            }
+                        </select>
+                    </div>
                 </Form>
-
-                {/* <Places
-                    setStart={(position) => {
-                        setStart(position)
-                        mapRef.current?.panTo(position)
-                        if (end) { // 檢查是否已經有終點
-                            fetchDirections(end, position);
-                        }
-                    }}
-                    setEnd={(position) => {
-                        setEnd(position)
-                        mapRef.current?.panTo(position)
-                        if (start) { // 檢查是否已經有起點
-                            fetchDirections(start, position);
-                        }
-                    }}
-                /> */}
 
                 <AutoCompleteInput type='passengerStart'
                     setLocation={setStart}
-                    // setLocation={(position) => {
-                    //     if (position.lat !== undefined && position.lng !== undefined) {
-                    //         // setStart({ lat: position.lat, lng: position.lng });
-                    //         // Call the action creator with the expected payload
-                    //         dispatch(setStart({
-                    //             name: position.name,
-                    //             placeId: position.placeId,
-                    //             lat: position.lat,
-                    //             lng: position.lng
-                    //         }));
-
-                    //         // Assuming mapRef is a ref to the GoogleMap instance
-                    //         mapRef.current?.panTo({ lat: position.lat, lng: position.lng });
-
-                    //         // If there's a destination set, fetch directions
-                    //         if (dest && dest.lat !== undefined && dest.lng !== undefined) {
-                    //             fetchDirections(
-                    //                 { lat: position.lat, lng: position.lng },
-                    //                 { lat: dest.lat, lng: dest.lng }
-                    //             );
-                    //         }
-                    //     }
-                    // }}
+                    setPoint={setStartPoint}
                     placeholderText="Pickup location"
                 />
 
-                {/* <AutoCompleteInput
-                    type='passengerDest'
-                    setLocation={(position) => {
-                        // Dispatch the setDest action with the new position
-                        if (position.lat !== undefined && position.lng !== undefined) {
-                            dispatch(setDest({
-                                name: position.name,
-                                placeId: position.placeId,
-                                lat: position.lat,
-                                lng: position.lng
-                            }));
-                        }
-                    }}
-                    placeholderText="Where to?"
-                /> */}
-
-                <AutoCompleteInput type='passengerDist'
+                <AutoCompleteInput type='passengerDest'
                     setLocation={setDest}
-                    // setLocation={(position) => {
-                    //     if (position.lat !== undefined && position.lng !== undefined) {
-                    //         setStart({ lat: position.lat, lng: position.lng });
-                    //         mapRef.current?.panTo({ lat: position.lat, lng: position.lng });
-
-                    //         if (end && end.lat !== undefined && end.lng !== undefined) {
-                    //             fetchDirections(
-                    //                 { lat: end.lat, lng: end.lng },
-                    //                 { lat: position.lat, lng: position.lng }
-                    //             );
-                    //         }
-                    //     }
-                    // }}
+                    setPoint={setDestPoint}
                     placeholderText="Where to?"
                 />
-
-                {/* <input type="text" id="location-input"
-                    className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-6"
-                    placeholder="Pickup location" required />
-
-                <input type="text" id="location-input"
-                    className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-6"
-                    placeholder="Where to?" required /> */}
-
 
                 <button
                     className="text-white text-xl bg-black p-3 items-center mt-6 rounded-xl mb-5"
                     type="button"
                     onClick={() => {
-                        navigate("/passenger/Tripinfo");
+                        console.log(passengerDepart.departureTime, passengerDepart.passengerCount)
+                        console.log(passengerStartDestReducer.start, passengerStartDestReducer.dest)
+                        // if (passengerStartDestReducer.start.name === undefined || passengerStartDestReducer.dest.name === undefined) {
+                        //     alert("請填寫完整資料")
+                        //     return;
+                        // }
+                        // navigate("/passenger/Tripinfo", { state: { directions: directions } });
+                        navigate("/passenger/Tripinfo")
                     }}
 
                 >Confirm</button>
-            </div>
+            </div> */}
 
         </main>
 

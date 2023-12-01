@@ -123,7 +123,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
           {
             directions && (
               <div>
-                <div className="absolute top-[45%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
+                <div className="absolute top-[70%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
                   <div className="text-xs px-2 py-2 font-medium">
                     距離：{directions.routes[0].legs[0].distance && directions.routes[0].legs[0].distance.text}
                     <br />

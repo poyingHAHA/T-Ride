@@ -109,12 +109,12 @@ const DriverMain = () => {
   {
     isLoaded && (
       <>
-        <div className='h-[60%]'>
-          <div className="bg-gray-200 flex justify-center items-center h-full">
+        <div className='h-[60%] min-h-0'>
+          <div className="relative bg-gray-200 flex justify-center items-center h-full z-0">
             <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} setOrders={setOrders} orders={orders} setMarkerOrderId={setMarkerOrderId} />
           </div>
         </div>
-        <div className='h-[45%] bottom-0 z-100 -translate-y-10'>
+        <div className='absolute h-fit overflow-auto bottom-0 z-100 min-h-[45%] w-[100%]'>
           {
             (() => {
               switch(panel){

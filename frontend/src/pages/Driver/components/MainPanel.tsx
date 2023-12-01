@@ -31,22 +31,22 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
     {
       isLoaded && (
         <>
-          <div className='flex flex-col justify-around items-center h-[100%] bg-white rounded-t-3xl overflow-hidden z-50'>
-            <div className='flex justify-between items-center w-[80vw] mt-4'>
-              <div className='flex grow-[3] justify-start items-center'>
-                <label htmlFor="departureTime">出發</label>
+          <div className='flex flex-col justify-around items-center h-fit min-h-[40vh] bg-white rounded-t-3xl z-50'>
+            <div className='flex justify-center items-center w-[100%] mt-4'>
+              <div className='flex flex-col items-start justify-start'>
+                <label htmlFor="departureTime" className='text-sm'>出發時間</label>
                 <input
                   type="datetime-local"
                   id="departureTime"
                   value={driverDepart.departureTime ? new Date(driverDepart.departureTime * 1000 + 8 * 60 * 60 * 1000).toISOString().slice(0, -8) : ""}
                   name="departureTime"
-                  className='bg-gray-200 rounded h-12 w-[12rem] ml-2 p-1'
+                  className='bg-gray-200 rounded h-12 w-[90%] p-1'
                   onChange={(e) => handleChangeDepartureTime(e)}
                 />
               </div>
-              <div className='flex grow-0 justify-between items-center'>
-                <label htmlFor="passNumber">人數</label>
-                <select name="passNumber" id="passNumber" className='h-12 rounded w-10 text-center ml-1' onChange={handleSelectPassengerCount} >
+              <div className='flex flex-col items-start w-[20%] '>
+                <label htmlFor="passNumber" className='text-sm'>人數</label>
+                <select name="passNumber" id="passNumber" className='h-12 rounded w-[100%] text-center' onChange={handleSelectPassengerCount} >
                   {
                     [...Array(10)].map((_, i) =>
                       driverDepart.passengerCount === i + 1 ? <option value={i + 1} selected>{i + 1}</option> : <option value={i + 1}>{i + 1}</option>
@@ -56,18 +56,16 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
               </div>
             </div>
 
-            <div className='flex justify-around items-center w-[90vw]'>
-              <label htmlFor="start" >起點</label>
-              <AutoCompleteInput type='driverStart' setLocation={setStart} setPoint={setStartPoint} />
+            <div className='w-[80%]'>
+              <AutoCompleteInput type='driverStart' setLocation={setStart} setPoint={setStartPoint} placeholderText='請輸入起點' />
             </div>
 
-            <div className='flex justify-around items-center w-[90vw]'>
-              <label htmlFor="destination" >終點</label>
-              <AutoCompleteInput type='driverDest' setLocation={setDest} setPoint={setDestPoint} />
+            <div className='w-[80%]'>
+              <AutoCompleteInput type='driverDest' setLocation={setDest} setPoint={setDestPoint} placeholderText='請輸入終點' />
             </div>
 
             <button
-              className='rounded bg-cyan-800 w-[80vw] h-10  text-white text-xl'
+              className='rounded bg-black w-[80vw] h-10  text-white text-xl'
               // disabled={driverStartDestReducer.start === undefined || driverStartDestReducer.dest===undefined || driverDepart.departureTime===undefined || driverDepart.passengerCount===0}
               onClick={() => {
                 if (driverStartDestReducer.start === undefined || driverStartDestReducer.dest === undefined || driverDepart.departureTime === undefined || driverDepart.passengerCount === 0) {

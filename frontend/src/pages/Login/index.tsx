@@ -3,10 +3,10 @@ import { useAppDispatch, useAppSelector } from "../../hooks";
 import { login } from "../../slices/login";
 import { userLogin } from "../../services/loginService"
 import { useEffect, useState } from "react";
+import { getTokenFromCookie } from "../../utils/cookieUtil";
 
 const Login: React.FC = () => {
   const loginReducer = useAppSelector((state) => state.loginReducer);
-  const loginStatus = loginReducer.loginStatus;
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -15,7 +15,9 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loginStatus) {
+    const token = getTokenFromCookie();
+    if (token) {
+      dispatch(login(true));
       navigate("/selectRole")
     }
   }, [])

@@ -7,6 +7,8 @@ import router from './routes';
 import { Provider } from 'react-redux'
 import store from './store';
 
+//TODO: 使用者每次開啟網頁都要確認Token是否過期或有效，如果過期就要重新登入
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

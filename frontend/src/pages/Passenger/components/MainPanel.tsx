@@ -3,6 +3,7 @@ import { setStart, setDest } from "../../../slices/passengerStartDest"
 import { setDepartureTime1, setDepartureTime2, setPassengerCount } from '../../../slices/passengerDepart';
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { Form } from "react-router-dom";
+import { postPassengerOrder } from '../../../services/orderService';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -11,6 +12,23 @@ type MainPanelProps = {
     setDestPoint: (point: LatLngLiteral) => any;
     setPickupPanel: (pickupPanel: boolean) => any;
 };
+
+interface PostPassengerOrderRequest {
+    token: string;
+    startPoint: {
+        lat: number;
+        lng: number;
+    }
+    startName: string;
+    endPoint: {
+        lat: number;
+        lng: number;
+    }
+    endName: string;
+    departureTime1: number;
+    departureTime2: number;
+    passengerCount: number;
+}
 
 const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: MainPanelProps) => {
 
@@ -36,6 +54,24 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
         console.log(passengerDepart)
     }
 
+    const postpaxorderHandler = async (params: PostPassengerOrderRequest) => {
+        // setLoading(true);
+        const postpaxorderResult = await postPassengerOrder(params)
+
+        // test
+        // dispatch(login(true));
+        // setLoading(false);
+        // navigate("/selectRole")
+        //======
+        // if (postpaxorderResult) {
+        //     // dispatch(login(true));
+        //     // setLoading(false);
+        //     // navigate("/selectRole")
+        // } else {
+        //     // setError("帳號或密碼錯誤");
+        //     // setLoading(false);
+        // }
+    }
     return <>
         {
             isLoaded && (
@@ -98,11 +134,28 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
                             onClick={() => {
                                 console.log(passengerDepart.departureTime1, passengerDepart.departureTime2, passengerDepart.passengerCount)
                                 console.log(passengerStartDestReducer.start, passengerStartDestReducer.dest)
-                                // if (passengerStartDestReducer.start.name === undefined || passengerStartDestReducer.dest.name === undefined) {
-                                //     alert("請填寫完整資料")
-                                //     return;
-                                // }
-                                setPickupPanel(true)
+
+                                const startPoint = passengerStartDestReducer.start
+                                const endPoint = passengerStartDestReducer.dest
+
+                                if (startPoint.lat !== undefined && startPoint.lng !== undefined && endPoint.lat !== undefined && endPoint.lng !== undefined && startPoint.name !== undefined
+                                    && endPoint.name !== undefined && passengerDepart.departureTime1 !== undefined && passengerDepart.departureTime2 !== undefined && passengerDepart.passengerCount !== undefined) {
+                                    setPickupPanel(true)
+                                    postpaxorderHandler({
+                                        token: "Xp80Bu9VfxmBNF1uEC4kpKwyRUAYCh7bQXMn4yq06mmAC5g1mRLOTM9b4jwdg0M8",
+                                        startPoint: { lat: startPoint.lat, lng: startPoint.lng },
+                                        startName: startPoint.name,
+                                        endPoint: { lat: endPoint.lat, lng: endPoint.lng },
+                                        endName: endPoint.name,
+                                        departureTime1: passengerDepart.departureTime1,
+                                        departureTime2: passengerDepart.departureTime2,
+                                        passengerCount: passengerDepart.passengerCount
+                                    });
+
+                                } else {
+                                    alert("請填寫完整資料")
+                                    return;
+                                }
                             }}
 
                         >Confirm</button>
@@ -114,7 +167,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
                                     >
                                         <span className="block px-1 pt-1 pb-1">
                                             <span className="block text-xs text-white pb-2 mx-auto">Home</span>
-                                            <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
+                                            <span className="block w-5 mx-auto h-1 rounded-full"></span>
                                         </span>
                                     </div>
                                 </div>

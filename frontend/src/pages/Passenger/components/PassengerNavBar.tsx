@@ -6,7 +6,7 @@ const PassengerNavbar: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="px-3 bg-white shadow-lg border-gray border-t-2 border-solid">
+        <div className="fixed bottom-0 w-full px-3 bg-white border-gray border-t-2 border-solid">
             <div className="flex">
                 <div className="flex-1 group">
                     <button className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"

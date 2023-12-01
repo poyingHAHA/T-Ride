@@ -11,9 +11,10 @@ type PickupPanelProps = {
     isLoaded: boolean;
     setPickupPanel: (pickupPanel: boolean) => any;
     orders?: orderDTO[];
+    directions_time: number;
 };
 
-const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => {
+const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: PickupPanelProps) => {
 
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
@@ -26,16 +27,17 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
         console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
     }, [tempOrderReducer])
 
-    const formatUnixDateTimestamp = (timestamp: number) => {
+    const formatUnixDatestamp = (timestamp: number) => {
         const date = new Date(timestamp * 1000);
-        return `${date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })} 
-                ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+        return `${date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })}`;
     };
 
     const formatUnixTimestamp = (timestamp: number) => {
         const date = new Date(timestamp * 1000);
         return `${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     };
+
+
 
     return <>
         {
@@ -49,7 +51,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
                             {/* Trip Information */}
                             <div className="mx-2 flex">
                                 <div className="w-3/4 text-base ml-3 font-bold">
-                                    {passengerDepart.departureTime1 ? formatUnixDateTimestamp(passengerDepart.departureTime1) : '未設定時間'}~{passengerDepart.departureTime2 ? formatUnixTimestamp(passengerDepart.departureTime2) : '未設定時間'}
+                                    {passengerDepart.departureTime1 ? formatUnixDatestamp(passengerDepart.departureTime1) : '未設定時間'}
                                 </div>
                                 <div className="flex-1 text-right text-lg mr-5">
                                     $200
@@ -68,7 +70,8 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
 
                                     <div className="w-2/3 flex flex-col">
                                         <div className='flex-1 mx-1 my-1 flex justify-between items-center font-bold'>
-                                            {passengerStartDestReducer.start.name || '未指定起點'}
+                                            {passengerStartDestReducer.start.name === 'current' ? '目前位置' : (passengerStartDestReducer.start.name || '未指定起點')}
+
                                         </div>
                                         <div className='flex-1 mx-1 my-1 flex justify-between items-center font-bold'>
                                             {passengerStartDestReducer.dest.name || '未指定終點'}
@@ -77,10 +80,11 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
 
                                     <div className="w-1/3 flex flex-col">
                                         <div className='flex-1 my-1 flex items-center justify-end '>
-                                            07:30-07:40
+                                            {passengerDepart.departureTime1 ? formatUnixTimestamp(passengerDepart.departureTime1) : '未設定時間'}~{passengerDepart.departureTime2 ? formatUnixTimestamp(passengerDepart.departureTime2) : '未設定時間'}
                                         </div>
                                         <div className='flex-1 my-1 flex items-center justify-end '>
-                                            08:25-08:35
+                                            {passengerDepart.departureTime1 ? formatUnixTimestamp((passengerDepart.departureTime1 + directions_time)) : '未設定時間'}~{passengerDepart.departureTime2 ? formatUnixTimestamp((passengerDepart.departureTime2 + directions_time)) : '未設定時間'}
+
                                         </div>
                                     </div>
                                 </div>
@@ -148,7 +152,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders }: PickupPanelProps) => 
                                             >
                                                 <span className="block px-1 pt-1 pb-1">
                                                     <span className="block text-xs text-white pb-2 mx-auto">Home</span>
-                                                    <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
+                                                    <span className="block w-5 mx-auto h-1 rounded-full"></span>
                                                 </span>
                                             </div>
                                         </div>

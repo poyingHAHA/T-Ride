@@ -9,6 +9,7 @@ import MainPanel from "../components/MainPanel";
 import PickupPanel from '../components/PickupPanel';
 import { orderDTO } from '../../../DTO/orders';
 
+
 const libraries: Libraries = ["marker", "places"];
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -16,6 +17,7 @@ type DirectionsResult = google.maps.DirectionsResult;
 const PassengerMain = () => {
     const navigate = useNavigate();
     const [directions, setDirections] = useState<DirectionsResult>()
+    const [direction_time, setDirection_time] = useState<number>(0)
     const [startPoint, setStartPoint] = useState<LatLngLiteral>()
     const [destPoint, setDestPoint] = useState<LatLngLiteral>()
     const [pickupPanel, setPickupPanel] = useState<boolean>(false)
@@ -67,12 +69,23 @@ const PassengerMain = () => {
             (result, status) => {
                 if (status === 'OK' && result) {
                     setDirections(result);
+                    if (result.routes[0] &&
+                        result.routes[0].legs[0] &&
+                        result.routes[0].legs[0].duration &&
+                        result.routes[0].legs[0].duration.value !== undefined) {
+
+                        const time = result.routes[0].legs[0].duration.value;
+                        console.log(time);
+                        setDirection_time(time)
+                    }
+
                 } else {
                     console.error(`error fetching directions ${result}`);
                 }
             }
         );
     }
+
 
     return <>{isLoaded && (
 
@@ -84,7 +97,7 @@ const PassengerMain = () => {
             <div className="w-full h-full overflow-auto overscroll-y-contain ">
                 {
                     pickupPanel
-                        ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} />
+                        ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} directions_time={direction_time} />
                         : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} />
                 }
             </div>

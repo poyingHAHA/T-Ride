@@ -49,9 +49,9 @@ const DriverRating: React.FC =() => {
           );
         })}
       </div>
-      <div className="flex flex-row justify-evenly items-center w-screen h-[100px] fixed bottom-[86px]">
+      <div className="bg-white flex flex-row justify-evenly items-center w-screen h-[100px] fixed bottom-[86px]">
       <button
-            className="w-[150px] h-[50px] rounded-[10px] bg-[#2e5a88] text-white text-[24px]"
+            className="w-[calc(100%-30px)] h-[50px] rounded-[10px] bg-[#2e5a88] text-white text-[24px]"
             onClick={() => {
               navigate("/driver/trip")
             }}

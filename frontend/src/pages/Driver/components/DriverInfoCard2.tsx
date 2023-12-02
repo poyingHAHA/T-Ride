@@ -4,7 +4,7 @@ const Card2: React.FC<{
   userName: string;
   startName: string;
   endName: string;
-  pickTime1: string;
+  pickTime: string;
 }> = (props) => {
   return (
     <div className="bg-[#d9d9d9] flex flex-col p-[20px] gap-[15px] rounded-[10px] w-[calc(100vw-80px)]">
@@ -26,7 +26,7 @@ const Card2: React.FC<{
         </div>
         <div>
           <span className="text-[18px] whitespace-pre">出發時間：</span>
-          <span className="text-[18px]">{props.pickTime1}</span>
+          <span className="text-[18px]">{props.pickTime}</span>
         </div>
       </div>
     </div>

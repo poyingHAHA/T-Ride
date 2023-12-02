@@ -38,14 +38,14 @@ const DriverDetail = () => {
           <DriverNavigate />
         </div>
       </div>
-      <div className="bg-white w-full h-[260px] rounded-t-[30px] bottom-[156px] absolute z-1 overflow-auto">
+      <div className="bg-white w-full h-[260px] rounded-t-[30px] bottom-[70px] absolute z-1 overflow-auto">
         <div className="flex flex-col p-[30px] gap-[30px]">
           {info.map((passenger:InfoItem) => {
             return(<DriverDetailCard key={passenger.id} {...passenger}/>);
           })}
         </div>
       </div>
-      <div className="bg-white w-full h-[70px] absolute bottom-[86px] z-2 flex justify-center items-center">
+      <div className="bg-white w-full h-[70px] absolute bottom-[0px] z-2 flex justify-center items-center">
         <button 
           className="w-[calc(100%-30px)] h-[50px] bg-[#2E5A88] rounded-[10px] text-white text-[24px]"
           onClick={() => {

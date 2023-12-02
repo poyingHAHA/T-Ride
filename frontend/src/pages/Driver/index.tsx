@@ -9,7 +9,7 @@ import DriverInfo from './pages/DriverInfo';
 import DriverTrip from './pages/DriverTrip';
 import DriverDetail from './pages/DriverDetail';
 import DriverRating from './pages/DriverRating';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useAppDispatch } from '../../hooks';
 import { setLocation } from '../../slices/location';
 
 const Driver: React.FC = () => {

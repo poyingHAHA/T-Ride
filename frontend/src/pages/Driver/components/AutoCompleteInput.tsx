@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import usePlacesAutoComplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 

@@ -1,8 +1,6 @@
 import { orderDTO } from "../../../DTO/orders";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { useAppSelector } from "../../../hooks";
 import PickupCard from "./PickupCard";
-import { useState,useEffect } from "react";
-import { addTempOrder } from "../../../slices/tempOrder";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {

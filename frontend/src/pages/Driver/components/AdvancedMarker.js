@@ -1,8 +1,7 @@
 "use client";
-import { FC, useRef, useEffect } from "react";
-import { createRoot, Root } from "react-dom/client";
+import { useRef, useEffect } from "react";
+import { createRoot } from "react-dom/client";
 import { useGoogleMap } from "@react-google-maps/api";
-import { on } from "events";
 
 // type LatLngLiteral = google.maps.LatLngLiteral;
 // type Map = google.maps.Map;

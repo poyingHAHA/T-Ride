@@ -1,6 +1,9 @@
 import { orderDTO } from "../../../DTO/orders";
 import { useAppSelector } from "../../../hooks";
+import { useState } from "react";
 import PickupCard from "./PickupCard";
+import { getDriverUnfinishedOrder } from "../../../services/driveOrderService";
+import ErrorLoading from "../../../components/ErrorLoading";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -15,6 +18,29 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   // tempOrderReducer.orders: 紀錄使用者點擊確認後的訂單
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const backBtnHandler = async() => {
+    try{
+      setLoading(true);
+      const unfinishedOrder = await getDriverUnfinishedOrder();
+      console.log(unfinishedOrder);
+      if (unfinishedOrder.data.length > 0) {
+        setPanel(1);
+        alert("您有未完成的訂單");
+        setLoading(false);
+      }
+      else{
+        setPanel(0);
+        setShowSpots && setShowSpots(false);
+      }
+    }catch(err){
+      setError("發生錯誤");
+      setPanel(1);
+      setLoading(false);
+    }
+  }
 
   return <>
     {
@@ -45,10 +71,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
             <div className='fixed bottom-20 flex justify-center w-[100%]'>
               <button 
                 className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl mr-4' 
-                onClick={() => {
-                  setPanel(0);
-                  setShowSpots && setShowSpots(false);
-                }}
+                onClick={backBtnHandler}
               >
                 返回
               </button>
@@ -64,6 +87,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
               </button>
             </div>
           </div>
+          <ErrorLoading error={error} setError={setError} loading={loading} setLoading={setLoading} /> 
         </>
       )
     }

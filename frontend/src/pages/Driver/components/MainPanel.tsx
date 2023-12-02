@@ -2,6 +2,11 @@ import AutoCompleteInput from '../components/AutoCompleteInput';
 import { setStart, setDest } from "../../../slices/driverStartDest"
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
 import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { postDriverOrder } from '../../../services/driveOrderService';
+import { getTokenFromCookie } from '../../../utils/cookieUtil';
+import { useState, useEffect } from 'react';
+import { getDriverUnfinishedOrder } from '../../../services/driveOrderService';
+import ErrorLoading from '../../../components/ErrorLoading';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -12,6 +17,8 @@ type MainPanelProps = {
   setShowSpots: (showSpots: boolean) => any;
 };
 const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpots }: MainPanelProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const dispatch = useAppDispatch();
@@ -21,10 +28,86 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
     dispatch(setPassengerCount(passengerCount));
     console.log(driverDepart)
   }
+
   const handleChangeDepartureTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     const departureTime = new Date(e.target.value).getTime() / 1000;
     dispatch(setDepartureTime(departureTime));
     console.log(driverDepart)
+  }
+
+  useEffect(() => {
+    const getUnfinishedOrder = async () => {
+      try {
+        setLoading(true);
+        const unfinishedOrder = await getDriverUnfinishedOrder();
+        setLoading(false);
+        if (unfinishedOrder.data.length > 0) {
+          dispatch(setStart({ name: unfinishedOrder.data[0].startName, placeId: "", lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng }));
+          dispatch(setDest({ name: unfinishedOrder.data[0].endName, placeId: "", lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng }));
+          dispatch(setDepartureTime(unfinishedOrder.data[0].departureTime));
+          dispatch(setPassengerCount(unfinishedOrder.data[0].passengerCount));
+          setStartPoint({ lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng });
+          setDestPoint({ lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng });
+          setPanel(0);
+          alert("您有未完成的訂單");
+        }
+      } catch (err) {
+        setLoading(false);
+        setError("發生錯誤");
+        setPanel(0);
+      }
+    }
+    getUnfinishedOrder();
+  }, [])
+
+
+  const handlePostDriverOrder = async () => {
+    const token = getTokenFromCookie();
+    if (token === undefined) {
+      alert("請先登入");
+      return;
+    }
+    if (
+      driverStartDestReducer.start.lat === undefined || 
+      driverStartDestReducer.start.lng === undefined || 
+      driverStartDestReducer.dest.lat === undefined || 
+      driverStartDestReducer.dest.lng === undefined || 
+      driverDepart.departureTime === undefined ||
+      driverStartDestReducer.start.name === undefined ||
+      driverStartDestReducer.dest.name === undefined || 
+      driverDepart.passengerCount === 0) 
+    {
+      alert("請填寫完整資料")
+      return;
+    }
+    else{
+      const order = {
+        token: token,
+        startPoint: {
+          lat: driverStartDestReducer.start.lat,
+          lng: driverStartDestReducer.start.lng,
+        },
+        startName: driverStartDestReducer.start.name,
+        endPoint: {
+          lat: driverStartDestReducer.dest.lat,
+          lng: driverStartDestReducer.dest.lng,
+        },
+        endName: driverStartDestReducer.dest.name,
+        departureTime: driverDepart.departureTime,
+        passengerCount: driverDepart.passengerCount,
+      }
+      setLoading(true);
+      try{
+        const res = await postDriverOrder(order);
+        setLoading(false);
+        setPanel(1)
+        setShowSpots(true)
+        console.log(res);
+      } catch (err) {
+        setError("訂單未發送成功");
+        setLoading(false);
+      }
+    }
   }
 
   return <>
@@ -65,16 +148,9 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
             </div>
 
             <button
-              className='rounded bg-black w-[80vw] h-10  text-white text-xl'
+              className='rounded tracking-wide bg-black w-[80vw] h-10  text-white text-xl'
               // disabled={driverStartDestReducer.start === undefined || driverStartDestReducer.dest===undefined || driverDepart.departureTime===undefined || driverDepart.passengerCount===0}
-              onClick={() => {
-                if (driverStartDestReducer.start === undefined || driverStartDestReducer.dest === undefined || driverDepart.departureTime === undefined || driverDepart.passengerCount === 0) {
-                  alert("請填寫完整資料")
-                  return;
-                }
-                setPanel(1)
-                setShowSpots(true)
-              }}
+              onClick={handlePostDriverOrder}
             >
               選擇乘客
             </button>
@@ -82,6 +158,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
         </>
       )
     }
+    <ErrorLoading error={error} setError={setError} loading={loading} setLoading={setLoading} />
   </>;
 }
 

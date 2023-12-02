@@ -15,6 +15,7 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
   const [markerSelected, setMarkerSelected] = useState<boolean>(false)
   const dispatch = useAppDispatch();
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const driverDepartReducer = useAppSelector((state) => state.driverDepartReducer);
   useEffect(() => {
     if(order.orderId === markerOrderId){
       setMarkerSelected(true);
@@ -37,6 +38,10 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
   }, [tempOrderReducer.orders, order.orderId])
 
   const onCLickHandler = () => {
+    if (tempOrderReducer.orders?.length === driverDepartReducer.passengerCount) {
+      alert("已達乘客人數上限");
+      return;
+    }
     if (!pickupSelected) {
       setPickupSelected(true);
       if(tempOrderReducer.orders?.length === 0){

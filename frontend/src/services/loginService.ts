@@ -24,6 +24,7 @@ const userLogin = async (params: LoginRequest) => {
     );
 
     if (response.status === 200 && response.data.token) {
+      localStorage.setItem("userId", response.data.userId);
       setTokenInCookie(response.data.token, 1);
     }
 

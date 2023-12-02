@@ -46,7 +46,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint, placeho
     else {
       initValue = {name: '', placeId: '', lat: 0, lng: 0};
     }
-  },[])
+  },[driverStartDestReducer])
 
   const handleSelect = async (val: string) => {
     // false means we don't want to fetch more data

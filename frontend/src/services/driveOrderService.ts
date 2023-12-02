@@ -1,8 +1,53 @@
-import { get } from './APIHelper';
+import { get, post } from './APIHelper';
 import { driverOrderDTO, driverInvitationDTO, driverInvitationTotalDTO, orderDTO } from '../DTO/orders';
 import { userDTO } from '../DTO/user';
 import { convertUTC } from './formatService';
+import { getUserId } from '../utils/userUtil';
 
+interface PostDriverOrderRequest {
+  token: string;
+  startPoint: {
+    lat: number;
+    lng: number;
+  }
+  startName: string;
+  endPoint: {
+    lat: number;
+    lng: number;
+  }
+  endName: string;
+  departureTime: number;
+  passengerCount: number;
+}
+
+const postDriverOrder = async (params: PostDriverOrderRequest) => {
+  try {
+    const response = await post(
+      "/order/driver",
+      JSON.stringify(params),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    console.log("postDriverOrder response: ", response);
+    return response;
+  } catch (error) {
+    console.log("postDriverOrder error: ", error);
+  }
+}
+
+const getDriverUnfinishedOrder = async () => {
+  const userId = getUserId();
+  try {
+    const response: any = await get(`/order/driver/unfinished/${userId}`);
+    console.log("getDriverUnfinishedOrder response: ", response);
+    return response;
+  } catch (error) {
+    console.log("getDriverUnfinishedOrder error: ", error);
+  }
+}
 
 const getStartEnd = async (orderId: number) => {
   try {
@@ -71,5 +116,5 @@ const getInvitationTotal = async (orderId: number) => {
   }
 }
 
-export { getStartEnd, getInvitationTotal };
+export { postDriverOrder, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder };
 

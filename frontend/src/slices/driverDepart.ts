@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface driverDepartState {
   departureTime?: number
-  passengerCount?: number
-  currentPassenger?: number
+  passengerCount: number
+  currentPassenger: number
 }
 
 const initialState: driverDepartState = {

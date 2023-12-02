@@ -24,7 +24,6 @@ interface PostPassengerOrderRequest {
   passengerCount: number;
 }
 
-
 const postPassengerOrder = async (params: PostPassengerOrderRequest) => {
   try {
     const response = await post(
@@ -42,6 +41,7 @@ const postPassengerOrder = async (params: PostPassengerOrderRequest) => {
     console.log("postPassengerOrder error: ", error);
   }
 }
+
 
 const getNearLandMark = async (params: NearLandMarkRequest) => {
   if (!params.radius) params.radius = 500;

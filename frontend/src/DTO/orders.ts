@@ -64,3 +64,13 @@ export interface driverInvitationDTO {
 export interface driverInvitationTotalDTO {
   invitations: driverInvitationDTO[];
 }
+
+export interface SpotDTO {
+  name: string;
+  order_count: number;
+  point: {
+    lat: number;
+    lng: number;
+  },
+  spot_id: number;
+}

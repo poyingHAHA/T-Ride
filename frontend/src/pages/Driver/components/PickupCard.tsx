@@ -38,7 +38,7 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
   }, [tempOrderReducer.orders, order.orderId])
 
   const onCLickHandler = () => {
-    if (tempOrderReducer.orders?.length === driverDepartReducer.passengerCount) {
+    if (!pickupSelected && tempOrderReducer.orders?.length === driverDepartReducer.passengerCount) {
       alert("已達乘客人數上限");
       return;
     }

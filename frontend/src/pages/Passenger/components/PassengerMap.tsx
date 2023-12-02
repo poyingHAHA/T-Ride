@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "../../../hooks";
 import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marker, Circle } from "@react-google-maps/api";
-import { getSpots, getSpotOrders } from "../../../services/orderService";
+import { getSpots, getSpotOrders } from "../../../services/spotService";
 import { orderDTO } from "../../../DTO/orders";
 
 type LatLngLiteral = google.maps.LatLngLiteral;

@@ -37,8 +37,8 @@ interface InfoState {
 
 const initialState: InfoState = {
   Midpoints: [],
-  StartPoint: {name: "", time: "", place: {lat: 25.039025603857986, lng: 121.51768403942792}},
-  EndPoint: {name: "", time: "", place: {lat: 25.047543200037893, lng: 121.50517308983143}}
+  StartPoint: {name: "", time: "", place: {lat: 0, lng: 0}},
+  EndPoint: {name: "", time: "", place: {lat: 0, lng: 0}}
 }
 
 export const driverJourney = createSlice({

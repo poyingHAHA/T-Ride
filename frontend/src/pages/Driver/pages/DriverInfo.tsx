@@ -23,6 +23,9 @@ interface StartEnd {
 }
 
 const DriverInfo: React.FC = () => {
+
+  //Todo: 傳入orderId
+
   const [orderId, setOrderId] = useState(1);
   const [start, setStart] = useState<StartEnd>({name:"",time:""});
   const [end, setEnd] = useState<StartEnd>({name:"",time:""});
@@ -67,7 +70,7 @@ const DriverInfo: React.FC = () => {
     <div className="bg-[#f3e779] m-0 h-full w-screen">
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>
       <div className="text-center w-screen fixed top-[120px] font-normal text-[18px] font-sans">2023年11月2日 星期三</div>
-      <div className="flex flex-col justify-between items-center rounded-t-[30px] rounded-t-[30px] bg-white w-screen max-h-[calc(100vh-350px)] fixed bottom-[166px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
+      <div className="flex flex-col items-center rounded-t-[30px] rounded-t-[30px] bg-white w-screen h-[calc(100vh-320px)] fixed bottom-[150px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         <Card1 name={start.name} time={start.time} />
         { 
           info.map((place: InfoItem) => {
@@ -76,14 +79,22 @@ const DriverInfo: React.FC = () => {
         <Card1 name={end.name} time={end.time} />
       </div>
 
-      <div className="bg-white flex flex-row justify-evenly items-center w-screen h-[80px] bottom-0 mb-[86px] fixed">
-        <button 
-          className="w-[120px] h-[50px] bg-[#f3e779] rounded-[10px] text-[24px]"
-          onClick={() => {
-            navigate("/driver")
-          }}
-          >返回</button>
+      <div className="bg-white flex flex-col justify-evenly items-center w-screen h-[100px] bottom-[70px] fixed gap-[10px] pb-[20px]">
         <span className="text-[16px]">已邀請： 0/4 已接受： 0/3</span>
+        <div className="flex flex-row w-full justify-evenly">
+          <button 
+            className="w-[120px] h-[50px] bg-[#f3e779] rounded-[10px] text-[24px]"
+            onClick={() => {
+              navigate("/driver");
+            }}
+          >返回</button>
+          <button
+            className="w-[120px] h-[50px] bg-[#f3e779] rounded-[10px] text-[24px]"
+            onClick={() => {
+              navigate("/driver/trip", {state: {orderId: orderId}});
+            }}
+          >繼續</button>
+        </div>
       </div>
     </div>
   );

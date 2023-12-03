@@ -42,6 +42,11 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
             </div>
 
             <div className="flex flex-col h-[32vh] w-[100%] overflow-scroll mt-4">
+              <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
+                <div className="flex justify-center items-center bg-black text-white rounded-md w-[70%] ">
+                  <div>起點：{driverStartDestReducer.start.name}</div>
+                </div>
+              </div>
               {
                 tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
                   <div 
@@ -56,7 +61,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                       <div>{order.pickTime1}-{order.pickTime2}</div>
                     </div>                   
                     <button 
-                      className="rounded-lg bg-cyan-800 w-[15%] text-white ml-2"
+                      className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
                       onClick={() => dispatch(removeTempOrder(order))}
                     >
                       移除
@@ -64,6 +69,11 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                   </div>
                 ))
               }
+              <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
+                <div className="flex justify-center items-center bg-black text-white rounded-md w-[80%] ">
+                  <div>終點：{driverStartDestReducer.dest.name}</div>
+                </div>
+              </div>
             </div>
 
             <div className='fixed bottom-20 flex justify-center w-[100%]'>

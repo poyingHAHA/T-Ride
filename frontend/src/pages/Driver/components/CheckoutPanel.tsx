@@ -1,10 +1,7 @@
-import { orderDTO } from "../../../DTO/orders";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import PickupCard from "./PickupCard";
-import { useState,useEffect } from "react";
-import { removeTempOrder } from "../../../slices/tempOrder";
+import { removeTempOrder, setTempOrder } from "../../../slices/tempOrder";
+import { useRef, useState } from "react";
 
-type LatLngLiteral = google.maps.LatLngLiteral;
 type CheckoutPanelProps = {
   isLoaded: boolean;
   setPanel: (panel: number) => any;
@@ -14,7 +11,17 @@ type CheckoutPanelProps = {
 const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const dispatch = useAppDispatch();
+  const dragOrder = useRef<number>(0);
+  const draggedOverPerson = useRef<number>(0);
+  const handleSort = () => {
+    const tempOrdersClone = [...tempOrderReducer.orders];
+    const temp = tempOrdersClone[dragOrder.current];
+    tempOrdersClone[dragOrder.current] = tempOrdersClone[draggedOverPerson.current];
+    tempOrdersClone[draggedOverPerson.current] = temp;
+    dispatch(setTempOrder(tempOrdersClone));
+  }
 
   return <>
     {
@@ -34,10 +41,16 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
               </div>
             </div>
 
-            <div className="flex flex-col h-[80%] w-[100%] overflow-scroll mt-4">
+            <div className="flex flex-col h-[32vh] w-[100%] overflow-scroll mt-4">
               {
-                tempOrderReducer.orders && tempOrderReducer.orders.map((order) => (
-                  <div className="flex justify-center w-[100%] h-[15%] mt-4">
+                tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
+                  <div 
+                    className="relative flex justify-center w-[100%] h-[16%] mt-4"
+                    draggable={true}
+                    onDragStart={() => (dragOrder.current = index)}
+                    onDragEnter={() => (draggedOverPerson.current = index)}
+                    onDragEnd={handleSort}
+                  >
                     <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
                       <div>{order.startName}</div>
                       <div>{order.pickTime1}-{order.pickTime2}</div>
@@ -53,7 +66,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
               }
             </div>
 
-            <div className='fixed bottom-4 flex justify-center w-[100%]'>
+            <div className='fixed bottom-20 flex justify-center w-[100%]'>
               <button 
                 className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl mr-4' 
                 onClick={() => {

@@ -238,7 +238,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }
             {
-              orders !== undefined && orders.length !== 0 && orders.map((order) => {
+              showSpots && orders !== undefined && orders.length !== 0 && orders.map((order) => {
                 return (
                   <MarkerF
                     key={order.orderId}

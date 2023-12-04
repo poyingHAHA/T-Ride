@@ -47,7 +47,7 @@ const DriverMain = () => {
 
     if(!driverStartDestReducer.start || !driverStartDestReducer.dest) return;
     fetchDirections();
-  }, [startPoint, destPoint, isLoaded, tempOrderReducer])
+  }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest])
 
   const fetchDirections = () => {
     if(!startPoint || ! destPoint) return;
@@ -60,33 +60,8 @@ const DriverMain = () => {
           stopover: true,
         })
       })
-      // 根據起點與終點進行waypoints的排序,如果是南下則由北往南排序,反之則由南往北排序
-      if(startPoint.lat >= destPoint.lat){
-        waypts.sort((a, b) => {
-          if(a.location !== undefined && b.location !== undefined){
-            a.location = a.location as LatLngLiteral
-            b.location = b.location as LatLngLiteral
-            return a.location.lat - b.location.lat
-          }
-          else{
-            return 0
-          }
-        })
-      }
-      else{
-        waypts.sort((a, b) => {
-          if(a.location !== undefined && b.location !== undefined){
-            a.location = a.location as LatLngLiteral
-            b.location = b.location as LatLngLiteral
-            return b.location.lat - a.location.lat
-          }
-          else{
-            return 0
-          }
-        })
-      }
-
     }
+
     const service = new google.maps.DirectionsService();
     service.route(
       {
@@ -109,12 +84,12 @@ const DriverMain = () => {
   {
     isLoaded && (
       <>
-        <div className='h-[60%]'>
-          <div className="bg-gray-200 flex justify-center items-center h-full">
+        <div className='h-[60%] min-h-0'>
+          <div className="relative bg-gray-200 flex justify-center items-center h-full z-0">
             <DriverMap isLoaded={isLoaded} directions={directions} showSpots={showSpots} setOrders={setOrders} orders={orders} setMarkerOrderId={setMarkerOrderId} />
           </div>
         </div>
-        <div className='h-[45%] bottom-0 z-100 -translate-y-10'>
+        <div className='absolute h-fit overflow-auto bottom-0 z-100 min-h-[45%] w-[100%]'>
           {
             (() => {
               switch(panel){

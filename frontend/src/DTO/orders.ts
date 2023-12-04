@@ -18,3 +18,59 @@ export interface orderDTO {
   "passengerCount": number,
   "fee": number
 }
+
+export interface driverOrderDTO {
+  "orderId": number,
+  "userId": number,
+  "startPoint": {
+    "lat": number,
+    "lng": number
+  },
+  "startName": string,
+  "endPoint": {
+    "lat": number,
+    "lng": number
+  },
+  "endName": string,
+  "departureTime": number,
+  "passengerCount": number
+}
+
+export interface passengerOrderDTO {
+  arrivalTime: number,
+  departureTime1: number,
+  departureTime2: number,
+  endName: string,
+  endPoint: {
+    lat: number,
+    lng: number
+  },
+  fee: number,
+  orderId: number,
+  passengerCount: number,
+  startName: string,
+  startPoint: {
+    lat: number,
+    lng: number
+  },
+  userId: number
+}
+
+export interface driverInvitationDTO {
+  accepted: boolean,
+  passengerOrder: passengerOrderDTO
+}
+
+export interface driverInvitationTotalDTO {
+  invitations: driverInvitationDTO[];
+}
+
+export interface SpotDTO {
+  name: string;
+  order_count: number;
+  point: {
+    lat: number;
+    lng: number;
+  },
+  spot_id: number;
+}

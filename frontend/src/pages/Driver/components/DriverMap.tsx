@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAppSelector } from "../../../hooks";
 import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marker, Circle} from "@react-google-maps/api";
 import AdvMarker from "./AdvancedMarker"
-import { getSpots, getSpotOrders } from "../../../services/orderService";
-import { orderDTO } from "../../../DTO/orders";
+import { getSpots, getSpotOrders } from "../../../services/spotService";
+import { orderDTO, SpotDTO } from "../../../DTO/orders";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -15,22 +15,13 @@ type DriverMapProps = {
   orders?: orderDTO[];
   setMarkerOrderId?: (orderId: number) => void
 };
-type spot = {
-  "spotId": number
-  "spotName": string,
-  "spotPoint": {
-    "lng": number,
-    "lat": number
-  },
-  "passengerCount": number
-};
 
 const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarkerOrderId}: DriverMapProps) => {
   const [tempOrderSpots, setTempOrderSpots] = useState<number[]>([]);
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
-  const [spots, setSpots] = useState<spot[]>([]);
+  const [spots, setSpots] = useState<SpotDTO[]>([]);
   const [activeMarker, setActiveMarker] = useState<number|null>(null);
   const [activeMarkerPoint, setActiveMarkerPoint] = useState<LatLngLiteral|null>(null);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
@@ -67,8 +58,12 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     if(!showSpots) setSpots([]);
     async function fetchData(){
       // const nearLandMark = await getNearLandMark({lat: location.lat || 0, lng: location.lng || 0});
-      const spots = await getSpots(Date.now());
-      setSpots(spots.spots);
+      if (driverDepart.departureTime === 0 || driverDepart.departureTime === undefined) {
+        alert("請選擇出發時間")
+        return;
+      }
+      const spots = await getSpots(driverDepart.departureTime, 1);
+      setSpots(spots);
       console.log("DriverMap Spots: ", spots);
     }
     try {
@@ -96,7 +91,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
     const orders = await getSpotOrders(spotId, driverDepart.departureTime);
     // 取得地標附近的訂單，並傳給父層，讓PickupPanel顯示
-    if (setOrders) setOrders(orders.orders);
+    if (setOrders) setOrders(orders);
     console.log("DriverMap: ", orders);
 
     setActiveMarker(spotId);
@@ -123,7 +118,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
           {
             directions && (
               <div>
-                <div className="absolute top-[45%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
+                <div className="absolute top-[70%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
                   <div className="text-xs px-2 py-2 font-medium">
                     距離：{directions.routes[0].legs[0].distance && directions.routes[0].legs[0].distance.text}
                     <br />
@@ -191,23 +186,23 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
             }
             {
               showSpots && (
-                spots.map(({spotId, spotName, spotPoint, passengerCount}) => {
-                  if(tempOrderSpots.includes(spotId)){
+                spots.map(({spot_id, name, point, order_count}) => {
+                  if(tempOrderSpots.includes(spot_id)){
                     return (
                       <MarkerF
-                        key={spotId}
-                        position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
-                        label={passengerCount.toString()+'人'}
-                        title={spotName}
+                        key={spot_id}
+                        position={{lat: point.lat, lng: point.lng} as LatLngLiteral }
+                        label={order_count.toString()+'人'}
+                        title={name}
                         icon={markerWithOrderIcon}
-                        onClick={()=>{handleActiveMarker(spotId, spotPoint)}}
+                        onClick={()=>{handleActiveMarker(spot_id, point)}}
                       >
                         {
-                          activeMarker === spotId ? (
+                          activeMarker === spot_id ? (
                             <InfoWindowF 
-                              position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                              position={{lat: point.lat, lng: point.lng} as LatLngLiteral }
                               onCloseClick={() => {setActiveMarker(null)}}>
-                              <div>{spotName}</div>
+                              <div>{name}</div>
                             </InfoWindowF>
                           ) : null
                         }
@@ -216,18 +211,18 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                   }else{
                     return (
                       <MarkerF
-                        key={spotId}
-                        position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
-                        label={passengerCount.toString()+'人'}
-                        title={spotName}
-                        onClick={()=>{handleActiveMarker(spotId, spotPoint)}}
+                        key={spot_id}
+                        position={{lat: point.lat, lng: point.lng} as LatLngLiteral }
+                        label={order_count.toString()+'人'}
+                        title={name}
+                        onClick={()=>{handleActiveMarker(spot_id, point)}}
                       >
                         {
-                          activeMarker === spotId ? (
+                          activeMarker === spot_id ? (
                             <InfoWindowF 
-                              position={{lat: spotPoint.lat, lng: spotPoint.lng} as LatLngLiteral }
+                              position={{lat: point.lat, lng: point.lng} as LatLngLiteral }
                               onCloseClick={() => {setActiveMarker(null)}}>
-                              <div>{spotName}</div>
+                              <div>{name}</div>
                             </InfoWindowF>
                           ) : null
                         }
@@ -243,7 +238,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }
             {
-              orders !== undefined && orders.length !== 0 && orders.map((order) => {
+              showSpots && orders !== undefined && orders.length !== 0 && orders.map((order) => {
                 return (
                   <MarkerF
                     key={order.orderId}

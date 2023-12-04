@@ -12,6 +12,9 @@ const DriverContact: React.FC = ()=> {
   const handleCloseModal = () => {
     setShowModal(false);
   };
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); //prevent refreshing the page
+  };
 
   return (
     <div>
@@ -34,7 +37,7 @@ const DriverContact: React.FC = ()=> {
             </button>
           </div>
           <p className="text-[24px]">傳送訊息</p>
-          <form className="flex flex-col gap-[30px] items-center">
+          <form className="flex flex-col gap-[30px] items-center" onSubmit={handleSubmit}>
             <input type="text" name="message1" value="已抵達上車地點" 
               className="w-full border-[1px] border-black p-[5px] rounded-[10px] text-center"/>
             <input type="text" name="message1" value="延遲五分鐘抵達" 

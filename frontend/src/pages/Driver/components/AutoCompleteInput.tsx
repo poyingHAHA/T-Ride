@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import usePlacesAutoComplete, { getGeocode, getLatLng } from 'use-places-autocomplete';
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 
@@ -13,10 +13,11 @@ type actionCreator = {
   type: string;
   setLocation: (action: actionType) => any;
   setPoint?: (point: LatLngLiteral) => any;
+  placeholderText?: string;
 };
 
 
-export default function AutoCompleteInput({ type, setLocation, setPoint }: actionCreator) {
+export default function AutoCompleteInput({ type, setLocation, setPoint, placeholderText }: actionCreator) {
   // 取得使用者目前位置
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
@@ -45,7 +46,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
     else {
       initValue = {name: '', placeId: '', lat: 0, lng: 0};
     }
-  },[])
+  },[driverStartDestReducer])
 
   const handleSelect = async (val: string) => {
     // false means we don't want to fetch more data
@@ -71,13 +72,13 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
   
   return <>
     <div>
-        <div className='relative w-[100%]' >
+        <div className='w-[100%] h-[100%]' >
           <input
+            placeholder={placeholderText || "Search an address"}
             ref={inputElement}
             value={value}
-            placeholder="Search an address"
             type="text"
-            className='text-black bg-gray-50 border border-gray-300 p-2 rounded-md '
+            className='text-black w-full bg-gray-50 border border-gray-300 p-2 rounded-md '
             onChange={(e) => {
               console.log(e.target.value)
               setValue(e.target.value);
@@ -85,7 +86,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint }: actio
           />
           {
             status === 'OK' && 
-            <div className='absolute max-h-32 z-50 overflow-scroll w-[100%] bg-[white] text-black flex flex-col rounded-xl shadow-lg shadow-cyan-500/50'>
+            <div className='max-h-[90vh] z-50 overflow-scroll w-[100%] bg-[white] text-black flex flex-col rounded-xl shadow-lg shadow-cyan-500/50'>
               {
                 type === 'driverStart' && data.length > 0 && (
                   <div className='px-2 py-2 hover:bg-[#ec7c7c]' onClick={() => {handleSelect('current')}} >

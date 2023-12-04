@@ -7,6 +7,7 @@ import passengerStartDestReducer from "./slices/passengerStartDest";
 import driverDepartReducer from "./slices/driverDepart";
 import passengerDepartReducer from "./slices/passengerDepart";
 import tempOrderReducer from "./slices/tempOrder";
+import driverJourneyReducer from "./slices/driverJourney";
 
 const reducers = combineReducers({
   loginReducer,
@@ -15,7 +16,8 @@ const reducers = combineReducers({
   passengerStartDestReducer,
   driverDepartReducer,
   passengerDepartReducer,
-  tempOrderReducer
+  tempOrderReducer,
+  driverJourneyReducer
 })
 
 const store = configureStore({

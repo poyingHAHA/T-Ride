@@ -24,10 +24,13 @@ export const tempOrder = createSlice({
     },
     removeTempOrder: (state, action) => {
       state.orders = state.orders.filter(order => order.orderId !== action.payload.orderId)
+    },
+    setTempOrder: (state, action) => {
+      state.orders = action.payload
     }
   }
 })
 
-export const { addTempOrder, removeTempOrder } = tempOrder.actions;
+export const { addTempOrder, removeTempOrder, setTempOrder } = tempOrder.actions;
 export default tempOrder.reducer;
   

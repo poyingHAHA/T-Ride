@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 // import { addOrder } from "../../../slices/tempOrder";
 import { MdFace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { FaCircle, FaSquareFull } from "react-icons/fa6";
+import { IoRemoveOutline } from "react-icons/io5";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -23,6 +25,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
     const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
     const dispatch = useAppDispatch();
 
+    console.log(passengerStartDestReducer.start)
     useEffect(() => {
         console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
     }, [tempOrderReducer])
@@ -37,14 +40,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
         return `${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     };
 
-
-
     return <>
         {
             isLoaded && (
                 <>
                     <div className=" flex h-full w-full flex-col px-5 pt-5 pb-3 overflow-auto overscroll-y-contain">
-                        <div> {/* Trip details */}
+                        <div>
                             <div className='mb-4 text-center text-xl font-bold'>
                                 Trip details
                             </div>
@@ -62,16 +63,21 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
                             <div className="mx-2 flex-col mb-3">
                                 <div className="flex">
                                     <div className='w-1/10 flex flex-col my-5 mr-1'>
-                                        <img className='h-3 w-3 brightness-0 ml-0.5' src='https://img.icons8.com/ios-filled/50/9CA3AF/filled-circle.png' alt="Filled Circle" />
-                                        <img className='h-[50px] w-5 pr-1' src='https://img.icons8.com/ios/50/9CA3AF/vertical-line.png' alt="Vertical Line" />
-                                        <img className='h-4 brightness-0 w-4' src='https://img.icons8.com/windows/50/000000/square-full.png' alt="Square Full" />
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <FaCircle className='h-3 w-3' />
+                                        </div>
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <img className='h-[50px] w-5 brightness-0 contrast-200' src='https://img.icons8.com/ios/50/9CA3AF/vertical-line.png' alt="Vertical Line" />
+                                        </div>
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <FaSquareFull className='h-3 w-3' />
+                                        </div>
                                     </div>
 
 
                                     <div className="w-2/3 flex flex-col">
                                         <div className='flex-1 mx-1 my-1 flex justify-between items-center font-bold'>
-                                            {passengerStartDestReducer.start.name === 'current' ? '目前位置' : (passengerStartDestReducer.start.name || '未指定起點')}
-
+                                            {passengerStartDestReducer.start.name !== 'current' ? (passengerStartDestReducer.start.name) : '目前位置'}
                                         </div>
                                         <div className='flex-1 mx-1 my-1 flex justify-between items-center font-bold'>
                                             {passengerStartDestReducer.dest.name || '未指定終點'}
@@ -167,5 +173,6 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
         }
     </>;
 }
+
 
 export default PickupPanel;

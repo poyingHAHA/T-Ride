@@ -16,11 +16,13 @@ type DirectionsResult = google.maps.DirectionsResult;
 
 const PassengerMain = () => {
     const navigate = useNavigate();
-    const [directions, setDirections] = useState<DirectionsResult>()
+    // const [directions, setDirections] = useState<DirectionsResult>()
+    const [directions, setDirections] = useState<DirectionsResult | undefined>(undefined);
     const [direction_time, setDirection_time] = useState<number>(0)
     const [startPoint, setStartPoint] = useState<LatLngLiteral>()
     const [destPoint, setDestPoint] = useState<LatLngLiteral>()
     const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+
     // 紀錄使用者點選marker後，該地標附近的訂單
     const [orders, setOrders] = useState<orderDTO[]>([])
     // // Redux state selectors
@@ -57,8 +59,11 @@ const PassengerMain = () => {
         fetchDirections();
     }, [startPoint, destPoint, isLoaded])
 
+
     const fetchDirections = () => {
         if (!startPoint || !destPoint) return;
+        setDirections(undefined);
+
         const service = new google.maps.DirectionsService();
         service.route(
             {
@@ -75,10 +80,8 @@ const PassengerMain = () => {
                         result.routes[0].legs[0].duration.value !== undefined) {
 
                         const time = result.routes[0].legs[0].duration.value;
-                        console.log(time);
                         setDirection_time(time)
                     }
-
                 } else {
                     console.error(`error fetching directions ${result}`);
                 }

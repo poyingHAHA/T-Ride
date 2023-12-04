@@ -24,7 +24,7 @@ const Login: React.FC = () => {
 
   const loginHandler = async () => {
     setLoading(true);
-    const loginResult = await userLogin({username, password});
+    const loginResult = await userLogin({ username, password });
     // test
     // dispatch(login(true));
     // setLoading(false);
@@ -34,7 +34,7 @@ const Login: React.FC = () => {
       dispatch(login(true));
       setLoading(false);
       navigate("/selectRole")
-    }else{
+    } else {
       setError("帳號或密碼錯誤");
       setLoading(false);
     }
@@ -46,16 +46,16 @@ const Login: React.FC = () => {
         登入
       </h1>
       <Form method="post" className="bg-white self-stretch flex w-full h-screen flex-col items-stretch mt-16 pt-40 pb-96 px-16 rounded-[50px_50px_0px_0px] max-md:max-w-full max-md:mt-10 max-md:px-5 max-md:py-24">
-        <input 
-          type="account" 
-          placeholder="公司帳號" 
-          className="text-black text-lg leading-6 whitespace-nowrap bg-gray-200 px-3 py-4 rounded-xl" 
+        <input
+          type="account"
+          placeholder="公司帳號"
+          className="text-black text-lg leading-6 whitespace-nowrap bg-gray-200 px-3 py-4 rounded-xl"
           onChange={(e) => setUsername(e.target.value)}
         />
-        <input 
-          type="password" 
-          placeholder="公司密碼" 
-          className="text-black text-lg leading-6 whitespace-nowrap bg-gray-200 px-3 py-4 rounded-xl mt-6" 
+        <input
+          type="password"
+          placeholder="公司密碼"
+          className="text-black text-lg leading-6 whitespace-nowrap bg-gray-200 px-3 py-4 rounded-xl mt-6"
           onChange={(e) => setPassword(e.target.value)}
         />
         <button

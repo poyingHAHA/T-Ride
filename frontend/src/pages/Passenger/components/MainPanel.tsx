@@ -4,6 +4,7 @@ import { setDepartureTime1, setDepartureTime2, setPassengerCount } from '../../.
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { Form } from "react-router-dom";
 import { postPassengerOrder } from '../../../services/orderService';
+import { getTokenFromCookie } from "../../../utils/cookieUtil";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -36,6 +37,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const dispatch = useAppDispatch();
+    const token = getTokenFromCookie();
 
     const handleSelectPassengerCount = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const passengerCount = parseInt(event.target.value);
@@ -57,20 +59,6 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
     const postpaxorderHandler = async (params: PostPassengerOrderRequest) => {
         // setLoading(true);
         const postpaxorderResult = await postPassengerOrder(params)
-
-        // test
-        // dispatch(login(true));
-        // setLoading(false);
-        // navigate("/selectRole")
-        //======
-        // if (postpaxorderResult) {
-        //     // dispatch(login(true));
-        //     // setLoading(false);
-        //     // navigate("/selectRole")
-        // } else {
-        //     // setError("帳號或密碼錯誤");
-        //     // setLoading(false);
-        // }
     }
     return <>
         {
@@ -141,8 +129,9 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
                                 if (startPoint.lat !== undefined && startPoint.lng !== undefined && endPoint.lat !== undefined && endPoint.lng !== undefined && startPoint.name !== undefined
                                     && endPoint.name !== undefined && passengerDepart.departureTime1 !== undefined && passengerDepart.departureTime2 !== undefined && passengerDepart.passengerCount !== undefined) {
                                     setPickupPanel(true)
+
                                     postpaxorderHandler({
-                                        token: "Xp80Bu9VfxmBNF1uEC4kpKwyRUAYCh7bQXMn4yq06mmAC5g1mRLOTM9b4jwdg0M8",
+                                        token: token,
                                         startPoint: { lat: startPoint.lat, lng: startPoint.lng },
                                         startName: startPoint.name,
                                         endPoint: { lat: endPoint.lat, lng: endPoint.lng },

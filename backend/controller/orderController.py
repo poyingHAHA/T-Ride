@@ -1,5 +1,4 @@
 from quart import Blueprint, request, make_response
-from quart_cors import cors
 from services.orderService import *
 from services.userService import *
 from utils import utils

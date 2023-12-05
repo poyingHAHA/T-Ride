@@ -1,6 +1,7 @@
 from repository.orderRepository import *
 from repository.matchRepository import *
 from repository.userRepository import *
+from repository.notificationRepository import *
 from services.orderService import *
 from services.models import *
 
@@ -10,6 +11,7 @@ class MatchService:
         self.user_repository = UserRepository()
         self.order_repository = OrderRepository()
         self.match_repository = MatchRepository()
+        self.notification_repository = NotificationRepository()
 
     def send_invitation(self, token, driver_order_id, passenger_order_id):
         '''
@@ -146,3 +148,9 @@ class MatchService:
         # TODO: 目前沒有考慮因其他乘客造成繞路，使得抵達時間延後
         self.match_repository.accept_invitation(driver_order_id, passenger_order_id)
         self.match_repository.delete_other_invitations(driver_order_id, passenger_order_id)
+
+        return # TODO: remove it
+        self.notification_repository.notify_accept_invitation(
+            driver_order_id,
+            passenger_order_id,
+            driver_order.user_id)

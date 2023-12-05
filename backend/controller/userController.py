@@ -1,5 +1,4 @@
 from quart import Blueprint, request, make_response, websocket
-from quart_cors import cors
 from services.userService import *
 from utils import utils
 from controller.models import *

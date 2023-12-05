@@ -4,6 +4,7 @@ import subprocess
 from controller.matchController import match
 from controller.orderController import order
 from controller.userController import user
+from controller.internalController import internal
 
 app = Quart(__name__)
 app = cors(app, allow_origin='*')
@@ -41,4 +42,5 @@ if __name__ == '__main__':
     app.register_blueprint(match, url_prefix='/match')
     app.register_blueprint(order, url_prefix='/order')
     app.register_blueprint(user, url_prefix='/user')
+    app.register_blueprint(internal, url_prefix='/internal')
     app.run(host='0.0.0.0', port=5239, debug=True)

@@ -63,6 +63,7 @@ const put = (url: string, data?: any, config?: any) => {
       .catch((error) => { reject(error); })
   })
 }
+
 const remove = (url: string, config?: any) => {
   return new Promise((resolve, reject) => {
     APIHelper.delete(url, config)

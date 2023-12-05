@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { Form } from "react-router-dom";
 import { postPassengerOrder } from '../../../services/orderService';
 import { getTokenFromCookie } from "../../../utils/cookieUtil";
+import { useState, useEffect } from 'react';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -12,7 +13,15 @@ type MainPanelProps = {
     setStartPoint: (point: LatLngLiteral) => any;
     setDestPoint: (point: LatLngLiteral) => any;
     setPickupPanel: (pickupPanel: boolean) => any;
+    setOrderId: (orderId: number) => any;
 };
+
+interface PostPassengerOrderResponse {
+    data: {
+        orderId: number;
+    };
+}
+
 
 interface PostPassengerOrderRequest {
     token: string;
@@ -31,13 +40,15 @@ interface PostPassengerOrderRequest {
     passengerCount: number;
 }
 
-const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: MainPanelProps) => {
+const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setOrderId }: MainPanelProps) => {
 
 
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const dispatch = useAppDispatch();
     const token = getTokenFromCookie();
+
+    // console.log(token)
 
     const handleSelectPassengerCount = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const passengerCount = parseInt(event.target.value);
@@ -57,9 +68,12 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
     }
 
     const postpaxorderHandler = async (params: PostPassengerOrderRequest) => {
-        // setLoading(true);
-        const postpaxorderResult = await postPassengerOrder(params)
+        const postpaxorderResult = await postPassengerOrder(params) as PostPassengerOrderResponse;
+        console.log(postpaxorderResult.data.orderId);
+        setOrderId(postpaxorderResult.data.orderId)
+        setPickupPanel(true);
     }
+
     return <>
         {
             isLoaded && (
@@ -96,7 +110,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
                                 >
                                     {
                                         [...Array(5)].map((_, i) =>
-                                            passengerDepart.passengerCount === i + 1 ? <option value={i + 1} selected>{i + 1}</option> : <option value={i + 1}>{i + 1}</option>
+                                            passengerDepart.passengerCount === i + 1 ? <option key={i} value={i + 1}>{i + 1}</option> : <option value={i + 1}>{i + 1}</option>
                                         )
                                     }
                                 </select>
@@ -128,7 +142,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
 
                                 if (startPoint.lat !== undefined && startPoint.lng !== undefined && endPoint.lat !== undefined && endPoint.lng !== undefined && startPoint.name !== undefined
                                     && endPoint.name !== undefined && passengerDepart.departureTime1 !== undefined && passengerDepart.departureTime2 !== undefined && passengerDepart.passengerCount !== undefined) {
-                                    setPickupPanel(true)
+
 
                                     postpaxorderHandler({
                                         token: token,
@@ -140,6 +154,9 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel }: Ma
                                         departureTime2: passengerDepart.departureTime2,
                                         passengerCount: passengerDepart.passengerCount
                                     });
+
+
+
 
                                 } else {
                                     alert("請填寫完整資料")

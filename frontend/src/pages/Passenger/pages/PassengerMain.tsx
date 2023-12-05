@@ -22,6 +22,7 @@ const PassengerMain = () => {
     const [startPoint, setStartPoint] = useState<LatLngLiteral>()
     const [destPoint, setDestPoint] = useState<LatLngLiteral>()
     const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+    const [orderId, setOrderId] = useState<number>(0);
 
     // 紀錄使用者點選marker後，該地標附近的訂單
     const [orders, setOrders] = useState<orderDTO[]>([])
@@ -100,8 +101,17 @@ const PassengerMain = () => {
             <div className="w-full h-full overflow-auto overscroll-y-contain ">
                 {
                     pickupPanel
-                        ? <PickupPanel isLoaded={isLoaded} setPickupPanel={setPickupPanel} orders={orders} directions_time={direction_time} />
-                        : <MainPanel isLoaded={isLoaded} setStartPoint={setStartPoint} setDestPoint={setDestPoint} setPickupPanel={setPickupPanel} />
+                        ? <PickupPanel
+                            isLoaded={isLoaded}
+                            setPickupPanel={setPickupPanel}
+                            orderId={orderId}
+                            directions_time={direction_time} />
+                        : <MainPanel
+                            isLoaded={isLoaded}
+                            setStartPoint={setStartPoint}
+                            setDestPoint={setDestPoint}
+                            setPickupPanel={setPickupPanel}
+                            setOrderId={setOrderId} />
                 }
             </div>
         </main>

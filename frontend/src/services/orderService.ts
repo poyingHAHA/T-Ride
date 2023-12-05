@@ -1,4 +1,5 @@
 import { get, post, put, remove } from './APIHelper';
+import { getUserId } from '../utils/userUtil';
 
 interface PostPassengerOrderRequest {
   token: string;
@@ -35,6 +36,34 @@ const postPassengerOrder = async (params: PostPassengerOrderRequest) => {
   }
 }
 
+const getPassengerUnfinishedOrder = async () => {
+  const userId = getUserId();
+  try {
+    const response: any = await get(`/order/passenger/unfinished/${userId}`);
+    console.log("getPassengerUnfinishedOrder response: ", response);
+    return response;
+  } catch (error) {
+    console.log("getPassengerUnfinishedOrder error: ", error);
+  }
+}
+
+const deletePassengerOrder = async (orderId: number, tokens: string) => {
+  try {
+    const response = await remove(
+      `/order/passenger/${orderId}`,
+      {
+        params: { token: tokens.replace(/['"]+/g, '') }
+      })
+    console.log("deletePassengerOrder respones: ", response)
+    return response;
+  } catch (error) {
+    console.log("deletePassengerOrder error: ", error);
+  }
+
+}
+
 export {
-  postPassengerOrder
+  postPassengerOrder,
+  getPassengerUnfinishedOrder,
+  deletePassengerOrder
 }

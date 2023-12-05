@@ -2,15 +2,33 @@ import React from 'react'
 import { MdSettings, MdOutlineCreditCard, MdOutlineContactSupport, MdAccountCircle, MdOutlineStar, MdHistory } from "react-icons/md";
 import { FaUserFriends } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { getUserinfo } from '../../../services/userService';
+
 
 export default function PassengerAccount() {
+
     const navigate = useNavigate();
+    const [error, setError] = useState<string>("");
+    const [userName, setUserName] = useState<string>("");
+
+    useEffect(() => {
+        const getUserName = async () => {
+            try {
+                const Userinfo = await getUserinfo();
+                setUserName(Userinfo.data.userName)
+            } catch (err) {
+                setError("發生錯誤");
+            }
+        }
+        getUserName();
+    }, [])
     return (
         <div className='flex flex-col'>
             <div className='bg-gray-200 px-6 py-10 flex'>
 
                 <div className='flex-1 flex items-center justify-center ' >
-                    <div className='text-neutral-800 text-4xl'>Bart</div>
+                    <div className='text-neutral-800 text-4xl'>{userName}</div>
                 </div>
                 <MdAccountCircle className=' h-20 w-20 flex-1' />
             </div>

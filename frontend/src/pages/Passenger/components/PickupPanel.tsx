@@ -6,17 +6,37 @@ import { useState, useEffect } from "react";
 import { MdFace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { FaCircle, FaSquareFull } from "react-icons/fa6";
-import { IoRemoveOutline } from "react-icons/io5";
+import { getDriverInvitations } from "../../../services/invitationService";
+import { deletePassengerOrder } from "../../../services/orderService";
+import { getTokenFromCookie } from "../../../utils/cookieUtil";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
     isLoaded: boolean;
     setPickupPanel: (pickupPanel: boolean) => any;
-    orders?: orderDTO[];
+    orderId: number;
     directions_time: number;
 };
 
-const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: PickupPanelProps) => {
+interface Invitation {
+    orderId: number;
+    userId: number;
+    startPoint: {
+        lat: number;
+        lng: number;
+    }
+    startName: string;
+    endPoint: {
+        lat: number;
+        lng: number;
+    }
+    endName: string;
+    departureTime: number;
+    PassengerCount: number;
+}
+
+
+const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: PickupPanelProps) => {
 
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
@@ -24,8 +44,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
     const [tempOrders, setTempOrders] = useState<orderDTO[]>([]);
     const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
     const dispatch = useAppDispatch();
-
+    const [invitations, setInvitations] = useState<Invitation[]>([]);
+    const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+    const token = getTokenFromCookie();
     console.log(passengerStartDestReducer.start)
+    console.log(orderId)
     useEffect(() => {
         console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
     }, [tempOrderReducer])
@@ -39,6 +63,25 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
         const date = new Date(timestamp * 1000);
         return `${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     };
+
+    useEffect(() => {
+        const getInvitations = async () => {
+            try {
+                setLoading(true);
+                const unfinishedOrder = await getDriverInvitations(orderId);
+                setLoading(false);
+                if (unfinishedOrder.data.length > 0) {
+                    setInvitations(unfinishedOrder.data);
+                }
+            } catch (err) {
+                setLoading(false);
+                setError("發生錯誤");
+            }
+        }
+        getInvitations();
+    }, [])
+
+
 
     return <>
         {
@@ -104,50 +147,38 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orders, directions_time }: Pick
                                     Invitations
                                 </div>
 
-                                <div className="h-20 border-gray border-b border-solid " >
-                                    <div className="m-4 pb-2 flex justify-between items-end h-full rounded-lg mx-10">
-                                        <div className='flex-1'>
-                                            <h3 className="font-bold text-lg">目的地：張忠謀大樓</h3>
-                                            <p className="text-gray-500 text-lg">行程時間：07:35 - 08:30</p>
+                                {invitations.length > 0 ? (
+                                    <ul>
+                                        <div className="h-20 border-gray border-b border-solid " >
+                                            <div className="m-4 pb-2 flex justify-between items-end h-full rounded-lg mx-10">
+                                                <div className='flex-1'>
+                                                    <h3 className="font-bold text-lg">目的地：張忠謀大樓</h3>
+                                                    <p className="text-gray-500 text-lg">行程時間：07:35 - 08:30</p>
+                                                </div>
+                                                <span className="block px-1">
+                                                    <MdFace className="far fa-cog text-5xl block mx-auto" />
+                                                    <span className="block text-base mx-auto">Burns</span>
+                                                </span>
+                                            </div>
                                         </div>
-                                        <span className="block px-1">
-                                            <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                            <span className="block text-base mx-auto">Burns</span>
-                                        </span>
-                                    </div>
-                                </div>
 
-                                <div className="h-20 border-gray border-b border-solid" >
-                                    <div className="m-4 pb-2 flex justify-between items-end h-full rounded-lg mx-10">
-                                        <div className='flex-1'>
-                                            <h3 className="font-bold text-lg">張忠謀大樓</h3>
-                                            <p className="text-gray-500 text-lg">07:35 - 08:30</p>
-                                        </div>
-                                        <span className="block px-1">
-                                            <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                            <span className="block text-base mx-auto">Burns</span>
-                                        </span>
-                                    </div>
-                                </div>
+                                    </ul>
+                                ) : (
+                                    <div className="flex items-center justify-center">
+                                        <div>未收到邀請</div>
+                                    </div>)}
 
-                                <div className="h-20 border-gray border-b border-solid" >
-                                    <div className="m-4 pb-2 flex justify-between items-end h-full rounded-lg mx-10">
-                                        <div className='flex-1'>
-                                            <h3 className="font-bold text-lg">張忠謀大樓</h3>
-                                            <p className="text-gray-500 text-lg">07:35 - 08:30</p>
-                                        </div>
-                                        <span className="block px-1">
-                                            <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                            <span className="block text-base mx-auto">Burns</span>
-                                        </span>
-                                    </div>
-                                </div>
+
 
                                 <div className="h-20 flex justify-center items-center py-2" >
                                     <button
                                         className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
                                         type="button"
-                                        onClick={() => { setPickupPanel(false) }}
+                                        onClick={() => {
+                                            // setPickupPanel(false);
+                                            deletePassengerOrder(orderId, token)
+                                        }}
+                                    // delete passenger order
                                     >Cancel</button>
                                 </div>
 

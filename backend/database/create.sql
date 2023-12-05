@@ -62,6 +62,11 @@ CREATE TABLE "spots" (
   "name" varchar
 );
 
+CREATE TABLE "websocket" (
+  "user_id" integer PRIMARY KEY,
+  "host_port" varchar
+);
+
 ALTER TABLE "session" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "users" ADD FOREIGN KEY ("driver_data_id") REFERENCES "driver_datas" ("id");
@@ -75,3 +80,5 @@ ALTER TABLE "passenger_orders" ADD FOREIGN KEY ("spot_id") REFERENCES "spots" ("
 ALTER TABLE "matches" ADD FOREIGN KEY ("driver_order_id") REFERENCES "driver_orders" ("id");
 
 ALTER TABLE "matches" ADD FOREIGN KEY ("passenger_order_id") REFERENCES "passenger_orders" ("id");
+
+ALTER TABLE "websocket" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

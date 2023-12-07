@@ -26,7 +26,7 @@ async def match_driver_invitation():
         "passengerOrderId"]):
         return await make_response("Incorrect parameter format", 400)
 
-    ret = match_service.send_invitation(
+    ret = await match_service.send_invitation(
         body["token"],
         body["driverOrderId"],
         body["passengerOrderId"])
@@ -123,19 +123,48 @@ async def accept_invitation_websocket(driverId):
     await websocket.accept()
 
     driverId = int(driverId)
+    key = f'driver{driverId}'
 
     # TODO: use config
     ret = notification_service.register_host_port(driverId, "127.0.0.1:5239")
     if ret != None:
         raise Exception(f'websocket: {ret}')
 
-    MessageQueue.register(driverId)
+    MessageQueue.register(key)
     try:
         while True:
-            await websocket.send(await MessageQueue.receive(driverId))
+            await websocket.send(await MessageQueue.receive(key))
     except asyncio.CancelledError:
-        MessageQueue.delete(driverId)
+        MessageQueue.delete(key)
 
     ret = notification_service.delete_host_port(driverId)
     if ret != None:
         raise Exception(f'websocket: {ret}')
+
+    print(f'accept invitation websocket with {driverId} is closed')
+
+
+@match.websocket('/invitation/send/<int:passengerId>')
+async def send_invitation_websocket(passengerId):
+    await websocket.accept()
+
+    passengerId = int(passengerId)
+    key = f'passenger{passengerId}'
+
+    # TODO: use config
+    ret = notification_service.register_host_port(passengerId, "127.0.0.1:5239")
+    if ret != None:
+        raise Exception(f'websocket: {ret}')
+
+    MessageQueue.register(key)
+    try:
+        while True:
+            await websocket.send(await MessageQueue.receive(key))
+    except asyncio.CancelledError:
+        MessageQueue.delete(key)
+
+    ret = notification_service.delete_host_port(passengerId)
+    if ret != None:
+        raise Exception(f'websocket: {ret}')
+
+    print(f'send invitation websocket with {passengerId} is closed')

@@ -13,7 +13,7 @@ class MatchService:
         self.match_repository = MatchRepository()
         self.notification_repository = NotificationRepository()
 
-    def send_invitation(self, token, driver_order_id, passenger_order_id):
+    async def send_invitation(self, token, driver_order_id, passenger_order_id):
         '''
         return "Invalid token",
                "user not found",
@@ -55,6 +55,8 @@ class MatchService:
         if passenger_order_id in [order.order_id for order in\
             self.order_repository.get_invited_orders(driver_order_id)]:
             return "already invited"
+
+        await self.notification_repository.notify_send_invitation(driver_order_id, passenger_order.user_id)
 
         self.match_repository.send_invitation(driver_order.order_id, passenger_order.order_id)
 

@@ -16,10 +16,27 @@ async def notify_accept_invitation():
     passenger_order_id = int(query['passengerOrderId'])
     accepted = bool(int(query['accepted']))
 
+    key = f'driver{driver_id}'
+
     passenger_order = order_service.get_passenger_order(passenger_order_id)
     data = {'accepted': accepted,
             'passenger_order': passenger_order}
 
-    await MessageQueue.send(driver_id, utils.to_json(data))
+    await MessageQueue.send(key, utils.to_json(data))
+
+    return 'success'
+
+@internal.route('/notification/invitation/send', methods=['POST'])
+async def notify_send_invitation():
+    query = request.args
+    passenger_id = int(query['passengerId'])
+    driver_order_id = int(query['driverOrderId'])
+
+    key = f'passenger{passenger_id}'
+
+    driver_order = order_service.get_driver_order(driver_order_id)
+    data = {'driver_order': driver_order}
+
+    await MessageQueue.send(key, utils.to_json(data))
 
     return 'success'

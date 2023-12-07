@@ -15,8 +15,12 @@ class NotificationRepository:
         self.client = httpx.AsyncClient()
 
     def register_host_port(self, user_id, host_port):
-        sql = f'''INSERT INTO websocket
-                  VALUES (%s, %s);'''
+        sql = f'''INSERT INTO websocket (
+                      user_id,
+                      host_port)
+                  VALUES (%s, %s)
+                  ON CONFLICT (user_id) DO
+                  UPDATE SET host_port = %s;'''
 
         # check connection
         try:
@@ -31,7 +35,7 @@ class NotificationRepository:
                 port=self.config.get('port'))
 
         with self.conn.cursor() as cur:
-            cur.execute(sql, (user_id, host_port))
+            cur.execute(sql, (user_id, host_port, host_port))
             self.conn.commit()
 
     def delete_host_port(self, user_id):
@@ -53,6 +57,34 @@ class NotificationRepository:
         with self.conn.cursor() as cur:
             cur.execute(sql)
             self.conn.commit()
+
+    async def notify_send_invitation(self, driver_order_id, passenger_id):
+        sql = f'''SELECT host_port FROM websocket
+                  WHERE user_id = {passenger_id};'''
+        url = f'http://{{host_port}}/internal/notification/invitation/send?passengerId={passenger_id}&driverOrderId={driver_order_id}'
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
+        # get host:port handling the passenger websocket
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            row = cur.fetchone()
+        if row is None:
+            # no host is handling the passenger websocket
+            return
+        host_port = row[0]
+
+        await self.client.post(url.format(host_port=host_port))
 
     async def notify_accept_invitation(self, passenger_order_id, driver_id, accepted):
         sql = f'''SELECT host_port FROM websocket

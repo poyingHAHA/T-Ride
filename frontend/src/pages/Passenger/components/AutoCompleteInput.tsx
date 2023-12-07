@@ -75,7 +75,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint, placeho
 
   return <>
     <div>
-      <div>
+      <div className='w-[100%] h-[100%]'>
         <input
           placeholder={placeholderText || "Search an address"} // 使用传入的 placeholderText
           ref={inputElement}
@@ -89,7 +89,7 @@ export default function AutoCompleteInput({ type, setLocation, setPoint, placeho
         />
         {
           status === 'OK' &&
-          <div className='w-[100%] bg-[white] text-black flex flex-col rounded-xl mt-4 shadow-lg'>
+          <div className='max-h-[90vh] z-50 overflow-scroll w-[100%] bg-[white] text-black flex flex-col rounded-xl mt-4 shadow-lg'>
             {
               type === 'passengerStart' && data.length > 0 && (
                 <div className='px-2 py-2 hover:bg-[#ec7c7c]' onClick={() => { handleSelect('current') }} >

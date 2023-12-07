@@ -6,6 +6,7 @@ import { Form } from "react-router-dom";
 import { postPassengerOrder } from '../../../services/orderService';
 import { getTokenFromCookie } from "../../../utils/cookieUtil";
 import { useState, useEffect } from 'react';
+import { getPassengerUnfinishedOrder } from '../../../services/orderService';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -21,7 +22,6 @@ interface PostPassengerOrderResponse {
         orderId: number;
     };
 }
-
 
 interface PostPassengerOrderRequest {
     token: string;
@@ -42,13 +42,12 @@ interface PostPassengerOrderRequest {
 
 const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setOrderId }: MainPanelProps) => {
 
-
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const dispatch = useAppDispatch();
     const token = getTokenFromCookie();
-
-    // console.log(token)
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
 
     const handleSelectPassengerCount = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const passengerCount = parseInt(event.target.value);
@@ -57,30 +56,67 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setO
     }
     const handleChangeDepartureTime1 = (e: React.ChangeEvent<HTMLInputElement>) => {
         const departureTime = new Date(e.target.value).getTime() / 1000;
-        dispatch(setDepartureTime1(departureTime));
+        if (passengerDepart.departureTime2 && departureTime > passengerDepart.departureTime2) {
+            alert("請選擇合理的時間區間");
+        } else {
+            dispatch(setDepartureTime1(departureTime));
+        }
         console.log(passengerDepart)
     }
 
     const handleChangeDepartureTime2 = (e: React.ChangeEvent<HTMLInputElement>) => {
         const departureTime = new Date(e.target.value).getTime() / 1000;
-        dispatch(setDepartureTime2(departureTime));
+        if (passengerDepart.departureTime1 && departureTime < passengerDepart.departureTime1) {
+            alert("請選擇合理的時間區間");
+        } else {
+            dispatch(setDepartureTime2(departureTime));
+        }
         console.log(passengerDepart)
     }
 
     const postpaxorderHandler = async (params: PostPassengerOrderRequest) => {
         const postpaxorderResult = await postPassengerOrder(params) as PostPassengerOrderResponse;
-        console.log(postpaxorderResult.data.orderId);
+        console.log("postpaxorderHandler params: ", params)
+        console.log("orderId: ", postpaxorderResult.data.orderId);
         setOrderId(postpaxorderResult.data.orderId)
         setPickupPanel(true);
     }
+
+    useEffect(() => {
+        const getUnfinishedOrder = async () => {
+            try {
+                setLoading(true);
+                const unfinishedOrder = await getPassengerUnfinishedOrder();
+                setLoading(false);
+                if (unfinishedOrder.data.length > 0) {
+                    console.log("unfinishedOrder.data.length", unfinishedOrder.data.length)
+                    dispatch(setStart({ name: unfinishedOrder.data[0].startName, placeId: "", lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng }));
+                    dispatch(setDest({ name: unfinishedOrder.data[0].endName, placeId: "", lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng }));
+                    dispatch(setDepartureTime1(unfinishedOrder.data[0].departureTime1));
+                    dispatch(setDepartureTime2(unfinishedOrder.data[0].departureTime2));
+                    dispatch(setPassengerCount(unfinishedOrder.data[0].passengerCount));
+                    setStartPoint({ lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng });
+                    setDestPoint({ lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng });
+                    setOrderId(unfinishedOrder.data[0].orderId)
+                    setPickupPanel(true);
+                    alert("您有未完成的訂單");
+                }
+            } catch (err) {
+                setLoading(false);
+                setError("發生錯誤");
+                setPickupPanel(false);
+            }
+        }
+        getUnfinishedOrder();
+    }, [])
 
     return <>
         {
             isLoaded && (
                 <>
-                    <div className="bg-white flex h-full w-full flex-col px-10 pt-5 pb-5">
+                    <div className="bg-white flex h-full w-full flex-col px-10 pt-5 pb-5 min-h-[50vh] z-50">
                         <Form method="post"   >
-                            <div className="flex-1 block w-full h-[50px] flex justify-between items-center mr-3">
+                            <div className="flex-1 block w-full h-[50px] flex justify-between items-center mr-3 mt-3">
                                 <label htmlFor="departureTime text-xs" className='w-[40px] mr-3'>出發時間</label>
                                 <input
                                     type="datetime-local"
@@ -117,13 +153,11 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setO
                             </div>
                         </Form>
 
-
                         <AutoCompleteInput type='passengerStart'
                             setLocation={setStart}
                             setPoint={setStartPoint}
                             placeholderText="Pickup location"
                         />
-
                         <AutoCompleteInput type='passengerDest'
                             setLocation={setDest}
                             setPoint={setDestPoint}
@@ -143,7 +177,10 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setO
                                 if (startPoint.lat !== undefined && startPoint.lng !== undefined && endPoint.lat !== undefined && endPoint.lng !== undefined && startPoint.name !== undefined
                                     && endPoint.name !== undefined && passengerDepart.departureTime1 !== undefined && passengerDepart.departureTime2 !== undefined && passengerDepart.passengerCount !== undefined) {
 
-
+                                    if (passengerDepart.departureTime1 > passengerDepart.departureTime2) {
+                                        alert("請選擇合理的時間區間");
+                                        return;
+                                    }
                                     postpaxorderHandler({
                                         token: token,
                                         startPoint: { lat: startPoint.lat, lng: startPoint.lng },

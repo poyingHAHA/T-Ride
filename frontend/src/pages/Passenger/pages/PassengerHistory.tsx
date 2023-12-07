@@ -48,10 +48,16 @@ export default function PassengerHistory() {
 
     return (
         <div>
-            <div className="bg-white overflow-auto overscroll-y-contain ">
-                <div className="p-4 items-center justify-center flex">
-                    <h2 className="text-lg font-bold">Upcoming Trips</h2>
-                </div>
+            <div className="bg-white overflow-auto overscroll-y-contain">
+
+                {orders.length > 0 ? (
+                    <ul>
+                        <div className="my-4 p-4 items-center justify-center flex ">
+                            <h2 className="text-lg font-bold">Upcoming Trips</h2>
+                        </div>
+
+                    </ul>
+                ) : (<p></p>)}
 
                 <div className="space-y-4 px-4">
                     {orders.length > 0 ? (
@@ -92,43 +98,50 @@ export default function PassengerHistory() {
                     ) : (<p></p>)}
                 </div>
 
-                <div className="p-4 items-center justify-center flex">
-                    <h2 className="text-lg font-bold">Past Orders</h2>
+                <div className="mt-4 p-4 items-center justify-center flex">
+                    <h2 className="my-2 text-lg font-bold">Past Orders</h2>
                 </div>
 
-                <div className="space-y-4 p-4">
-                    <button className=' w-full'
-                        type="button"
-                        onClick={() => {
-                            navigate("/passenger/Tripinfo")
-                        }}>
-                        <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-7">
+                {orders.length > 0 ? (
+                    <ul>
+                        <div className="space-y-4 p-4">
+                            <button className=' w-full'
+                                type="button"
+                                onClick={() => {
+                                    navigate("/passenger/Tripinfo")
+                                }}>
+                                <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-7">
 
-                            <div className="px-4 py-2 bg-gray-100">
-                                <p className="text-gray-600 text-sm">2023/12/1</p>
-                            </div>
-                            <div className="p-4">
-                                <div className="flex items-center">
-                                    <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
-                                    <div className="text-sm font-semibold text-gray-800">新竹市東區新莊車站</div>
+                                    <div className="px-4 py-2 bg-gray-100">
+                                        <p className="text-gray-600 text-sm">2023/12/1</p>
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="flex items-center">
+                                            <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
+                                            <div className="text-sm font-semibold text-gray-800">新竹市東區新莊車站</div>
+                                        </div>
+                                        <div className="border-l-2 border-dotted border-green-500 my-2 mx-4"></div>
+                                        <div className="flex items-center">
+                                            <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
+                                            <div className="text-sm font-semibold text-gray-800 truncate">新竹市東區中央路巨城</div>
+                                        </div>
+                                    </div>
+                                    <div className="px-4 py-2 bg-gray-100 flex justify-between items-center">
+                                        <p className="">$200</p>
+                                        <div className="text-yellow-400 text-xs">
+                                            ★★★★★
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="border-l-2 border-dotted border-green-500 my-2 mx-4"></div>
-                                <div className="flex items-center">
-                                    <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
-                                    <div className="text-sm font-semibold text-gray-800 truncate">新竹市東區中央路巨城</div>
-                                </div>
-                            </div>
-                            <div className="px-4 py-2 bg-gray-100 flex justify-between items-center">
-                                <p className="">$200</p>
-                                <div className="text-yellow-400 text-xs">
-                                    ★★★★★
-                                </div>
-                            </div>
+
+
+                            </button>
                         </div>
-
-
-                    </button>
-                </div>
+                    </ul>
+                ) : (
+                    <div className='flex items-center justify-center'>
+                        <div className=''>無訂單記錄</div>
+                    </div>)}
 
                 <div className="px-3">
                     <div className="flex">

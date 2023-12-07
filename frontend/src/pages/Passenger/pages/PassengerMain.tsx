@@ -93,12 +93,12 @@ const PassengerMain = () => {
 
     return <>{isLoaded && (
 
-        <main className="flex flex-col items-center h-screen">
+        <main className="bg-white flex flex-col items-center h-screen w-full">
 
-            <div className="h-2/3 w-full h-full">
+            <div className="relative h-1/2 w-full">
                 <PassengerMap isLoaded={isLoaded} directions={directions} />
             </div>
-            <div className="w-full h-full overflow-auto overscroll-y-contain ">
+            <div className="bg-white h-fit absolute h-fit overflow-auto bottom-0 z-100 min-h-[25%] w-[100%]">
                 {
                     pickupPanel
                         ? <PickupPanel

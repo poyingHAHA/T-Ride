@@ -38,6 +38,7 @@ const postPassengerOrder = async (params: PostPassengerOrderRequest) => {
 
 const getPassengerUnfinishedOrder = async () => {
   const userId = getUserId();
+  console.log("getPassengerUnfinishedOrder userId: ", userId);
   try {
     const response: any = await get(`/order/passenger/unfinished/${userId}`);
     console.log("getPassengerUnfinishedOrder response: ", response);

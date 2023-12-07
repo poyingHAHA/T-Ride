@@ -1,9 +1,11 @@
 import React from 'react'
 import { MdAccountCircle } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { UnsetCookie, getTokenFromCookie } from '../../../utils/cookieUtil';
 
 export default function PassengerSetting() {
     const navigate = useNavigate();
+
     return (
         <div className='flex flex-col'>
 
@@ -19,7 +21,10 @@ export default function PassengerSetting() {
 
                 <div className="group">
                     <button className="flex w-full items-center px-6 py-5 group-hover:bg-gray-100"
-                        onClick={() => navigate("/")}>
+                        onClick={() => {
+                            navigate("/");
+                            UnsetCookie();
+                        }}>
                         <div className="text-neutral-800 text-red-500 dark:text-white text-lg">Log out</div>
                     </button>
                 </div>

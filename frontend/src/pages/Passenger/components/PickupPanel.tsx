@@ -49,7 +49,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
     const [loading, setLoading] = useState<boolean>(false);
     const token = getTokenFromCookie();
     console.log(passengerStartDestReducer.start)
-    console.log(orderId)
+    // console.log("orderId: ", orderId)
     useEffect(() => {
         console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
     }, [tempOrderReducer])
@@ -165,7 +165,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                     </ul>
                                 ) : (
                                     <div className="flex items-center justify-center">
-                                        <div>未收到邀請</div>
+                                        <div>未收到邀請  (orderID: {orderId})</div>
                                     </div>)}
 
 
@@ -175,7 +175,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                         className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
                                         type="button"
                                         onClick={() => {
-                                            // setPickupPanel(false);
+                                            setPickupPanel(false);
                                             deletePassengerOrder(orderId, token)
                                         }}
                                     // delete passenger order

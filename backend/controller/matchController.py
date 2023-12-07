@@ -1,8 +1,10 @@
-from quart import Blueprint, request, make_response
+from quart import Blueprint, request, make_response, websocket
 from services.matchService import *
 from services.userService import *
 from services.orderService import *
+from services.notificationService import *
 from utils import utils
+from utils.messageQueue import MessageQueue
 from controller.models import *
 
 
@@ -11,6 +13,7 @@ match = Blueprint('match_page', __name__)
 match_service = MatchService()
 user_service = UserService()
 order_service = OrderService()
+notification_service = NotificationService()
 
 
 @match.route('/driver/invitation', methods=['POST'])
@@ -92,7 +95,7 @@ async def accept_invitation():
         "passengerOrderId"]):
         return await make_response("Incorrect parameter format", 400)
 
-    ret = match_service.accept_invitation(
+    ret = await match_service.accept_invitation(
         body['token'],
         body['driverOrderId'],
         body['passengerOrderId'])
@@ -112,3 +115,27 @@ async def accept_invitation():
         return await make_response("Invitation not received or order already accepted/completed", 409)
 
     return await make_response("Successfully accepted invitation", 200)
+
+
+import asyncio
+@match.websocket('/invitation/accept/<int:driverId>')
+async def accept_invitation_websocket(driverId):
+    await websocket.accept()
+
+    driverId = int(driverId)
+
+    # TODO: use config
+    ret = notification_service.register_host_port(driverId, "127.0.0.1:5239")
+    if ret != None:
+        raise Exception(f'websocket: {ret}')
+
+    MessageQueue.register(driverId)
+    try:
+        while True:
+            await websocket.send(await MessageQueue.receive(driverId))
+    except asyncio.CancelledError:
+        MessageQueue.delete(driverId)
+
+    ret = notification_service.delete_host_port(driverId)
+    if ret != None:
+        raise Exception(f'websocket: {ret}')

@@ -1,4 +1,4 @@
-from quart import Blueprint, request, make_response, websocket
+from quart import Blueprint, request, make_response
 from services.userService import *
 from utils import utils
 from controller.models import *
@@ -70,19 +70,3 @@ async def post_driver_data():
         return await make_response("資料已上傳過", 409)
     else:
         return await make_response("註冊成功", 200)
-
-
-import time
-import asyncio
-@user.websocket('/test')
-async def websocket_test():
-    try:
-        while True:
-            time.sleep(1)
-            await websocket.send('hihihi')
-            print('in loop')
-        print('out loop')
-    except Exception as e:
-        print('close connection')
-        print(e)
-    print('return')

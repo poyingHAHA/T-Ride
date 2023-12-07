@@ -174,8 +174,8 @@ class OrderService:
 
         return None on success
         '''
+        # TODO: 自動完成駕駛訂單
         user_id = self.user_repository.get_user_id(token)
-        print(user_id)
         if user_id is None:
             return "Invalid token"
         

@@ -6,6 +6,7 @@ from services.notificationService import *
 from utils import utils
 from utils.messageQueue import MessageQueue
 from controller.models import *
+import asyncio
 
 
 match = Blueprint('match_page', __name__)
@@ -117,7 +118,6 @@ async def accept_invitation():
     return await make_response("Successfully accepted invitation", 200)
 
 
-import asyncio
 @match.websocket('/invitation/accept/<int:driverId>')
 async def accept_invitation_websocket(driverId):
     await websocket.accept()

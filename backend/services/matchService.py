@@ -167,3 +167,40 @@ class MatchService:
         # TODO: 目前沒有考慮因其他乘客造成繞路，使得抵達時間延後
         self.match_repository.accept_invitation(driver_order_id, passenger_order_id)
         self.match_repository.delete_other_invitations(driver_order_id, passenger_order_id)
+
+    def delete_driver_invitation(self, token, driverOrderId, passengerOrderId):
+        '''
+        return "Invalid token",
+               "Not the driver's own order",
+               "Order not found",
+               "Invitation not sent or order completed"
+        
+        return {"total_order_count":total_order_count,
+                "abandon_order_count":abandon_order_count}
+                on success
+        '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "Invalid token"
+        
+        driver_order = self.order_repository.get_driver_order(driverOrderId)
+        if driver_order is None:
+            return "Order not found"
+
+        passenger_order = self.order_repository.get_passenger_order(passengerOrderId)
+        if passenger_order is None:
+            return "Order not found"
+        
+        if driver_order.user_id != user_id:
+            return "Not the driver's own order"
+        
+        if driver_order.finished is True or passenger_order.finished is True:
+            return "Invitation not sent or order completed"
+        ret = self.match_repository.delete_one_invitation(driverOrderId,passengerOrderId)
+        if ret == "Invitation not sent":
+            return "Invitation not sent or order completed"
+        if ret == "Abandon an order":
+            self.user_repository.add_abandon_order_count(user_id,1)
+        user = self.user_repository.get_user(user_id)
+        return {"total_order_count":user.total_order_count,
+                "abandon_order_count":user.abandon_order_count}

@@ -16,7 +16,7 @@ async def notify_accept_invitation():
     passenger_order_id = int(query['passengerOrderId'])
     accepted = bool(int(query['accepted']))
 
-    key = f'driver{driver_id}'
+    key = f'match-driver{driver_id}'
 
     passenger_order = order_service.get_passenger_order(passenger_order_id)
     data = {'accepted': accepted,
@@ -32,7 +32,7 @@ async def notify_send_invitation():
     passenger_id = int(query['passengerId'])
     driver_order_id = int(query['driverOrderId'])
 
-    key = f'passenger{passenger_id}'
+    key = f'match-passenger{passenger_id}'
 
     driver_order = order_service.get_driver_order(driver_order_id)
     data = {'driver_order': driver_order}

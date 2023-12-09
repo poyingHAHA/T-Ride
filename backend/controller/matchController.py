@@ -123,7 +123,7 @@ async def accept_invitation_websocket(driverId):
     await websocket.accept()
 
     driverId = int(driverId)
-    key = f'driver{driverId}'
+    key = f'match-driver{driverId}'
 
     # TODO: use config
     ret = notification_service.register_host_port(driverId, "127.0.0.1:5239")
@@ -149,7 +149,7 @@ async def send_invitation_websocket(passengerId):
     await websocket.accept()
 
     passengerId = int(passengerId)
-    key = f'passenger{passengerId}'
+    key = f'match-passenger{passengerId}'
 
     # TODO: use config
     ret = notification_service.register_host_port(passengerId, "127.0.0.1:5239")

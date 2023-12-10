@@ -50,7 +50,24 @@ async def match_driver_invitation():
 
 @match.route('/driver/invitation/<int:driverOrderId>/<int:passengerOrderId>', methods=['DELETE'])
 async def delete_driver_invitation(driverOrderId, passengerOrderId):
-    token = request.args.get('token')
+    query = request.args
+    if not utils.is_keys_in_dict(query, ["token"]):
+        return await make_response("Incorrect parameter format", 400)
+
+    ret = match_service.delete_driver_invitation(query["token"], driverOrderId, passengerOrderId)
+    if ret == "Invalid token":
+        return await make_response("Invalid token",401)
+    if ret == "Not the driver's own order":
+        return await make_response("Not the driver's own order",403)
+    if ret == "Order not found":
+        return await make_response("Order not found",404)
+    if ret == "Invitation not sent or order completed":
+        return await make_response("Invitation not sent or order completed",409)
+    else:
+        return utils.to_json({
+        "totalOrderCount": ret["total_order_count"],
+        "abandonCount": ret["abandon_order_count"]})
+    
 
     # TODO: 實現邏輯，處理取消司機邀請的情況
 

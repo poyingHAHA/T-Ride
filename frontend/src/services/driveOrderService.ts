@@ -74,6 +74,18 @@ const getDriverUnfinishedOrder = async () => {
   }
 }
 
+const deleteDriverOrder = async (orderId: number) => {
+  try {
+    const token = getTokenFromCookie();
+    const response: any = await remove(`/order/driver/${orderId}?token=${token}`);
+    console.log("deleteDriverOrder", response);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 const deleteDriverInvitation = async (driverOrderId: number, passengerOrderId: number, token: string) => {
   const config = {
     headers: {
@@ -209,4 +221,4 @@ const getPerson = async (userId: number) => {
   }
 }
 
-export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder, deleteDriverInvitation, getPerson };
+export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder, deleteDriverInvitation, getPerson, deleteDriverOrder };

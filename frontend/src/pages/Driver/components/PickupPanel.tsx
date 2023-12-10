@@ -1,6 +1,6 @@
 import { orderDTO } from "../../../DTO/orders";
 import { useAppSelector } from "../../../hooks";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import PickupCard from "./PickupCard";
 import { getDriverUnfinishedOrder } from "../../../services/driveOrderService";
 import ErrorLoading from "../../../components/ErrorLoading";
@@ -20,6 +20,13 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const cardContainerRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (cardContainerRef.current) {
+      document.getElementById(`pickupCard-${markerOrderId}`)?.scrollIntoView({ behavior: "smooth"});
+    }
+  }, [markerOrderId])
 
   const backBtnHandler = async() => {
     try{
@@ -60,7 +67,10 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
               </div>
             </div>
 
-            <div className="flex flex-col h-[36vh] w-[100%] overflow-scroll">
+            <div 
+              ref={cardContainerRef}
+              className="flex flex-col h-[36vh] w-[100%] overflow-auto"
+            >
               {
                 orders && orders.map((order) => (
                   <PickupCard key={order.orderId} order={order} markerOrderId={markerOrderId} />
@@ -73,7 +83,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
                 className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl mr-4' 
                 onClick={backBtnHandler}
               >
-                返回
+                取消
               </button>
 
               <button 

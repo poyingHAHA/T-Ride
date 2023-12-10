@@ -71,10 +71,13 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
     console.log("PickupCard tempOrderReducer.orders af: ", tempOrderReducer.orders)
   }
 
-  const wrapperClass = pickupSelected ? `flex border rounded-lg mx-4 my-2 bg-gray-200 ${markerSelected && "border-lime-500 border-4"}` : `flex border rounded-lg mx-4 my-2 ${markerSelected && "border-lime-500 border-4"} `;
+  const wrapperClass = pickupSelected ? 
+    `flex border rounded-lg mx-4 my-2 bg-gray-200 ${markerSelected && "border-lime-500 border-4"}` 
+    : `flex border rounded-lg mx-4 my-2 ${markerSelected && "border-lime-500 border-4"} `;
 
   return <>
     <div 
+      id={`pickupCard-${order.orderId}`}
       className={wrapperClass}
       onClick={onCLickHandler}
     >

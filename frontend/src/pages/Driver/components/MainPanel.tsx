@@ -1,12 +1,13 @@
 import AutoCompleteInput from '../components/AutoCompleteInput';
-import { setStart, setDest } from "../../../slices/driverStartDest"
+import { setStart, setDest, setOrderId } from "../../../slices/driverStartDest"
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { postDriverOrder } from '../../../services/driveOrderService';
+import { postDriverOrder, getDriverUnfinishedOrder, getInvitationTotal } from '../../../services/driveOrderService';
 import { getTokenFromCookie } from '../../../utils/cookieUtil';
 import { useState, useEffect } from 'react';
-import { getDriverUnfinishedOrder } from '../../../services/driveOrderService';
 import ErrorLoading from '../../../components/ErrorLoading';
+import { orderDTO } from '../../../DTO/orders';
+import { addTempOrder } from '../../../slices/tempOrder';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -19,8 +20,10 @@ type MainPanelProps = {
 const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpots }: MainPanelProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [unfinishedOrder, setUnfinishedOrder] = useState<orderDTO[]>([]);
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const dispatch = useAppDispatch();
 
   const handleSelectPassengerCount = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -35,19 +38,52 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
     console.log(driverDepart)
   }
 
+
+
   useEffect(() => {
     const getUnfinishedOrder = async () => {
       try {
         setLoading(true);
         const unfinishedOrder = await getDriverUnfinishedOrder();
+        const invitationTotal = await getInvitationTotal(unfinishedOrder.data[0].orderId);
         setLoading(false);
         if (unfinishedOrder.data.length > 0) {
+          dispatch(setOrderId({ orderId: unfinishedOrder.data[0].orderId }));
+          setUnfinishedOrder(unfinishedOrder.data[0]);
           dispatch(setStart({ name: unfinishedOrder.data[0].startName, placeId: "", lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng }));
           dispatch(setDest({ name: unfinishedOrder.data[0].endName, placeId: "", lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng }));
           dispatch(setDepartureTime(unfinishedOrder.data[0].departureTime));
           dispatch(setPassengerCount(unfinishedOrder.data[0].passengerCount));
           setStartPoint({ lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng });
           setDestPoint({ lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng });
+          if (invitationTotal !== undefined && invitationTotal.length > 0) {
+            for(const invitation of invitationTotal){
+              // todo應該要判斷是否為pending狀態，但是目前accepted只有true跟false，沒有pending
+              // 還在等待回覆的邀請 accepted為false
+              if(!invitation.state){
+                dispatch(addTempOrder({
+                  startPoint: {
+                    lat: invitation.startPlace.lat,
+                    lng: invitation.startPlace.lng,
+                  },
+                  startName: invitation.startName,
+                  endPoint: {
+                    lat: invitation.endPlace.lat,
+                    lng: invitation.endPlace.lng,
+                  },
+                  endName: invitation.endName,
+                  departureTime: invitation.pickTime,
+                  arrivalTime: invitation.arriveTime,  
+                  passengerCount: invitation.passengerCount,
+                  passenger: invitation.passengerCount  ,
+                
+                }));
+              }
+            }
+            setPanel(1);
+            setShowSpots(true);
+            return;
+          }
           setPanel(0);
           alert("您有未完成的訂單");
         }
@@ -66,6 +102,10 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
     if (token === undefined) {
       alert("請先登入");
       return;
+    }
+    if(unfinishedOrder.length > 0){
+      setPanel(1);
+      return; 
     }
     if (
       driverStartDestReducer.start.lat === undefined || 

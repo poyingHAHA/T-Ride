@@ -12,6 +12,9 @@ interface driverStartDestState {
     placeId?: string,
     lat?: number,
     lng?: number
+  },
+  order: {
+    orderId?: number,
   }
 }
 
@@ -27,6 +30,9 @@ const initialState: driverStartDestState = {
     placeId: undefined,
     lat: undefined,
     lng: undefined
+  },
+  order: {
+    orderId: undefined
   }
 }
 
@@ -45,10 +51,13 @@ export const driverStartDest = createSlice({
       state.dest.placeId = action.payload.placeId
       state.dest.lat = action.payload.lat
       state.dest.lng = action.payload.lng
+    },
+    setOrderId: (state, action) => {
+      state.order.orderId = action.payload.orderId
     }
   }
 })
 
-export const { setStart, setDest } = driverStartDest.actions;
+export const { setStart, setDest, setOrderId } = driverStartDest.actions;
 export default driverStartDest.reducer;
   

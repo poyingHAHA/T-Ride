@@ -3,6 +3,7 @@ import { driverOrderDTO, driverInvitationDTO, driverInvitationTotalDTO, orderDTO
 import { userDTO } from '../DTO/user';
 import { convertUTC } from './formatService';
 import { getUserId } from '../utils/userUtil';
+import { getTokenFromCookie } from '../utils/cookieUtil';
 
 interface PostDriverOrderRequest {
   token: string;
@@ -35,6 +36,29 @@ const postDriverOrder = async (params: PostDriverOrderRequest) => {
     return response;
   } catch (error) {
     console.log("postDriverOrder error: ", error);
+  }
+}
+
+const postInvitation = async (driverOrderId: number, passengerOrderId: number) => {
+  try {
+    const response: any = await post(
+      "/match/driver/invitation",
+      JSON.stringify({
+        token: getTokenFromCookie(),
+        driverOrderId,
+        passengerOrderId
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    console.log("postInvitation response: ", response);
+    return response;
+  } catch (error) {
+    console.log("postInvitation error: ", error);
+    return error;
   }
 }
 
@@ -116,5 +140,5 @@ const getInvitationTotal = async (orderId: number) => {
   }
 }
 
-export { postDriverOrder, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder };
+export { postDriverOrder, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder };
 

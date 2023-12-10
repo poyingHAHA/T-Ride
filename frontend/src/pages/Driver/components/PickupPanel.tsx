@@ -56,7 +56,11 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
             <div className='flex items-center justify-evenly bg-white w-[100vw] mt-0'>
               <div className="mt-2">
                 <p>
-                  乘客人數 <span className='ml-1'>{tempOrderReducer.orders.length}</span> / <span>{driverDepart.passengerCount}</span> 人
+                  乘客人數 <span className='ml-1'>
+                    {
+                      tempOrderReducer.orders.reduce((accumulator, currentValue) => accumulator+currentValue.passengerCount, 0)
+                    }
+                  </span> / <span>{driverDepart.passengerCount}</span> 人
                 </p>
               </div>
               <div className="mt-2" >

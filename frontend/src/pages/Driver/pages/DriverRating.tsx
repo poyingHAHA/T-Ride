@@ -29,7 +29,7 @@ const RateCard: React.FC<RateProps> = (props) => {
         <input type="text" name="comment" placeholder="請輸入評語"
           className="w-full min-h-[100px] border-[1px] border-black p-[5px] rounded-[10px] text-center" />
         <input type="submit" value="送出" 
-          className="w-[80px] h-[50px] bg-[#2E5A88] rounded-[10px] text-white text-[18px]" /> 
+          className="w-[80px] h-[50px] bg-black rounded-[10px] text-white text-[18px]" /> 
       </form>
     </div>
   );
@@ -44,13 +44,12 @@ const DriverRating: React.FC =() => {
   const [names, setNames] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log(driverJourneyReducer.Midpoints);
     const userNames: string[] = driverJourneyReducer.Midpoints.map((item) => item.userName);
     setNames(userNames);
   }, []);
 
   return(
-    <div className="bg-[#f3e779] m-0 h-full w-screen">
+    <div className="bg-[#ededed] m-0 h-full w-screen">
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">乘客評分</div>
       <div className="flex flex-col justify-between items-center rounded-t-[30px] bg-white w-screen h-[calc(100vh-320px)] fixed bottom-[150px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {names.map((name, index) => {
@@ -61,7 +60,7 @@ const DriverRating: React.FC =() => {
       </div>
       <div className="bg-white flex flex-row justify-evenly items-center w-screen h-[100px] fixed bottom-[70px]">
       <button
-            className="w-[calc(100%-30px)] h-[50px] rounded-[10px] bg-[#2e5a88] text-white text-[24px]"
+            className="w-[calc(100%-30px)] h-[50px] rounded-[10px] bg-black text-white text-[24px]"
             onClick={() => {
               navigate("/driver/trip", {state: {orderId: orderId}})
             }}

@@ -6,9 +6,18 @@ const convertUTC = (timestamp: number) => {
   return formattedDateTime;
 }
 
+const convertDate = (timestamp: number) => {
+  const date: Date = new Date(timestamp * 1000);
+  const year: number = date.getFullYear();
+  const month: number = date.getUTCMonth()+1;
+  const day: number = date.getDate();
+  const formattedDate: string = `${year.toString()}-${month.toString()}-${day.toString()}`;
+  return formattedDate;
+}
+
 const convertChinese = (inputString: string) => {
   const chineseCharacters:string = decodeURIComponent(inputString);
   return chineseCharacters;
 }
 
-export { convertUTC, convertChinese };
+export { convertUTC, convertChinese, convertDate };

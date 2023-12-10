@@ -19,14 +19,14 @@ const DriverNavigate = (props: any) =>{
   const dispatch = useAppDispatch();
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
   const location = useLocation();
-  const order = location.state?.orderId;
+  const orderId = location.state?.orderId;
 
   useEffect(() => {
-    async function fetchSpots(order: number) {
-      const middle: InfoItem[] = await getInvitationTotal(order) as InfoItem[];
-      dispatch(setJourney(middle));
-      const StartEnd: StartEnd[] = await getStartEnd(order) as StartEnd[];
-      dispatch(setStartEnd(StartEnd));
+    async function fetchSpots(orderId: number) {
+      // const middle: InfoItem[] = await getInvitationTotal(orderId) as InfoItem[];
+      // dispatch(setJourney(middle));
+      // const StartEnd: StartEnd[] = await getStartEnd(orderId) as StartEnd[];
+      // dispatch(setStartEnd(StartEnd));
 
       const start: LatLngLiteral= driverJourneyReducer.StartPoint.place;
       const midpoints1: LatLngLiteral[] = driverJourneyReducer.Midpoints.map((item) => item.startPlace);
@@ -34,9 +34,9 @@ const DriverNavigate = (props: any) =>{
       const end: LatLngLiteral = driverJourneyReducer.EndPoint.place;
       const allLocations: LatLngLiteral[] = [start, ...midpoints1, ...midpoints2, end];
       setLocations(allLocations);
+      setIsLoad(true);
     };
-    fetchSpots(order);
-    setIsLoad(true);
+    fetchSpots(orderId);
   }, [isLoad]);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const DriverNavigate = (props: any) =>{
           <GoogleMap
             center={locations[0]}
             zoom={defaultProps.zoom}
-            mapContainerStyle={{ height: "60%", width: "100%" }}
+            mapContainerStyle={{ height: "55%", width: "100%" }}
             options={{
               mapId: "955417d2092c184d",
               disableDefaultUI: true,
@@ -95,10 +95,10 @@ const DriverNavigate = (props: any) =>{
               />
             )}
 
-            {locations.map((place:LatLngLiteral) => {
+            {locations.map((place:LatLngLiteral, index) => {
               return(
                 <MarkerF
-                  key={place.lat}
+                  key={index}
                   position = {place}
                 />
               );

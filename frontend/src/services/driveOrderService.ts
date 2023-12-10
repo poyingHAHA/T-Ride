@@ -1,7 +1,7 @@
-import { get, post } from './APIHelper';
+import { get, post, remove } from './APIHelper';
 import { driverOrderDTO, driverInvitationDTO, driverInvitationTotalDTO, orderDTO } from '../DTO/orders';
 import { userDTO } from '../DTO/user';
-import { convertUTC } from './formatService';
+import { convertUTC, convertDate } from './formatService';
 import { getUserId } from '../utils/userUtil';
 import { getTokenFromCookie } from '../utils/cookieUtil';
 
@@ -74,6 +74,24 @@ const getDriverUnfinishedOrder = async () => {
   }
 }
 
+const deleteDriverInvitation = async (driverOrderId: number, passengerOrderId: number, token: string) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json"
+    },
+    params: {
+      token: token
+    }
+  };
+  try {
+    const response = await remove(`/match/driver/invitation/${driverOrderId}/${passengerOrderId}`, config);
+    console.log("deleteDriverInvitation", response);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 const getStartEnd = async (orderId: number) => {
   try {
     const response: {data: driverOrderDTO} = await get(`/order/driver/${orderId}`) as {data: driverOrderDTO};
@@ -83,14 +101,16 @@ const getStartEnd = async (orderId: number) => {
         place: {
           lat: response.data.startPoint.lat,
           lng: response.data.startPoint.lng
-        } 
+        },
+        date: convertDate(response.data.departureTime)
       },
       { name: response.data.endName, 
         time: "",
         place: {
           lat: response.data.endPoint.lat,
           lng: response.data.startPoint.lng
-        }
+        },
+        date: ""
       }
     ];
     return startEnd;
@@ -170,7 +190,8 @@ const getInvitationTotal = async (orderId: number) => {
           },
           accepted: order.accepted,
           fee: order.passengerOrder.fee,
-          passengerCount: order.passengerOrder.passengerCount
+          passengerCount: order.passengerOrder.passengerCount,
+          date: convertDate(order.passengerOrder.arrivalTime)
         };
       }));
     return acceptedOrders;
@@ -179,5 +200,13 @@ const getInvitationTotal = async (orderId: number) => {
   }
 }
 
-export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder };
+const getPerson = async (userId: number) => {
+  try {
+    const response:{data: userDTO} = await get(`/user/${userId}`) as {data: userDTO};
+    return response.data;
+  } catch(error) {
+    console.log(error);
+  }
+}
 
+export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder, deleteDriverInvitation, getPerson };

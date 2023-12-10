@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface InfoItem {
+  orderId: number,
   userId: number;
   userName: string;
   startName: string;
@@ -17,7 +18,8 @@ export interface InfoItem {
     lng: number
   },
   fee: number,
-  passengerCount: number
+  passengerCount: number,
+  date: string
 }
 
 export interface StartEnd {
@@ -26,7 +28,8 @@ export interface StartEnd {
   place: {
     lat: number,
     lng: number
-  }
+  },
+  date: string
 }
 
 interface InfoState {
@@ -37,8 +40,8 @@ interface InfoState {
 
 const initialState: InfoState = {
   Midpoints: [],
-  StartPoint: {name: "", time: "", place: {lat: 0, lng: 0}},
-  EndPoint: {name: "", time: "", place: {lat: 0, lng: 0}}
+  StartPoint: {name: "", time: "", place: {lat: 0, lng: 0}, date: ""},
+  EndPoint: {name: "", time: "", place: {lat: 0, lng: 0}, date: ""}
 }
 
 export const driverJourney = createSlice({

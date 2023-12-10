@@ -21,7 +21,6 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const cardContainerRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (cardContainerRef.current) {
       document.getElementById(`pickupCard-${markerOrderId}`)?.scrollIntoView({ behavior: "smooth"});

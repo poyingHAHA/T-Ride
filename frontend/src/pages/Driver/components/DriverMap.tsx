@@ -18,6 +18,7 @@ type DriverMapProps = {
 
 const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarkerOrderId}: DriverMapProps) => {
   const [tempOrderSpots, setTempOrderSpots] = useState<number[]>([]);
+  const [tempOrders, setTempOrders] = useState<number[]>([]);
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({lat: locationReducer.lat || 0, lng: locationReducer.lng || 0});
   const location = { ...locationReducer}
@@ -45,10 +46,23 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     strokeWeight: 2,
   };
 
+  const spotWithOrderIcon = {
+    path: "M-1.547 12l6.563-6.609-1.406-1.406-5.156 5.203-2.063-2.109-1.406 1.406zM0 0q2.906 0 4.945 2.039t2.039 4.945q0 1.453-0.727 3.328t-1.758 3.516-2.039 3.070-1.711 2.273l-0.75 0.797q-0.281-0.328-0.75-0.867t-1.688-2.156-2.133-3.141-1.664-3.445-0.75-3.375q0-2.906 2.039-4.945t4.945-2.039z",
+    fillColor: 'green',
+    fillOpacity: 1,
+    strokeWeight: 0,
+    rotation: 0,
+    scale: 2,
+    anchor: new google.maps.Point(0, 20),
+  }
+
   // 取得所有有tempOrder的地標
   useEffect(() => {
     if(tempOrderReducer.orders){
       const tempOrderSpots = tempOrderReducer.orders.map((order) => order.spotId);
+      const tempOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
+      console.log("DriverMap tempOrderSpots: ", tempOrderSpots);
+      setTempOrders(tempOrderIds)
       setTempOrderSpots(tempOrderSpots);
     }
   }, [tempOrderReducer.orders]);
@@ -89,8 +103,9 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
       return;
     }
     // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
-    const orders = await getSpotOrders(spotId, driverDepart.departureTime);
+    let orders = await getSpotOrders(spotId, driverDepart.departureTime);
     // 取得地標附近的訂單，並傳給父層，讓PickupPanel顯示
+    orders = orders.map((order) => {order.spotId = spotId; return order});
     if (setOrders) setOrders(orders);
     console.log("DriverMap: ", orders);
 
@@ -194,7 +209,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                         position={{lat: point.lat, lng: point.lng} as LatLngLiteral }
                         label={order_count.toString()+'人'}
                         title={name}
-                        icon={markerWithOrderIcon}
+                        icon={spotWithOrderIcon}
                         onClick={()=>{handleActiveMarker(spot_id, point)}}
                       >
                         {
@@ -243,9 +258,9 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                   <MarkerF
                     key={order.orderId}
                     position={{lat: order.startPoint.lat, lng: order.startPoint.lng} as LatLngLiteral }
-                    label={order.userId.toString()}
+                    label={order.passengerCount.toString()+'人'}
                     title={order.startName}
-                    icon={markerIcon}
+                    icon={tempOrders.includes(order.orderId) ? markerWithOrderIcon : markerIcon}
                     onClick={()=>{setMarkerOrderId && setMarkerOrderId(order.orderId)}}
                   ></MarkerF>
                 )

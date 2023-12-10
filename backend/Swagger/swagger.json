@@ -867,12 +867,12 @@ components:
     DriverTotalInvitations:
       type: object
       properties:
-        passengerOrders:
+        invitations:
           type: array
           items:
             type: object
             properties:
-              invitations:
+              passengerOrder:
                 $ref: '#/components/schemas/PassengerOrderDetails'
               accepted:
                 type: boolean  

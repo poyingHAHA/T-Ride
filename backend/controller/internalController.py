@@ -40,3 +40,15 @@ async def notify_send_invitation():
     await MessageQueue.send(key, utils.to_json(data))
 
     return 'success'
+
+@internal.route('/position/send', methods=['POST'])
+async def send_driver_position():
+    query = request.args
+    passenger_order_id = int(query['passengerOrderId'])
+    position = query['position']
+
+    key = f'passengerOrder{passenger_order_id}-driver-position'
+
+    await MessageQueue.send(key, position)
+
+    return 'success'

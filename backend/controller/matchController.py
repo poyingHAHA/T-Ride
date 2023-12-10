@@ -137,10 +137,6 @@ async def accept_invitation_websocket(driverId):
     except asyncio.CancelledError:
         MessageQueue.delete(key)
 
-    ret = notification_service.delete_host_port(driverId)
-    if ret != None:
-        raise Exception(f'websocket: {ret}')
-
     print(f'accept invitation websocket with {driverId} is closed')
 
 
@@ -163,8 +159,45 @@ async def send_invitation_websocket(passengerId):
     except asyncio.CancelledError:
         MessageQueue.delete(key)
 
-    ret = notification_service.delete_host_port(passengerId)
+    print(f'send invitation websocket with {passengerId} is closed')
+
+@match.websocket('/position/driver/get/<int:passengerOrderId>')
+async def get_driver_position_websocket(passengerOrderId):
+    await websocket.accept()
+
+    passengerOrderId = int(passengerOrderId)
+
+    key = f'passengerOrder{passengerOrderId}-driver-position'
+
+    passenger_order = order_service.get_passenger_order(passengerOrderId)
+    if passenger_order is None:
+        raise Exception(f'get driver position websocket: order not found')
+
+    # TODO: use config
+    ret = notification_service.register_host_port(passenger_order.user_id, "127.0.0.1:5239")
     if ret != None:
         raise Exception(f'websocket: {ret}')
 
-    print(f'send invitation websocket with {passengerId} is closed')
+    MessageQueue.register(key)
+    try:
+        while True:
+            await websocket.send(await MessageQueue.receive(key))
+    except asyncio.CancelledError:
+        MessageQueue.delete(key)
+
+    print(f'get driver position of passenger order{passengerOrderId} websocket is closed')
+
+@match.websocket('/position/driver/send/<int:driverOrderId>')
+async def send_driver_position_websocket(driverOrderId):
+    await websocket.accept()
+
+    driverOrderId = int(driverOrderId)
+
+    try:
+        while True:
+            position = await websocket.receive()
+            await notification_service.send_driver_position(driverOrderId, position)
+    except asyncio.CancelledError:
+        pass
+
+    print(f'send driver position of driver order {driverOrderId} websocket is closed')

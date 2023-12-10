@@ -484,6 +484,45 @@ paths:
                 $ref: '#/components/schemas/DriverOrderDetails'
         '404':
           description: Order not found
+    delete:
+      summary: Delete Driver Order by ID and Token
+      tags:
+        - order
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+        - name: token
+          in: query
+          description: User token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrderCount:
+                    type: integer
+                  abandonCount:
+                    type: integer
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed
   /order/passenger/{orderId}:
     get:
       summary: Get Passenger Order by ID
@@ -534,6 +573,8 @@ paths:
                     type: integer
                   abandonCount:
                     type: integer
+        '400':
+          description: Incorrect parameter format
         '401':
           description: Invalid token
         '403':

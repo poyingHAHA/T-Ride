@@ -1,6 +1,7 @@
 from repository.orderRepository import *
 from repository.userRepository import *
 from repository.gmapsRepository import *
+from repository.matchRepository import *
 from services.models import *
 import math
 
@@ -9,6 +10,7 @@ class OrderService:
     def __init__(self):
         self.order_repository = OrderRepository()
         self.user_repository = UserRepository()
+        self.match_repository = MatchRepository()
         self.gmaps_repository = GmapsRepository()
 
     def get_unfinished_driver_orders(self, user_id):
@@ -195,6 +197,38 @@ class OrderService:
             self.user_repository.add_total_order_count(user_id, 1)
 
         self.order_repository.finish_passenger_order(order_id)
+
+    def delete_driver_order(self, token, order_id):
+        '''
+        return "Invalid token",
+               "user not found",
+               "user incorrect",
+               "order not found",
+               "order is finished"
+
+        return None on success
+        '''
+        user_id = self.user_repository.get_user_id(token)
+        if user_id is None:
+            return "Invalid token"
+        
+        if self.user_repository.get_user(user_id) is None:
+            return "user not found"
+
+        order = self.order_repository.get_driver_order(order_id)
+        if order is None:
+            return "order not found"
+
+        if user_id != order.user_id:
+            return "user incorrect"
+        if order.finished:
+            return "order is finished"
+
+        invitations = self.match_repository.get_driver_invitations(order_id)
+        accepted_count = len([invitation for invitation in invitations if invitation.accepted])
+        self.user_repository.add_abandon_order_count(user_id, accepted_count)
+
+        self.order_repository.delete_driver_order(order_id)
 
     def delete_passenger_order(self, token, order_id):
         '''

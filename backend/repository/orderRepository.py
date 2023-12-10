@@ -357,6 +357,34 @@ class OrderRepository:
             cur.execute(sql)
             self.conn.commit()
 
+    def delete_driver_order(self, order_id):
+        '''
+        order exists and isn't finished
+
+        return None on success
+        '''
+        order_sql = f'''DELETE FROM driver_orders
+                        WHERE id = {order_id};'''
+        match_sql = f'''DELETE FROM matches
+                        WHERE driver_order_id = {order_id};'''
+
+        # check connection
+        try:
+            with self.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            self.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
+        with self.conn.cursor() as cur:
+            cur.execute(match_sql);
+            cur.execute(order_sql);
+            self.conn.commit()
+
     def delete_passenger_order(self, order_id):
         '''
         order exists and isn't finished

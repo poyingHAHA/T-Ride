@@ -133,6 +133,34 @@ async def post_passenger_order():
     return utils.to_json({"orderId": ret})
 
 
+@order.route('/driver/<int:orderId>', methods=['DELETE'])
+async def delete_driver_order(orderId):
+    query = request.args
+    if not utils.is_keys_in_dict(query, ["token"]):
+        return await make_response("Incorrect parameter format", 400)
+
+    ret = order_service.delete_driver_order(query["token"], orderId)
+
+    if ret == "Invalid token":
+        return await make_response("Invalid token", 401)
+    if ret == "user not found":
+        # should not happen, unless user is deleted but token still exists
+        return await make_response("Invalid token", 401)
+    if ret == "user incorrect":
+        return await make_response("Not the driver's own order", 403)
+    if ret == "order not found":
+        return await make_response("Order not found", 404)
+    if ret == "order is finished":
+        return await make_response("Order already completed", 409)
+
+    user_id = user_service.get_user_id(query["token"])
+    user = user_service.get_user(user_id)
+
+    return utils.to_json({
+        "totalOrderCount": user.total_order_count,
+        "abandonCount": user.abandon_order_count})
+
+
 @order.route('/passenger/<int:orderId>', methods=['DELETE'])
 async def delete_passenger_order(orderId):
     query = request.args

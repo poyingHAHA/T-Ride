@@ -20,7 +20,7 @@ async def notify_accept_invitation():
 
     passenger_order = order_service.get_passenger_order(passenger_order_id)
     data = {'accepted': accepted,
-            'passenger_order': passenger_order}
+            'passengerOrder': passenger_order}
 
     await MessageQueue.send(key, utils.to_json(data))
 
@@ -35,7 +35,7 @@ async def notify_send_invitation():
     key = f'match-passenger{passenger_id}'
 
     driver_order = order_service.get_driver_order(driver_order_id)
-    data = {'driver_order': driver_order}
+    data = {'driverOrder': driver_order}
 
     await MessageQueue.send(key, utils.to_json(data))
 

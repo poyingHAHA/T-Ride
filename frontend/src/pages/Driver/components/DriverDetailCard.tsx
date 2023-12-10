@@ -1,5 +1,8 @@
-import { FaUser } from "react-icons/fa6";
-import DriverContact from "../components/DriverContact";
+import { useEffect, useState } from "react";
+import DriverContact from "./DriverContact";
+import PersonalPage from "./PersonalPage";
+import { getPerson } from "../../../services/driveOrderService";
+import { userDTO } from "../../../DTO/user";
 
 interface InfoItem {
   id: number;
@@ -12,8 +15,19 @@ interface InfoItem {
 }
 
 const DriverDetailCard: React.FC<InfoItem> = (props) => {
+  const [totalOrder, setTotalOrder] = useState(0);
+  const [abandonCount, setabandonCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchPerson() {
+      const response:userDTO = await getPerson(props.id) as userDTO;
+      setTotalOrder(response.totalOrderCount);
+      setabandonCount(response.abandonOrderCount);
+    }
+  },[]);
+
   return(
-    <div className="flex flex-row h-[220px] w-[calc(100%-80px) bg-[#F3E779] p-[20px] rounded-[30px] text-[18px] justify-between">
+    <div className="flex flex-row h-[220px] w-[calc(100%-80px) bg-[#d9d9d9] p-[20px] rounded-[30px] text-[18px] justify-between">
       <div>
         <p className="text-[24px]">{props.name}</p>
         <span className=" whitespace-pre">人數：</span>
@@ -28,9 +42,7 @@ const DriverDetailCard: React.FC<InfoItem> = (props) => {
         <span>{props.time}</span>
       </div>
       <div className="flex flex-col mr-0 gap-[15px] justify-center items-center">
-        <div className="w-[75px] h-[75px] bg-white rounded-full flex justify-center items-center">
-          <FaUser className="w-[40px] h-[40px]"/>
-        </div>
+        <PersonalPage name={props.name} total={totalOrder} abandon={abandonCount}/>
         <DriverContact />
       </div>
     </div>

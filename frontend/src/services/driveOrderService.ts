@@ -23,7 +23,7 @@ interface PostDriverOrderRequest {
 
 const postDriverOrder = async (params: PostDriverOrderRequest) => {
   try {
-    const response = await post(
+    const response: any = await post(
       "/order/driver",
       JSON.stringify(params),
       {
@@ -36,6 +36,7 @@ const postDriverOrder = async (params: PostDriverOrderRequest) => {
     return response;
   } catch (error) {
     console.log("postDriverOrder error: ", error);
+    return error;
   }
 }
 
@@ -108,13 +109,15 @@ const getUserName = async (userId: number) => {
   }
 }
 
-const getInvitationTotal = async (orderId: number) => {
+const getAcceptedOrders = async (orderId: number) => {
   try {
     const response: {data: driverInvitationTotalDTO} = await get(`/match/driver/invitation/total/${orderId}`) as { data: driverInvitationTotalDTO };
     const acceptedOrders = await Promise.all(response.data.invitations
+      .filter(order => order.accepted === true)
       .map(async (order) => {
         const name: string = await getUserName(order.passengerOrder.userId);
         return {
+          orderId: order.passengerOrder.orderId,
           userId: order.passengerOrder.userId,
           userName: name,
           startName: order.passengerOrder.startName,
@@ -130,6 +133,42 @@ const getInvitationTotal = async (orderId: number) => {
             lat: order.passengerOrder.endPoint.lat,
             lng: order.passengerOrder.endPoint.lng
           },
+          accepted: order.passengerOrder.accepted,
+          fee: order.passengerOrder.fee,
+          passengerCount: order.passengerOrder.passengerCount
+        };
+      }));
+    return acceptedOrders;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+const getInvitationTotal = async (orderId: number) => {
+  try {
+    const response: {data: driverInvitationTotalDTO} = await get(`/match/driver/invitation/total/${orderId}`) as { data: driverInvitationTotalDTO };
+    const acceptedOrders = await Promise.all(response.data.invitations
+      .map(async (order) => {
+        const name: string = await getUserName(order.passengerOrder.userId);
+        return {
+          orderId: order.passengerOrder.orderId,
+          userId: order.passengerOrder.userId,
+          userName: name,
+          startName: order.passengerOrder.startName,
+          endName: order.passengerOrder.endName,
+          pickTime: convertUTC(order.passengerOrder.departureTime1),
+          arriveTime: convertUTC(order.passengerOrder.arrivalTime),
+          state: order.accepted,
+          startPlace: {
+            lat: order.passengerOrder.startPoint.lat,
+            lng: order.passengerOrder.startPoint.lng
+          },
+          endPlace: {
+            lat: order.passengerOrder.endPoint.lat,
+            lng: order.passengerOrder.endPoint.lng
+          },
+          accepted: order.accepted,
           fee: order.passengerOrder.fee,
           passengerCount: order.passengerOrder.passengerCount
         };
@@ -140,5 +179,5 @@ const getInvitationTotal = async (orderId: number) => {
   }
 }
 
-export { postDriverOrder, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder };
+export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder };
 

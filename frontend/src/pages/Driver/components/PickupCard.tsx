@@ -45,13 +45,13 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
     if (!pickupSelected) {
       setPickupSelected(true);
       if(tempOrderReducer.orders?.length === 0){
-        dispatch(addTempOrder(order));
+        dispatch(addTempOrder({...order, invitationStatus: {invited: false, accepted: false}}));
       }
       // 如果tempOrderReducer.orders裡面沒有這個order，就把它加進去
       else if(tempOrderReducer.orders.length > 0){
         const index = tempOrderReducer.orders?.findIndex((tempOrder) => tempOrder.orderId === order.orderId);
         if(index === -1){
-          dispatch(addTempOrder(order));
+          dispatch(addTempOrder({...order, invitationStatus: {invited: false, accepted: false}}));
         }
         else{
           // 如果tempOrderReducer.orders裡面已經有這個order，就把它從tempOrderReducer.orders裡面移除

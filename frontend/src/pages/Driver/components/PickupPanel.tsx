@@ -2,7 +2,7 @@ import { orderDTO } from "../../../DTO/orders";
 import { useAppSelector } from "../../../hooks";
 import { useState, useRef, useEffect } from "react";
 import PickupCard from "./PickupCard";
-import { getDriverUnfinishedOrder } from "../../../services/driveOrderService";
+import { getDriverUnfinishedOrder, getAcceptedOrders } from "../../../services/driveOrderService";
 import ErrorLoading from "../../../components/ErrorLoading";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
@@ -18,6 +18,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   // tempOrderReducer.orders: 紀錄使用者點擊確認後的訂單
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const cardContainerRef = useRef<HTMLDivElement>(null);
@@ -30,6 +31,21 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   const backBtnHandler = async() => {
     try{
       setLoading(true);
+      if(driverStartDestReducer.order.orderId === null || driverStartDestReducer.order.orderId === undefined){
+        setPanel(0);
+        setShowSpots && setShowSpots(false);
+        setLoading(false);
+        return;
+      }
+      else{
+        const acceptedOrders = await getAcceptedOrders(driverStartDestReducer.order.orderId);
+        if(acceptedOrders.length > 0){
+          setPanel(1);
+          alert("您有已經配對好的訂單");
+          setLoading(false);
+          return;
+        }
+      }
       const unfinishedOrder = await getDriverUnfinishedOrder();
       console.log(unfinishedOrder);
       if (unfinishedOrder.data.length > 0) {

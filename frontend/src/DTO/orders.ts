@@ -16,7 +16,11 @@ export interface orderDTO {
   "pickTime2": number,
   "arrivalTime": number,
   "passengerCount": number,
-  "fee": number
+  "fee": number,
+  "invitationStatus": {
+    "invitated": boolean,
+    "accepted": boolean
+  }
 }
 
 export interface driverOrderDTO {
@@ -52,8 +56,9 @@ export interface passengerOrderDTO {
   startPoint: {
     lat: number,
     lng: number
-  },
-  userId: number
+  }, 
+  userId: number,
+  accepted?: boolean
 }
 
 export interface driverInvitationDTO {

@@ -130,13 +130,27 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                     <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
                       <div>{order.startName}</div>
                       <div>{order.pickTime1}-{order.pickTime2}</div>
-                    </div>                   
-                    <button 
-                      className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
-                      onClick={() => dispatch(removeTempOrder(order))}
-                    >
-                      移除
-                    </button>
+                    </div>
+                    {
+                      order.invitationStatus.invitated ? (
+                        order.invitationStatus.accepted ? (
+                          <div className="flex justify-center items-center rounded-lg bg-green-500 w-[14%] text-white ml-2">  
+                            已接受
+                          </div>
+                        ):(
+                          <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
+                            邀請中
+                          </div>
+                        )
+                       ) : (
+                        <button 
+                          className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
+                          onClick={() => dispatch(removeTempOrder(order))}
+                        >
+                          移除
+                        </button>
+                      )
+                    }                   
                   </div>
                 ))
               }

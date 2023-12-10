@@ -57,28 +57,29 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
           setStartPoint({ lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng });
           setDestPoint({ lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng });
           if (invitationTotal !== undefined && invitationTotal.length > 0) {
+            console.log("MainPanel 60: ", invitationTotal)
             for(const invitation of invitationTotal){
-              // todo應該要判斷是否為pending狀態，但是目前accepted只有true跟false，沒有pending
-              // 還在等待回覆的邀請 accepted為false
-              if(!invitation.state){
-                dispatch(addTempOrder({
-                  startPoint: {
-                    lat: invitation.startPlace.lat,
-                    lng: invitation.startPlace.lng,
-                  },
-                  startName: invitation.startName,
-                  endPoint: {
-                    lat: invitation.endPlace.lat,
-                    lng: invitation.endPlace.lng,
-                  },
-                  endName: invitation.endName,
-                  departureTime: invitation.pickTime,
-                  arrivalTime: invitation.arriveTime,  
-                  passengerCount: invitation.passengerCount,
-                  passenger: invitation.passengerCount  ,
-                
-                }));
-              }
+              dispatch(addTempOrder({
+                orderId: invitation.orderId,
+                startPoint: {
+                  lat: invitation.startPlace.lat,
+                  lng: invitation.startPlace.lng,
+                },
+                startName: invitation.startName,
+                endPoint: {
+                  lat: invitation.endPlace.lat,
+                  lng: invitation.endPlace.lng,
+                },
+                endName: invitation.endName,
+                departureTime: invitation.pickTime,
+                arrivalTime: invitation.arriveTime,  
+                passengerCount: invitation.passengerCount,
+                passenger: invitation.passengerCount  ,
+                invitationStatus: {
+                  invitated: true,
+                  accepted: invitation.accepted,
+                }
+              }));
             }
             setPanel(1);
             setShowSpots(true);
@@ -140,6 +141,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
       try{
         const res = await postDriverOrder(order);
         setLoading(false);
+        dispatch(setOrderId({orderId: res.data.orderId}));
         setPanel(1)
         setShowSpots(true)
         console.log(res);

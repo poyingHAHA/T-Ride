@@ -1,5 +1,4 @@
 import psycopg2
-import pandas as pd
 from utils.config import ConfigUtil
 from utils import utils
 import hashlib

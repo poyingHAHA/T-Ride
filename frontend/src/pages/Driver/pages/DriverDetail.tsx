@@ -30,8 +30,6 @@ const DriverDetail: React.FC =() => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const order = location.state?.orderId;
-  const [orderId, setOrderId] = useState(order);
   const [info, setInfo] = useState<Middle[]>([]);
   const [isLoad, setIsLoad] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); //ErrorLoading
@@ -80,7 +78,7 @@ const DriverDetail: React.FC =() => {
         <button 
           className="w-[calc(100%-30px)] h-[50px] bg-black rounded-[10px] text-white text-[24px]"
           onClick={() => {
-            navigate('/driver/trip', {state: {orderId: orderId}})
+            navigate('/driver/trip')
           }}
           >返回</button>
       </div>

@@ -27,9 +27,8 @@ interface StartEnd {
 
 const DriverInfo: React.FC = () => {
 
-  //Todo: 傳入orderId
-
-  const [orderId, setOrderId] = useState(1);
+  const [orderId, setOrderId] = useState(0);
+  const [userId, setUserId] = useState();
   const [start, setStart] = useState<StartEnd>({name:"",time:"",date:""});
   const [end, setEnd] = useState<StartEnd>({name:"",time:"",date:""});
   const [date, setDate] = useState("");
@@ -37,18 +36,30 @@ const DriverInfo: React.FC = () => {
   const [isLoad, setIsLoad] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); //ErrorLoading
   const [error, setError] = useState<string>("");
+  const [refresh, setRefresh] = useState(0);
   const navigate = useNavigate();  
   const dispatch = useAppDispatch();
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
+  const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
 
+  //refresh when invitation is deleted in Popup component
+  const handleUpdate = () => {
+    setRefresh(prev => prev+1);
+  }
 
   useEffect(() => {
+    const id: any = driverStartDestReducer.order.orderId;
+    setOrderId(id);
+    localStorage.setItem("orderId", JSON.stringify(id));
+
     async function fetchDriverOrder() {
       try {
         setLoading(true);
-        const result= await getStartEnd(orderId);
+        const result:any= await getStartEnd(orderId);
         setLoading(false);
-        dispatch(setStartEnd(result));
+        dispatch(setStartEnd(result[0]));
+        setUserId(result[1]);
+        console.log("result", result);
       } catch (error) {
         console.error(error);
         setLoading(false);
@@ -59,11 +70,8 @@ const DriverInfo: React.FC = () => {
       setStart(Start);
       setEnd(End);
       setDate(Start.date);
-    }
-    fetchDriverOrder();
-  }, [isLoad]);
+    };
 
-  useEffect(() => {
     async function fetchPassenger() {
       try {
         setLoading(true);
@@ -78,9 +86,20 @@ const DriverInfo: React.FC = () => {
         setLoading(false);
         setError("發生錯誤");
       }
+    };
+
+    if (orderId){
+      fetchDriverOrder();
+      fetchPassenger();
     }
-    fetchPassenger();
-  }, [isLoad]);
+    if (userId){
+      const ws = new WebSocket(`ws://ws1.csie.ntu.edu.tw:5239/match/invitation/accept/${userId}`);
+      ws.onmessage = (event) => {
+        console.log(event.data);  
+      }
+      console.log(ws);
+    }
+  }, [isLoad, orderId]);
 
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
@@ -90,7 +109,7 @@ const DriverInfo: React.FC = () => {
         <Card1 name={start.name} time={start.time} />
         { 
           info.map((place: InfoItem) => {
-            return (<Card2 key={place.orderId} {...place} driverOrderId={orderId} />);
+            return (<Card2 key={place.orderId} {...place} driverOrderId={orderId} onUpdate={handleUpdate} />);
         })}
         <Card1 name={end.name} time={end.time} />
       </div>
@@ -107,7 +126,7 @@ const DriverInfo: React.FC = () => {
           <button
             className="w-[120px] h-[50px] bg-black rounded-[10px] text-[24px] text-white"
             onClick={() => {
-              navigate("/driver/trip", {state: {orderId: orderId}});
+              navigate("/driver/trip");
             }}
           >開始</button>
         </div>

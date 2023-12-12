@@ -10,6 +10,7 @@ interface PopupProps {
 	tag: boolean;
     driverOrderId: number;
     passengerOrderId: number;
+    onUpdate: () => void;
 }
 
 const DriverPopup: React.FC<PopupProps> = (props) => {
@@ -54,6 +55,7 @@ const DriverPopup: React.FC<PopupProps> = (props) => {
                         onClick={() => {
                             handleDelete();
                             handleCloseModal();
+                            props.onUpdate();
                         }}
                     >確定</button>
                 </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
 import { FaUser } from "react-icons/fa6";
 import DriverStar from "../components/DriverStar";
 import { useAppSelector } from "../../../hooks";
@@ -38,9 +37,6 @@ const RateCard: React.FC<RateProps> = (props) => {
 const DriverRating: React.FC =() => {
   const navigate = useNavigate();
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
-  const location = useLocation();
-  const order = location.state?.orderId;
-  const [orderId, setOrderId] = useState(order);
   const [names, setNames] = useState<string[]>([]);
 
   useEffect(() => {
@@ -62,7 +58,7 @@ const DriverRating: React.FC =() => {
       <button
             className="w-[calc(100%-30px)] h-[50px] rounded-[10px] bg-black text-white text-[24px]"
             onClick={() => {
-              navigate("/driver/trip", {state: {orderId: orderId}})
+              navigate("/driver/trip")
             }}
           >返回</button>
       </div>

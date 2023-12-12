@@ -137,6 +137,7 @@ class MatchRepository:
         with self.conn.cursor() as cur:
             cur.execute(sql)
             self.conn.commit()
+
     def delete_one_invitation(self, driver_order_id, passenger_order_id):
         '''
         return "Invitation not sent",
@@ -180,4 +181,3 @@ class MatchRepository:
             return "Abandon an order"
         else :
             return None
-            

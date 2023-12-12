@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from 'react-router-dom';
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import { IoStarSharp } from "react-icons/io5";
 import DriverTripCard from "../components/DriverTripCard";
@@ -8,7 +7,6 @@ import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { getStartEnd, getInvitationTotal  } from "../../../services/driveOrderService";
 import { StartEnd, InfoItem, setStartEnd, setJourney } from "../../../slices/driverJourney";
 import ErrorLoading from '../../../components/ErrorLoading';
-
 
 interface TripItem {
   type: string;
@@ -18,14 +16,10 @@ interface TripItem {
 
 const DriverTrip: React.FC =() => {
 
-  //Todo:抓orderId
-
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const location = useLocation();
-  const order = location.state?.orderId;
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
-  const [orderId, setOrderId] = useState(order);
+  const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const [trip, setTrip] = useState<TripItem[]>([]);
   const [isLoad, setIsLoad] = useState(false);
   const [date, setDate] = useState("");
@@ -54,12 +48,17 @@ const DriverTrip: React.FC =() => {
   };
 
   useEffect(() => {
+    
     async function fetchAll() {
       try {
-        // setLoading(true);
-        // const middle: InfoItem[] = await getInvitationTotal(orderId) as InfoItem[];
-        // setLoading(false);
-        // dispatch(setJourney(middle));
+        if (!driverJourneyReducer.StartPoint.name){
+          console.log("reducer is empty");
+          const orderId = Number(localStorage.getItem("orderId"));
+          setLoading(true);
+          const middle: InfoItem[] = await getInvitationTotal(orderId) as InfoItem[];
+          setLoading(false);
+          dispatch(setJourney(middle));
+        }
         const mappedPlaces = driverJourneyReducer.Midpoints.flatMap((mid) => [
           {
             type: "中途經過",
@@ -83,7 +82,7 @@ const DriverTrip: React.FC =() => {
         // setLoading(true);
         // const StartEnd: StartEnd[] = await getStartEnd(orderId) as StartEnd[];
         // setLoading(false);
-        // dispatch(setStartEnd(StartEnd));
+        // dispatch(setStartEnd(StartEnd[0]));
         const start = { 
           type: "起點", 
           name: driverJourneyReducer.StartPoint.name, 
@@ -120,7 +119,7 @@ const DriverTrip: React.FC =() => {
           <button
             className="w-[60px] h-[60px] bg-black rounded-[10px] flex justify-evenly items-center"
             onClick={() => {
-              navigate("/driver/detail", {state: {orderId: orderId}})
+              navigate("/driver/detail")
             }}>
             <IoIosInformationCircleOutline className="w-[40px] h-[40px] text-white"/>
           </button>
@@ -134,7 +133,7 @@ const DriverTrip: React.FC =() => {
           <button 
             className="w-[60px] h-[60px] rounded-[10px] bg-black flex justify-evenly items-center rounded-[10px]"
             onClick={() => {
-              navigate("/driver/rating", {state: {orderId: orderId}})
+              navigate("/driver/rating")
             }}>
               <IoStarSharp className="w-[30px] h-[30px] text-white"/>
             </button>

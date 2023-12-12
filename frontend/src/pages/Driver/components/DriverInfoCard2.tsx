@@ -8,10 +8,11 @@ interface Card2Props {
   endName: string;
   pickTime: string;
   state: boolean;
+  onUpdate: () => void;
 }
 
-const Card2: React.FC<Card2Props> = (props) => {
-  // console.log("props", props);
+const Card2: React.FC<Card2Props> = (props, {onUpdate}) => {
+
   return (
     <div className="bg-[#d9d9d9] flex flex-col p-[20px] gap-[15px] rounded-[10px] w-[calc(100vw-80px)]">
       <div className="flex flex-row justify-between items-center">
@@ -20,11 +21,10 @@ const Card2: React.FC<Card2Props> = (props) => {
           {props.state ? (<span className='text-[16px]'>已接受</span>) : (<span className='text-[16px]'>未接受</span>)}
         </div>
         <div className="flex flex-row gap-[10px]">
-          {/* <Popup text={"送出"} tag={true} /> */}
           {props.state ? (
-            <Popup text={"刪除"} tag={props.state} driverOrderId={props.driverOrderId} passengerOrderId={props.orderId}/>
+            <Popup text={"刪除"} tag={props.state} driverOrderId={props.driverOrderId} passengerOrderId={props.orderId} onUpdate={props.onUpdate}/>
           ) : (
-            <Popup text={"取消"} tag={props.state} driverOrderId={props.driverOrderId} passengerOrderId={props.orderId}/>
+            <Popup text={"取消"} tag={props.state} driverOrderId={props.driverOrderId} passengerOrderId={props.orderId} onUpdate={props.onUpdate}/>
           )}
         </div>
       </div>

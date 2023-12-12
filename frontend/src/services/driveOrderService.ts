@@ -112,7 +112,7 @@ const getStartEnd = async (orderId: number) => {
         date: ""
       }
     ];
-    return startEnd;
+    return [startEnd, response.data.userId];
   } catch (error) {
     console.log(`startEnd: ${error}`);
   }

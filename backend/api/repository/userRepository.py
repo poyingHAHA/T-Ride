@@ -85,8 +85,7 @@ class UserRepository:
                 return None
             else:
                 token = utils.rand_str()
-                # current expire time is 1 day
-                expire = utils.get_time() + 86400
+                expire = utils.get_time() + int(ConfigUtil.get('service').get('tokenExpire'))
 
                 token_sql = f'''DELETE FROM session
                                 WHERE user_id = {row[f2i["id"]]};

@@ -414,8 +414,7 @@ class OrderRepository:
             self.conn.commit()
 
     def get_all_spots(self, departure_time, with_passenger):
-        # TODO: use config to set time range
-        time_range = 3600
+        time_range = int(ConfigUtil.get('service').get('searchPassengerTimeRange'))
 
         if with_passenger:
             sql = f'''SELECT spots.*, COUNT(spot_id) AS order_count
@@ -462,8 +461,7 @@ class OrderRepository:
         '''
         spot exists
         '''
-        # TODO: use config to set time range
-        time_range = 3600
+        time_range = int(ConfigUtil.get('service').get('searchPassengerTimeRange'))
         sql = f'''SELECT * FROM passenger_orders
                   WHERE spot_id = {spot_id}
                   AND NOT (time1 > {departure_time + time_range}

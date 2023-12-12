@@ -166,6 +166,23 @@ class OrderService:
 
         self.order_repository.finish_driver_order(order_id)
 
+    def __finish_driver_order(self, order_id):
+        '''
+        order exists and not finished
+        '''
+        order = self.order_repository.get_driver_order(order_id)
+
+        related_orders = self.order_repository.get_driver_related_orders(order_id)
+        for order in related_orders:
+            if not order.finished:
+                return "related passenger order isn't finished"
+
+        self.user_repository.add_total_order_count(
+            order.user_id,
+            len(related_orders))
+
+        self.order_repository.finish_driver_order(order_id)
+
     def finish_passenger_order(self, token, order_id):
         '''
         return "invalid token",
@@ -174,9 +191,10 @@ class OrderService:
                "order not found",
                "order is finished"
 
+        automatically finish driver order when
+        all passenger orders are finished
         return None on success
         '''
-        # TODO: 自動完成駕駛訂單
         user_id = self.user_repository.get_user_id(token)
         if user_id is None:
             return "Invalid token"
@@ -193,10 +211,14 @@ class OrderService:
         if order.finished:
             return "order is finished"
 
-        if self.order_repository.get_passenger_related_order(order_id) is not None:
+        self.order_repository.finish_passenger_order(order_id)
+
+        driver_order = self.order_repository.get_passenger_related_order(order_id)
+        if driver_order is not None:
             self.user_repository.add_total_order_count(user_id, 1)
 
-        self.order_repository.finish_passenger_order(order_id)
+            # finish driver order automatically
+            self.__finish_driver_order(driver_order.order_id)
 
     def delete_driver_order(self, token, order_id):
         '''

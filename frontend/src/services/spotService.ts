@@ -25,7 +25,6 @@ const getNearLandMark = async (params: NearLandMarkRequest) => {
 const getSpots = async (departureTime: number, all: number) => {
    // 測試用
   departureTime = 1701081800;
-  all = 0;
   // ====================
   try {
     const response: any = await get(`/order/passenger/spot/all?departureTime=${departureTime}&withPassenger=${all}`);

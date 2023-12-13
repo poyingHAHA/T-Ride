@@ -22,10 +22,6 @@ class NotificationService:
         if self.user_repository.get_user(user_id) is None:
             return "user not found"
 
-        pattern = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$')
-        if not bool(pattern.match(host_port)):
-            return "invalid format"
-
         self.notification_repository.register_host_port(user_id, host_port)
 
     async def send_driver_position(self, driver_order_id, position):

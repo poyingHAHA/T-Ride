@@ -1,11 +1,11 @@
 import math 
 import googlemaps
-from utils.config import ConfigUtil
+from utils.config import Config
 
 
 class GmapsRepository:
     def __init__(self):
-        config = ConfigUtil.get('googleMapsApi')
+        config = Config.get('googleMapsApi')
 
         self.test = bool(int(config.get('test')))
 

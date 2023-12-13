@@ -1,12 +1,13 @@
 import psycopg2
-from utils.config import ConfigUtil
+from utils.config import Config
+from utils.dbConnection import DbConnection
 import httpx
 
 
 class NotificationRepository:
     def __init__(self):
-        self.config = ConfigUtil.get('database')
-        self.conn = psycopg2.connect(
+        self.config = Config.get('database')
+        DbConnection.conn = psycopg2.connect(
             database=self.config.get('name'),
             user=self.config.get('user'),
             password=self.config.get('password'),
@@ -24,19 +25,19 @@ class NotificationRepository:
 
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
                 host=self.config.get('host'),
                 port=self.config.get('port'))
 
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             cur.execute(sql, (user_id, host_port, host_port))
-            self.conn.commit()
+            DbConnection.conn.commit()
 
     async def notify_send_invitation(self, driver_order_id, passenger_id):
         url = f'http://{{host_port}}/internal/notification/invitation/send?passengerId={passenger_id}&driverOrderId={driver_order_id}'
@@ -59,10 +60,10 @@ class NotificationRepository:
 
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
@@ -70,7 +71,7 @@ class NotificationRepository:
                 port=self.config.get('port'))
 
         # get host:port handling the user websocket
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             cur.execute(sql)
             row = cur.fetchone()
         if row is None:

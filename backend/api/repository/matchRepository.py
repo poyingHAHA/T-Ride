@@ -1,17 +1,12 @@
 import psycopg2
-from utils.config import ConfigUtil
+from utils.config import Config
+from utils.dbConnection import DbConnection
 from repository.models import *
 
 
 class MatchRepository:
     def __init__(self):
-        self.config = ConfigUtil.get('database')
-        self.conn = psycopg2.connect(
-            database=self.config.get('name'),
-            user=self.config.get('user'),
-            password=self.config.get('password'),
-            host=self.config.get('host'),
-            port=self.config.get('port'))
+        self.config = Config.get('database')
 
     def send_invitation(self, driver_order_id, passenger_order_id):
         '''
@@ -28,19 +23,19 @@ class MatchRepository:
 
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
                 host=self.config.get('host'),
                 port=self.config.get('port'))
 
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             cur.execute(sql)
-            self.conn.commit()
+            DbConnection.conn.commit()
 
     def get_driver_invitations(self, order_id):
         '''
@@ -56,17 +51,17 @@ class MatchRepository:
 
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
                 host=self.config.get('host'),
                 port=self.config.get('port'))
 
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             cur.execute(sql)
             f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
             rows = cur.fetchall()
@@ -100,19 +95,19 @@ class MatchRepository:
 
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
                 host=self.config.get('host'),
                 port=self.config.get('port'))
 
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             cur.execute(sql)
-            self.conn.commit()
+            DbConnection.conn.commit()
 
     def delete_other_invitations(self, driver_order_id, passenger_order_id):
         '''
@@ -124,19 +119,19 @@ class MatchRepository:
 
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
                 host=self.config.get('host'),
                 port=self.config.get('port'))
 
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             cur.execute(sql)
-            self.conn.commit()
+            DbConnection.conn.commit()
 
     def delete_one_invitation(self, driver_order_id, passenger_order_id):
         '''
@@ -148,17 +143,17 @@ class MatchRepository:
         
         # check connection
         try:
-            with self.conn.cursor() as cur:
+            with DbConnection.conn.cursor() as cur:
                 cur.execute('SELECT 1;')
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            self.conn = psycopg2.connect(
+            DbConnection.conn = psycopg2.connect(
                 database=self.config.get('name'),
                 user=self.config.get('user'),
                 password=self.config.get('password'),
                 host=self.config.get('host'),
                 port=self.config.get('port'))
 
-        with self.conn.cursor() as cur:
+        with DbConnection.conn.cursor() as cur:
             sql = f'''SELECT * FROM matches
                       WHERE driver_order_id = {driver_order_id}
                       AND passenger_order_id = {passenger_order_id};'''
@@ -171,12 +166,11 @@ class MatchRepository:
                 flag = True
             else:
                 flag = False
-            print(row)
             sql = f'''DELETE FROM matches
                       WHERE driver_order_id = {driver_order_id}
                       AND passenger_order_id = {passenger_order_id};'''
             cur.execute(sql)
-            self.conn.commit()
+            DbConnection.conn.commit()
         if flag is True:
             return "Abandon an order"
         else :

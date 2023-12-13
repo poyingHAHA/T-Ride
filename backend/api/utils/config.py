@@ -1,9 +1,9 @@
 import configparser
 
 
-class ConfigUtil:
+class Config:
     config = configparser.ConfigParser()
     config.read('config.ini')
 
     def get(key):
-        return ConfigUtil.config[key]
+        return Config.config[key]

@@ -3,7 +3,7 @@ info:
   title: T-Ride
   description: |-
     T-Ride
-  version: 0.0.99
+  version: 0.1.99
 tags:
   - name: user
     description: 管理使用者資料

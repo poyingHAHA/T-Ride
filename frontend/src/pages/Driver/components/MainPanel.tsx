@@ -45,9 +45,8 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
       try {
         setLoading(true);
         const unfinishedOrder = await getDriverUnfinishedOrder();
-        const invitationTotal = await getInvitationTotal(unfinishedOrder.data[0].orderId);
-        setLoading(false);
         if (unfinishedOrder.data.length > 0) {
+          const invitationTotal = await getInvitationTotal(unfinishedOrder.data[0].orderId);
           dispatch(setOrderId({ orderId: unfinishedOrder.data[0].orderId }));
           setUnfinishedOrder(unfinishedOrder.data[0]);
           dispatch(setStart({ name: unfinishedOrder.data[0].startName, placeId: "", lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng }));
@@ -88,7 +87,9 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
           setPanel(0);
           alert("您有未完成的訂單");
         }
+        setLoading(false);
       } catch (err) {
+        console.log(err)
         setLoading(false);
         setError("發生錯誤");
         setPanel(0);

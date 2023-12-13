@@ -49,6 +49,10 @@ const router = createBrowserRouter([
         path: "rating",
         element: <DriverRating />
       },
+      {
+        path: "account",
+        element: <DriverAccount />
+      }
     ]
   },
   {

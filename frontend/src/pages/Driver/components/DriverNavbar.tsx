@@ -39,7 +39,7 @@ const DriverNavbar: React.FC = () => {
           </div>
           <div className="flex-1 group">
               <button className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"
-                  onClick={() => navigate("/driver/setting")} >
+                  onClick={() => navigate("/driver/account")} >
                   <span className="block px-1 pt-1 pb-1">
                       <MdAccountCircle className="far fa-cog text-2xl pt-1 mb-1 block mx-auto" />
                       <span className="block text-xs pb-2 mx-auto">Account</span>

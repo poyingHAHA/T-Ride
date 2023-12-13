@@ -1,9 +1,11 @@
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { removeTempOrder, setTempOrder } from "../../../slices/tempOrder";
 import { useRef, useEffect, useState } from "react";
-import { getDriverUnfinishedOrder, getInvitationTotal, postInvitation } from "../../../services/driveOrderService";
+import { getDriverUnfinishedOrder, getInvitationTotal } from "../../../services/driveOrderService";
+import { postInvitation } from "../../../services/invitationService";
 import { useNavigate } from "react-router-dom";
 import { UnsetCookie } from "../../../utils/cookieUtil";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 type CheckoutPanelProps = {
   isLoaded: boolean;
@@ -15,12 +17,12 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const [invitatedOrders, setInvitatedOrders] = useState<number[]>([]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const dragOrder = useRef<number>(0);
   const draggedOverPerson = useRef<number>(0);
   const [dirverOrderId, setDirverOrderId] = useState<number|null>(null);
-  const [successInvitedOrderId, setSuccessInvitedOrderId] = useState<number[]>([]);
   const handleSort = () => {
     const tempOrdersClone = [...tempOrderReducer.orders];
     const temp = tempOrdersClone[dragOrder.current];
@@ -30,6 +32,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
   }
 
   useEffect(() => {
+    setInvitatedOrders(tempOrderReducer.orders.map((order) => order.orderId));
     const getDirverOrderId = async () => {
       try{
         const res = await getDriverUnfinishedOrder();
@@ -43,7 +46,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       }
     }
     getDirverOrderId();
-  })
+  }, [])
 
   const handleInvitation = async () => {
     if(!dirverOrderId){
@@ -59,35 +62,30 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
         console.log(err);
       }
     }else{
-      const passengerOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
-      
-      for (const passengerOrderId of passengerOrderIds) {
-        const res = await postInvitation(dirverOrderId, passengerOrderId);
-        console.log("CheckoutPanel 74", res)
-        if(res.data){
-          setSuccessInvitedOrderId((prev) => [...prev, passengerOrderId]);
-        }
-        if(res.status !== 200 && res.response.status === 401){
-          alert("Invlid token, 請重新登入")
-          UnsetCookie();
-          navigate('/login');
-          return;
-        }
+      let passengerOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
+      for(const order of passengerOrderIds){
+        passengerOrderIds = passengerOrderIds.filter((id) => id !== order);
       }
-
-      if(successInvitedOrderId.length === 0){
-        // TODO 載入已經送出邀請的訂單
-        const pendingInvitation = await getInvitationTotal(dirverOrderId);
-        if (pendingInvitation !== undefined && pendingInvitation.length > 0) {
-          navigate('/driver/info');
-          return;
-        }
-
-        alert('邀請失敗')
+      console.log("CheckoutPanel 68", passengerOrderIds)
+      if(passengerOrderIds.length === 0){
+        navigate('/driver/info');
+        return;
+      }
+      
+      const res = await postInvitation(dirverOrderId, passengerOrderIds);
+      console.log("CheckoutPanel 74", res)
+      if(res?.success === 0){
+        alert("Invlid token, 請重新登入")
+        UnsetCookie();
+        navigate('/login');
+        return;
       }else{
         navigate('/driver/info');
       }
     }
+  }
+
+  const onDragEnd = (result: any) => {
   }
 
   return <>
@@ -118,7 +116,61 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                   <div>起點：{driverStartDestReducer.start.name}</div>
                 </div>
               </div>
-              {
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {
+                    (provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="flex flex-col justify-center items-center w-[100%]"
+                      >
+                        {tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
+                          <Draggable draggableId={order.orderId.toString()} index={index} >
+                            {
+                              provided => (
+                                <div 
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  ref={provided.innerRef}
+                                  className="relative flex justify-center w-[100%] h-[5vh] mt-4"
+                                >
+                                  <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
+                                    <div>{order.startName}</div>
+                                    <div>{order.pickTime1}-{order.pickTime2}</div>
+                                  </div>
+                                  {
+                                    order.invitationStatus.invitated ? (
+                                      order.invitationStatus.accepted ? (
+                                        <div className="flex justify-center items-center rounded-lg bg-green-500 w-[14%] text-white ml-2">  
+                                          已接受
+                                        </div>
+                                      ):(
+                                        <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
+                                          邀請中
+                                        </div>
+                                      )
+                                    ) : (
+                                      <button 
+                                        className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
+                                        onClick={() => dispatch(removeTempOrder(order))}
+                                      >
+                                        移除
+                                      </button>
+                                    )
+                                  }                   
+                                </div>
+                              )
+                            }
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )
+                  }
+                </Droppable>
+              </DragDropContext>
+              {/* {
                 tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
                   <div 
                     className="relative flex justify-center w-[100%] h-[16%] mt-4"
@@ -153,7 +205,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                     }                   
                   </div>
                 ))
-              }
+              } */}
               <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
                 <div className="flex justify-center items-center bg-black text-white rounded-md w-[80%] ">
                   <div>終點：{driverStartDestReducer.dest.name}</div>

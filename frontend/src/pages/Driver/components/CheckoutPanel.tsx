@@ -5,6 +5,7 @@ import { getDriverUnfinishedOrder, getInvitationTotal } from "../../../services/
 import { postInvitation } from "../../../services/invitationService";
 import { useNavigate } from "react-router-dom";
 import { UnsetCookie } from "../../../utils/cookieUtil";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 type CheckoutPanelProps = {
   isLoaded: boolean;
@@ -84,6 +85,9 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
     }
   }
 
+  const onDragEnd = (result: any) => {
+  }
+
   return <>
     {
       isLoaded && (
@@ -112,7 +116,61 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                   <div>起點：{driverStartDestReducer.start.name}</div>
                 </div>
               </div>
-              {
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {
+                    (provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="flex flex-col justify-center items-center w-[100%]"
+                      >
+                        {tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
+                          <Draggable draggableId={order.orderId.toString()} index={index} >
+                            {
+                              provided => (
+                                <div 
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  ref={provided.innerRef}
+                                  className="relative flex justify-center w-[100%] h-[5vh] mt-4"
+                                >
+                                  <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
+                                    <div>{order.startName}</div>
+                                    <div>{order.pickTime1}-{order.pickTime2}</div>
+                                  </div>
+                                  {
+                                    order.invitationStatus.invitated ? (
+                                      order.invitationStatus.accepted ? (
+                                        <div className="flex justify-center items-center rounded-lg bg-green-500 w-[14%] text-white ml-2">  
+                                          已接受
+                                        </div>
+                                      ):(
+                                        <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
+                                          邀請中
+                                        </div>
+                                      )
+                                    ) : (
+                                      <button 
+                                        className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
+                                        onClick={() => dispatch(removeTempOrder(order))}
+                                      >
+                                        移除
+                                      </button>
+                                    )
+                                  }                   
+                                </div>
+                              )
+                            }
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )
+                  }
+                </Droppable>
+              </DragDropContext>
+              {/* {
                 tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
                   <div 
                     className="relative flex justify-center w-[100%] h-[16%] mt-4"
@@ -147,7 +205,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                     }                   
                   </div>
                 ))
-              }
+              } */}
               <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
                 <div className="flex justify-center items-center bg-black text-white rounded-md w-[80%] ">
                   <div>終點：{driverStartDestReducer.dest.name}</div>

@@ -167,6 +167,9 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                         strokeColor: "#1976D2",
                         strokeOpacity: 0.8,
                         strokeWeight: 4,
+                      },
+                      markerOptions: {
+                        
                       }
                   }} />
                 </>

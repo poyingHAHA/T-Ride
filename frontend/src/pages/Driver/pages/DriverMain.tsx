@@ -59,6 +59,10 @@ const DriverMain = () => {
           location: { lat: order.startPoint.lat, lng: order.startPoint.lng },
           stopover: true,
         })
+        waypts.push({
+          location: { lat: order.endPoint.lat, lng: order.endPoint.lng },
+          stopover: true,
+        })
       })
     }
 

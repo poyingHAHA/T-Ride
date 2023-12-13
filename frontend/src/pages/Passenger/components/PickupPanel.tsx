@@ -1,14 +1,13 @@
-import { orderDTO } from "../../../DTO/orders";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-// import PickupCard from "./PickupCard";
 import { useState, useEffect } from "react";
-// import { addOrder } from "../../../slices/tempOrder";
 import { MdFace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { FaCircle, FaSquareFull } from "react-icons/fa6";
 import { getDriverInvitations } from "../../../services/invitationService";
 import { deletePassengerOrder } from "../../../services/orderService";
 import { getTokenFromCookie } from "../../../utils/cookieUtil";
+import { acceptDriverInvitations, getPassengerAcceptedInvitations } from "../../../services/invitationService";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -19,7 +18,7 @@ type PickupPanelProps = {
 };
 
 interface Invitation {
-    orderId: number;
+    orderId: number; // driver orderId
     userId: number;
     startPoint: {
         lat: number;
@@ -35,21 +34,32 @@ interface Invitation {
     PassengerCount: number;
 }
 
+interface AcceptDriverInvitations {
+    token: string,
+    driverOrderId: number,
+    passengerOrderId: number
+}
 
 const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: PickupPanelProps) => {
 
     const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
     const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
 
-    const [tempOrders, setTempOrders] = useState<orderDTO[]>([]);
     const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
     const dispatch = useAppDispatch();
     const [invitations, setInvitations] = useState<Invitation[]>([]);
+    const [num_invitations, setNum_Invitations] = useState<number>(0);
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const token = getTokenFromCookie();
-    console.log(passengerStartDestReducer.start)
-    // console.log("orderId: ", orderId)
+    const [selectedInvitation, setSelectedInvitation] = useState<number | null>(null);
+    const navigate = useNavigate();
+
+    const acceptDriverInvitationsHandler = async (params: AcceptDriverInvitations) => {
+        const acceptDriverInvitationsResult = await acceptDriverInvitations(params);
+        console.log("acceptDriverInvitations params: ", params)
+    }
+
     useEffect(() => {
         console.log("PickupPanel tempOrderReducer: ", tempOrderReducer)
     }, [tempOrderReducer])
@@ -64,33 +74,77 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
         return `${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     };
 
+    const handleInvitationClick = (invitationId: number) => {
+        if (selectedInvitation === invitationId) {
+            // Deselect if the same invitation is clicked again
+            setSelectedInvitation(null);
+        } else {
+            // Select the clicked invitation
+            setSelectedInvitation(invitationId);
+        }
+    };
+
     useEffect(() => {
         const getInvitations = async () => {
             try {
                 setLoading(true);
                 const unfinishedOrder = await getDriverInvitations(orderId);
+                console.log(unfinishedOrder.data.driverOrders)
                 setLoading(false);
-                if (unfinishedOrder.data.length > 0) {
-                    setInvitations(unfinishedOrder.data);
+                if (unfinishedOrder.data.driverOrders.length > 0) {
+                    setInvitations(unfinishedOrder.data.driverOrders);
+                    setNum_Invitations(unfinishedOrder.data.driverOrders.length)
+                    console.log("inviting")
+                }
+                else {
+                    console.log("no invitation")
                 }
             } catch (err) {
+                console.log("false")
                 setLoading(false);
                 setError("發生錯誤");
             }
         }
         getInvitations();
+        console.log(invitations)
     }, [])
 
+    useEffect(() => {
+        const getAcceptedInvitations = async () => {
+            try {
+                setLoading(true);
+                const AcceptedInvitations = await getPassengerAcceptedInvitations(orderId);
+                setLoading(false);
+                alert("您有已接受的邀請");
+                navigate("/passenger/Navigating")
 
+            } catch (err) {
+                setLoading(false);
+                setError("發生錯誤");
+            }
+
+        }
+        getAcceptedInvitations();
+    }, [])
 
     return <>
         {
             isLoaded && (
                 <>
-                    <div className=" flex h-full w-full flex-col px-5 pt-5 pb-3 overflow-auto overscroll-y-contain">
+                    <div className=" flex h-full w-full flex-col px-5 pt-5 pb-3 min-h-[50vh] z-50 overflow-auto overscroll-y-contain">
                         <div>
-                            <div className='mb-4 text-center text-xl font-bold'>
-                                Trip details
+                            <div className="mb-4">
+                                {/* // backbutton
+                                    <button
+                                    className="absolute top-0 left-0 m-4 cursor-pointer"
+                                    type="button"
+                                // onClick={() => { navigate("/passenger/History") }}
+                                >
+                                    <IoMdArrowRoundBack className="far fa-compass text-2xl pt-1 mb-1 block mx-auto" />
+                                </button> */}
+                                <div className=' text-center text-xl font-bold'>
+                                    Trip details
+                                </div>
                             </div>
                             {/* Trip Information */}
                             <div className="mx-2 flex">
@@ -147,30 +201,104 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                     Invitations
                                 </div>
 
-                                {invitations.length > 0 ? (
+                                {num_invitations > 0 ? (
                                     <ul>
-                                        <div className="h-20 border-gray border-b border-solid " >
-                                            <div className="m-4 pb-2 flex justify-between items-end h-full rounded-lg mx-10">
-                                                <div className='flex-1'>
-                                                    <h3 className="font-bold text-lg">目的地：張忠謀大樓</h3>
-                                                    <p className="text-gray-500 text-lg">行程時間：07:35 - 08:30</p>
+                                        {invitations.map((invitation, index) => (
+                                            <div
+                                                className={`border-gray border-b rounded-lg border-solid ${selectedInvitation === invitation.orderId ? 'bg-gray-200' : ''}`}
+                                                key={index}
+                                                onClick={() => handleInvitationClick(invitation.orderId)}
+                                            >
+                                                <div className="m-2 py-2 flex justify-between items-end h-full rounded-lg ml-7 mr-5">
+                                                    <div className='flex-1 mr-1'>
+                                                        <div key={index}>
+                                                            <h3 className="font-bold">目的地： {invitation.endName}</h3>
+                                                            <h3 className="font-bold">driver OrderID： {invitation.orderId}</h3>
+                                                            <h3 className="font-bold">pax OrderID： {orderId}</h3>
+                                                        </div>
+                                                        <p className="text-gray-500">行程時間：07:35 - 08:30</p>
+                                                    </div>
+                                                    <span className="block ml-3 flex-col items-center justify-center mb-1">
+                                                        <MdFace className="far fa-cog text-5xl block mx-auto" />
+                                                        <span className="block text-base mx-auto">Burns</span>
+                                                    </span>
                                                 </div>
-                                                <span className="block px-1">
-                                                    <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                                    <span className="block text-base mx-auto">Burns</span>
-                                                </span>
                                             </div>
-                                        </div>
-
+                                        ))}
+                                        {selectedInvitation !== null ? (
+                                            <div className="flex">
+                                                <div className="flex-1 w-full flex items-center justify-center pt-5">
+                                                    <button
+                                                        className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
+                                                        type="button"
+                                                        onClick={() => setSelectedInvitation(null)}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                                <div className="flex-1 w-full flex items-center justify-center pt-5">
+                                                    <button
+                                                        className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
+                                                        type="button"
+                                                        onClick={() => {
+                                                            acceptDriverInvitationsHandler({
+                                                                token: token,
+                                                                driverOrderId: selectedInvitation,
+                                                                passengerOrderId: orderId
+                                                            });
+                                                            navigate("/passenger/Navigating")
+                                                            // 跳轉到導航頁面
+                                                        }}
+                                                    >
+                                                        Accept
+                                                    </button>
+                                                </div>
+                                            </div>) : (
+                                            <>
+                                                <div className="flex-1 w-full flex items-center justify-center pt-5">
+                                                    <button
+                                                        className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setPickupPanel(false);
+                                                            deletePassengerOrder(orderId, token);
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </ul>
                                 ) : (
-                                    <div className="flex items-center justify-center">
-                                        <div>未收到邀請  (orderID: {orderId})</div>
+                                    <div className="flex-col">
+                                        <div className="flex items-center justify-center pb-10">
+                                            <div>尚未收到邀請</div>
+                                        </div>
+                                        <div className="flex items-center justify-center">
+                                            <button
+                                                className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
+                                                type="button"
+                                                onClick={() => {
+                                                    setPickupPanel(false);
+                                                    deletePassengerOrder(orderId, token);
+                                                }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>)}
 
 
 
-                                <div className="h-20 flex justify-center items-center py-2" >
+
+                                {/* <div className="h-20 flex justify-center items-center py-2" >
+                                    {selectedInvitation !== null ? (
+                                        <></>
+
+                                    ) : (
+                                        <></>
+                                    )}
                                     <button
                                         className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
                                         type="button"
@@ -180,7 +308,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                         }}
                                     // delete passenger order
                                     >Cancel</button>
-                                </div>
+                                </div> */}
 
                                 <div className="px-3">
                                     <div className="flex">

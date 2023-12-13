@@ -12,6 +12,18 @@ const getUserinfo = async () => {
     }
 }
 
+const getDriverinfo = async (driverId: number) => {
+    try {
+        const response: any = await get(`/user/${driverId}`);
+        console.log("getUserinfo response: ", response);
+        return response;
+    } catch (error) {
+        console.log("getUserinfo error: ", error);
+    }
+}
+
+
 export {
-    getUserinfo
+    getUserinfo,
+    getDriverinfo
 }

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { setStart, setDest } from "../../../slices/driverStartDest"
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
 
+
 interface Order {
     orderId: number;
     startName: string;
@@ -19,6 +20,7 @@ export default function PassengerHistory() {
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [orders, setOrders] = useState<Order[]>([]);
+    const [finishedorders, setFinishedOrders] = useState<Order[]>([]);
 
     const navigate = useNavigate();
 
@@ -66,7 +68,7 @@ export default function PassengerHistory() {
                                 <button className=' w-full'
                                     type="button"
                                     onClick={() => {
-                                        navigate("/passenger/Tripinfo")
+                                        navigate("/passenger/Tripinfo", { state: { orderId: order.orderId } })
                                     }}>
                                     <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-7">
 
@@ -87,7 +89,7 @@ export default function PassengerHistory() {
                                             </div>
                                             <div className="flex-col items-center">
                                                 <p className="flex-1">${order.fee}</p>
-                                                <p className="flex-1">order:{order.orderId}</p>
+                                                {/* <p className="flex-1">order:{order.orderId}</p> */}
                                             </div>
                                         </div>
                                     </div>
@@ -102,7 +104,7 @@ export default function PassengerHistory() {
                     <h2 className="my-2 text-lg font-bold">Past Orders</h2>
                 </div>
 
-                {orders.length > 0 ? (
+                {finishedorders.length > 0 ? (
                     <ul>
                         <div className="space-y-4 p-4">
                             <button className=' w-full'

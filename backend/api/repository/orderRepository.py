@@ -22,33 +22,17 @@ class OrderRepository:
                   WHERE user_id = {user_id}
                   AND NOT finished;'''
 
-        # check connection
-        try:
-            with DbConnection.conn.cursor() as cur:
-                cur.execute('SELECT 1;')
-        except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            DbConnection.conn = psycopg2.connect(
-                database=self.config.get('name'),
-                user=self.config.get('user'),
-                password=self.config.get('password'),
-                host=self.config.get('host'),
-                port=self.config.get('port'))
+        return self.__sql_get_driver_orders(sql)
 
-        with DbConnection.conn.cursor() as cur:
-            cur.execute(sql)
-            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
-            rows = cur.fetchall()
-            
-        return [DriverOrderEntity(
-            row[f2i['id']],
-            row[f2i['user_id']],
-            row[f2i['time']],
-            row[f2i['start_point']],
-            row[f2i['start_name']],
-            row[f2i['end_point']],
-            row[f2i['end_name']],
-            row[f2i['passenger_count']],
-            row[f2i['finished']]) for row in rows]
+    def get_finished_driver_orders(self, user_id):
+        '''
+        user exists
+        '''
+        sql = f'''SELECT * FROM driver_orders
+                  WHERE user_id = {user_id}
+                  AND finished;'''
+
+        return self.__sql_get_driver_orders(sql)
 
     def get_unfinished_passenger_orders(self, user_id):
         '''
@@ -58,17 +42,15 @@ class OrderRepository:
                   WHERE user_id = {user_id}
                   AND NOT finished;'''
 
-        # check connection
-        try:
-            with DbConnection.conn.cursor() as cur:
-                cur.execute('SELECT 1;')
-        except (psycopg2.OperationalError, psycopg2.InterfaceError):
-            DbConnection.conn = psycopg2.connect(
-                database=self.config.get('name'),
-                user=self.config.get('user'),
-                password=self.config.get('password'),
-                host=self.config.get('host'),
-                port=self.config.get('port'))
+        return self.__sql_get_passenger_orders(sql)
+
+    def get_finished_passenger_orders(self, user_id):
+        '''
+        user exists
+        '''
+        sql = f'''SELECT * FROM passenger_orders
+                  WHERE user_id = {user_id}
+                  AND finished;'''
 
         return self.__sql_get_passenger_orders(sql)
 
@@ -596,6 +578,35 @@ class OrderRepository:
         with DbConnection.conn.cursor() as cur:
             cur.execute(sql)
             DbConnection.conn.commit()
+
+    def __sql_get_driver_orders(self, sql):
+        # check connection
+        try:
+            with DbConnection.conn.cursor() as cur:
+                cur.execute('SELECT 1;')
+        except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            DbConnection.conn = psycopg2.connect(
+                database=self.config.get('name'),
+                user=self.config.get('user'),
+                password=self.config.get('password'),
+                host=self.config.get('host'),
+                port=self.config.get('port'))
+
+        with DbConnection.conn.cursor() as cur:
+            cur.execute(sql)
+            f2i = {desc[0]: i for i, desc in enumerate(cur.description)}
+            rows = cur.fetchall()
+
+        return [DriverOrderEntity(
+            row[f2i['id']],
+            row[f2i['user_id']],
+            row[f2i['time']],
+            row[f2i['start_point']],
+            row[f2i['start_name']],
+            row[f2i['end_point']],
+            row[f2i['end_name']],
+            row[f2i['passenger_count']],
+            row[f2i['finished']]) for row in rows]
 
     def __sql_get_passenger_orders(self, sql):
         # check connection

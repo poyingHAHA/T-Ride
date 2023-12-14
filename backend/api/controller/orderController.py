@@ -50,6 +50,7 @@ async def post_driver_order():
 
     return utils.to_json({"orderId": ret})
 
+
 @order.route('/driver/unfinished/<int:userId>', methods=['GET'])
 async def get_driver_order_unfinished(userId):
     orders = order_service.get_unfinished_driver_orders(userId)
@@ -58,6 +59,14 @@ async def get_driver_order_unfinished(userId):
 
     return utils.to_json([DriverOrderVo(order) for order in orders])
 
+
+@order.route('/driver/finished/<int:userId>', methods=['GET'])
+async def get_driver_order_finished(userId):
+    orders = order_service.get_finished_driver_orders(userId)
+    if orders is None:
+        return await make_response("User not found", 404)
+
+    return utils.to_json([DriverOrderVo(order) for order in orders])
 
 @order.route('/driver/<int:orderId>', methods=['GET'])
 async def get_driver_order_details(orderId):
@@ -225,6 +234,15 @@ async def post_passenger_order_finished():
 @order.route('/passenger/unfinished/<int:userId>', methods=['GET'])
 async def get_passenger_order_unfinished(userId):
     orders = order_service.get_unfinished_passenger_orders(userId)
+    if orders is None:
+        return await make_response("User not found", 404)
+
+    return utils.to_json([PassengerOrderVo(order) for order in orders])
+
+
+@order.route('/passenger/finished/<int:userId>', methods=['GET'])
+async def get_passenger_order_finished(userId):
+    orders = order_service.get_finished_passenger_orders(userId)
     if orders is None:
         return await make_response("User not found", 404)
 

@@ -303,12 +303,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  unfinishedDriverOrders:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/DriverOrderDetails'
+                type: array
+                items:
+                  $ref: '#/components/schemas/DriverOrderDetails'
         '404':
           description: User not found
   /order/passenger/unfinished/{user_id}:
@@ -329,12 +326,55 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  unfinishedPassengerOrders:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PassengerOrderDetails'
+                type: array
+                items:
+                  $ref: '#/components/schemas/PassengerOrderDetails'
+        '404':
+          description: User not found
+  /order/driver/finished/{user_id}:
+    get:
+      summary: Get Finished Driver Orders for a User
+      tags:
+        - order
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DriverOrderDetails'
+        '404':
+          description: User not found
+  /order/passenger/finished/{user_id}:
+    get:
+      summary: Get Finished Passenger Orders for a User
+      tags:
+        - order
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PassengerOrderDetails'
         '404':
           description: User not found
   /order/fee:

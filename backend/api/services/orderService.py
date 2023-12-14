@@ -22,6 +22,15 @@ class OrderService:
 
         return [DriverOrderDto(entity) for entity in self.order_repository.get_unfinished_driver_orders(user_id)]
 
+    def get_finished_driver_orders(self, user_id):
+        '''
+        return None if user doesn't exist
+        '''
+        if self.user_repository.get_user(user_id) is None:
+            return None
+
+        return [DriverOrderDto(entity) for entity in self.order_repository.get_finished_driver_orders(user_id)]
+
     def get_unfinished_passenger_orders(self, user_id):
         '''
         return None if user doesn't exist
@@ -31,6 +40,16 @@ class OrderService:
 
         return [PassengerOrderDto(entity, self.__get_estimated_arrival_time(entity))
             for entity in self.order_repository.get_unfinished_passenger_orders(user_id)]
+
+    def get_finished_passenger_orders(self, user_id):
+        '''
+        return None if user doesn't exist
+        '''
+        if self.user_repository.get_user(user_id) is None:
+            return None
+
+        return [PassengerOrderDto(entity, self.__get_estimated_arrival_time(entity))
+            for entity in self.order_repository.get_finished_passenger_orders(user_id)]
 
     def create_driver_order(self, token, create_driver_order_dto):
         '''

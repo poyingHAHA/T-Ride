@@ -150,8 +150,8 @@ async def delete_driver_order(orderId):
         return await make_response("Not the driver's own order", 403)
     if ret == "order not found":
         return await make_response("Order not found", 404)
-    if ret == "order is finished":
-        return await make_response("Order already completed", 409)
+    if ret == "order is finished" or ret == "passenger already accept":
+        return await make_response("Order already completed or passenger already accept", 409)
 
     user_id = user_service.get_user_id(query["token"])
     user = user_service.get_user(user_id)

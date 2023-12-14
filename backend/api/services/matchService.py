@@ -173,7 +173,7 @@ class MatchService:
         return "Invalid token",
                "Not the driver's own order",
                "Order not found",
-               "Invitation not sent or order completed"
+               "Invitation not sent or passenger already accept"
         
         return {"total_order_count":total_order_count,
                 "abandon_order_count":abandon_order_count}
@@ -198,9 +198,11 @@ class MatchService:
             return "Invitation not sent or order completed"
         ret = self.match_repository.delete_one_invitation(driverOrderId,passengerOrderId)
         if ret == "Invitation not sent":
-            return "Invitation not sent or order completed"
-        if ret == "Abandon an order":
-            self.user_repository.add_abandon_order_count(user_id,1)
+            return "Invitation not sent or passenger already accept"
+        if ret == "Passenger already accept":
+            return "Invitation not sent or passenger already accept"
+        # if ret == "Abandon an order":
+        #     self.user_repository.add_abandon_order_count(user_id,1)
         user = self.user_repository.get_user(user_id)
         return {"total_order_count":user.total_order_count,
                 "abandon_order_count":user.abandon_order_count}

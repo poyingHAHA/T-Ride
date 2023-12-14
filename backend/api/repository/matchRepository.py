@@ -136,7 +136,7 @@ class MatchRepository:
     def delete_one_invitation(self, driver_order_id, passenger_order_id):
         '''
         return "Invitation not sent",
-        return "Abandon an order",
+        return "Passenger already accept",
                 None 
                 on success 
         '''
@@ -163,15 +163,16 @@ class MatchRepository:
             if row is None:
                 return "Invitation not sent"
             if row[f2i["accepted"]] is True:
-                flag = True
-            else:
-                flag = False
+                return "Passenger already accept"
+            # if row[f2i["accepted"]] is True:
+            #     flag = True
+            # else:
+            #     flag = False
             sql = f'''DELETE FROM matches
                       WHERE driver_order_id = {driver_order_id}
                       AND passenger_order_id = {passenger_order_id};'''
             cur.execute(sql)
             DbConnection.conn.commit()
-        if flag is True:
-            return "Abandon an order"
-        else :
-            return None
+        # if flag is True:
+        #     return "Abandon an order"
+            

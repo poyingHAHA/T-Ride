@@ -105,6 +105,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                 setError("發生錯誤");
             }
         }
+
+        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/passenger/invitation/total/${orderId}`);
+      ws.onmessage = (event) => {
+        console.log(event.data);  
+      }
+      console.log("ws", ws);
         getInvitations();
         console.log(invitations)
     }, [])
@@ -114,9 +120,13 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
             try {
                 setLoading(true);
                 const AcceptedInvitations = await getPassengerAcceptedInvitations(orderId);
+                console.log(AcceptedInvitations.data)
                 setLoading(false);
-                alert("您有已接受的邀請");
-                navigate("/passenger/Navigating")
+                if (AcceptedInvitations.data.length > 0){
+                    alert("您有已接受的邀請");
+                    navigate("/passenger/Navigating")
+                
+                }
 
             } catch (err) {
                 setLoading(false);
@@ -124,6 +134,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
             }
 
         }
+
         getAcceptedInvitations();
     }, [])
 

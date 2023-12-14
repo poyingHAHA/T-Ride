@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react";
 import { getDriverUnfinishedOrder, getInvitationTotal } from "../../../services/driveOrderService";
 import { postInvitation } from "../../../services/invitationService";
 import { useNavigate } from "react-router-dom";
-import { UnsetCookie } from "../../../utils/cookieUtil";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { orderDTO } from "../../../DTO/orders";
 

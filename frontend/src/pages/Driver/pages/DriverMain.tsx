@@ -93,7 +93,7 @@ const DriverMain = () => {
     dispatch(setWaypoint(waypts));
     console.log("DriverMain 96: ", waypts)
     const service = new google.maps.DirectionsService();
-    waypts.forEach(async (waypt, index) => {
+    for(let [index, waypt] of waypts.entries()){
       if(index === waypts.length - 1) return;
       if(waypt.location !== undefined && waypts[index + 1].location !== undefined){
         await service.route(
@@ -112,7 +112,27 @@ const DriverMain = () => {
             }
         )
       }
-    })
+    }
+    // waypts.forEach(async (waypt, index) => {
+    //   if(index === waypts.length - 1) return;
+    //   if(waypt.location !== undefined && waypts[index + 1].location !== undefined){
+    //     await service.route(
+    //         {
+    //           origin: waypt.location,
+    //           destination: waypts[index + 1].location as google.maps.LatLngLiteral,
+    //           travelMode: google.maps.TravelMode.DRIVING,
+    //         },
+    //         (result, status) => {
+    //           if (status === 'OK' && result) {
+    //             console.log("DriverMain 97: ", result)
+    //             setDirections((prev) => [...prev, result]);
+    //           } else {
+    //             console.error(`error fetching directions ${result}`);
+    //           }
+    //         }
+    //     )
+    //   }
+    // })
   }
 
   return <>

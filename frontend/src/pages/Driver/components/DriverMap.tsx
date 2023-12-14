@@ -179,7 +179,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                           directions={leg}
                           options={{
                             polylineOptions: {
-                              strokeColor: "#1976D2",
+                              strokeColor: getColor(index),
                               strokeOpacity: 0.8,
                               strokeWeight: 4,
                               zIndex: ((1/(index+1))*100),

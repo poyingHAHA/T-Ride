@@ -55,6 +55,11 @@ export default function PassengerTripinfo() {
                 ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
     };
 
+    const formatUnixDatestamp = (timestamp: number) => {
+        const date = new Date(timestamp * 1000);
+        return `${date.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' })} `;
+    };
+
     const formatUnixTimestamp = (timestamp: number) => {
         const date = new Date(timestamp * 1000);
         return ` ${date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
@@ -170,20 +175,15 @@ export default function PassengerTripinfo() {
                 {/* Map Image Placeholder */}
                 <div className="bg-gray-300 h-60 rounded-lg mb-4">
                     <PassengerMap isLoaded={isLoaded} directions={directions} detail={false} />
-                    {/* <iframe className="w-full h-60"
-                        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12080.73732861526!2d-74.0059418!3d40.7127847!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM40zMDA2JzEwLjAiTiA3NMKwMjUnMzcuNyJX!5e0!3m2!1sen!2sus!4v1648482801994!5m2!1sen!2sus"
-                        title="Google Maps Location View"
-                    >
-                    </iframe> */}
                 </div>
 
                 {/* Trip Information */}
                 <div className="mb-4 mx-2 flex">
-                    <div className="flex-1 text-base ml-3 font-bold">
-                        {formatUnixDateTimestamp(departureTime)}
+                    <div className="flex-1 text-lg ml-3 font-bold">
+                        {formatUnixDatestamp(departureTime)}
                     </div>
                     <div className="flex-1 text-right text-lg font-bold mr-5">
-                        ${fee}
+                        NT${fee}
                     </div>
                 </div>
 
@@ -226,26 +226,31 @@ export default function PassengerTripinfo() {
             </div>
 
             {/* Driver's Info */}
-            <div className='h-2/5 border-gray border-t-2 border-solid items-center justify-center'>
+            <div className='h-1/2 border-gray border-t-2 border-solid items-center justify-center'>
                 <div className="mb-4">
                     <div className="text-center text-xl font-bold my-4 ">
                         Driver's Info
                     </div>
-                    <div>
+                    {driverstartName ? (
                         <div>
-                            <div className="m-4 pb-2 flex items-center justify-center justify-between items-end h-full rounded-lg mx-10">
-                                <div className='flex-1 flex-col items-center justify-center '>
-                                    <h3 className="font-bold h-[30px]">出發點：{driverstartName}</h3>
-                                    <h3 className="font-bold h-[30px]">目的地：{driverendName}</h3>
-                                    {/* <p className="text-gray-500 h-[30px]">行程時間：{formatUnixDateTimestamp(driverdepartureTime)}</p> */}
+                            <div>
+                                <div className="m-4 pb-2 flex items-center justify-center justify-between items-end h-full rounded-lg mx-10">
+                                    <div className='flex-1 flex-col items-center justify-center '>
+                                        <h3 className="font-bold my-2">出發點：{driverstartName}</h3>
+                                        <h3 className="font-bold my-2">目的地：{driverendName}</h3>
+                                    </div>
+                                    <span className="flex-col items-center justify-center block px-1">
+                                        <MdFace className="far fa-cog text-5xl block mx-auto" />
+                                        <span className="block text-base font-bold mx-auto">{driverName}</span>
+                                    </span>
                                 </div>
-                                <span className="flex-col items-center justify-center block px-1">
-                                    <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                    <span className="block text-base font-bold mx-auto">{driverName}</span>
-                                </span>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="text-center my-8">
+                            <span className="text-lg">尚未配對到司機</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

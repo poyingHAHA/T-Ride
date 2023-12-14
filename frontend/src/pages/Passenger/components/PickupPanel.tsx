@@ -95,7 +95,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                 if (unfinishedOrder.data.driverOrders.length > 0) {
                     setInvitations(unfinishedOrder.data.driverOrders);
                     setNum_Invitations(unfinishedOrder.data.driverOrders.length)
-                    console.log("inviting")
+                    console.log("inviting", unfinishedOrder.data.driverOrders)
                 }
                 else {
                     console.log("no invitation")
@@ -110,11 +110,20 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
         const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/send/${orderId}`);
         ws.onmessage = (event) => {
             console.log(event.data);
-            if (event.data === "true") {
-                setRefresh(!refresh);  
+            try {
+                const data = JSON.parse(event.data);
+                if (data.driverOrder) {
+                    setRefresh(!refresh)
+                    console.log("Driver Order Data:", data.driverOrder);
+                    console.log("Departure Time:", data.driverOrder.departure_time);
+                    console.log("End Name:", data.driverOrder.end_name);
+                }
+            } catch (error) {
+                console.error("Error parsing WebSocket message:", error);
             }
         }
         console.log("ws", ws);
+
         getInvitations();
         console.log(invitations)
     }, [refresh])
@@ -125,20 +134,17 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                 setLoading(true);
                 const AcceptedInvitations = await getPassengerAcceptedInvitations(orderId);
                 console.log(AcceptedInvitations.data)
+                console.log(AcceptedInvitations.data.driverOrder)
                 setLoading(false);
-                if (AcceptedInvitations.data.length > 0){
+                if (AcceptedInvitations.data.driverOrder !== null) {
                     alert("您有已接受的邀請");
-                    navigate("/passenger/Navigating")
-                
+                    navigate("/passenger/Navigating", { state: { passengerOrderId: orderId } })
                 }
-
             } catch (err) {
                 setLoading(false);
                 setError("發生錯誤");
             }
-
         }
-
         getAcceptedInvitations();
     }, [])
 
@@ -224,20 +230,21 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                                 key={index}
                                                 onClick={() => handleInvitationClick(invitation.orderId)}
                                             >
-                                                <div className="m-2 py-2 flex justify-between items-end h-full rounded-lg ml-7 mr-5">
+                                                <div className="text-xs">driver OrderID： {invitation.orderId} pax OrderID： {orderId}</div>
+                                                <div className="m-2 py-2 flex justify-between items-center justify-center items-end h-full rounded-lg ml-7 mr-5">
                                                     <div className='flex-1 mr-1'>
                                                         <div key={index}>
-                                                            <h3 className="font-bold">出發地： {invitation.startName}</h3>
-                                                            <h3 className="font-bold">目的地： {invitation.endName}</h3>
-                                                            
+                                                            <div className="font-bold">出發地： {invitation.startName}</div>
+                                                            <div className="font-bold">目的地： {invitation.endName}</div>
                                                         </div>
-                                                        <p className="text-gray-500">預計司機出發時間：{formatUnixTimestamp(invitation.departureTime)}</p>
-                                                        <div className="text-xs">driver OrderID： {invitation.orderId} pax OrderID： {orderId}</div>
+                                                        <p className="text-gray-500">司機預計出發時間：{formatUnixTimestamp(invitation.departureTime)}</p>
                                                     </div>
-                                                    <span className="block ml-3 flex-col items-center justify-center mb-1">
-                                                        <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                                        <span className="block text-base mx-auto">Burns</span>
-                                                    </span>
+                                                    <div className="flex-2">
+                                                        <span className="block ml-3 flex-col items-center justify-center mb-1">
+                                                            <MdFace className="far fa-cog text-5xl block mx-auto" />
+                                                            <span className="block text-base mx-auto">Burns</span>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -262,7 +269,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                                                 driverOrderId: selectedInvitation,
                                                                 passengerOrderId: orderId
                                                             });
-                                                            navigate("/passenger/Navigating")
+                                                            navigate("/passenger/Navigating", { state: { passengerOrderId: orderId } })
                                                             // 跳轉到導航頁面
                                                         }}
                                                     >

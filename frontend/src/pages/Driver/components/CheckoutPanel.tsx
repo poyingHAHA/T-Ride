@@ -6,12 +6,18 @@ import { postInvitation } from "../../../services/invitationService";
 import { useNavigate } from "react-router-dom";
 import { UnsetCookie } from "../../../utils/cookieUtil";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { orderDTO } from "../../../DTO/orders";
 
 type CheckoutPanelProps = {
   isLoaded: boolean;
   setPanel: (panel: number) => any;
   setShowSpots?: (showSpots: boolean) => void;
 };
+
+type column = {
+  columnid: string;
+  orders: orderDTO[];
+}
 
 const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps) => {
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
@@ -20,19 +26,15 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
   const [invitatedOrders, setInvitatedOrders] = useState<number[]>([]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const dragOrder = useRef<number>(0);
-  const draggedOverPerson = useRef<number>(0);
+  const [columns, setColumns] = useState<column[]>([{
+    columnid: 'droppable',
+    orders: []
+  }]);
   const [dirverOrderId, setDirverOrderId] = useState<number|null>(null);
-  const handleSort = () => {
-    const tempOrdersClone = [...tempOrderReducer.orders];
-    const temp = tempOrdersClone[dragOrder.current];
-    tempOrdersClone[dragOrder.current] = tempOrdersClone[draggedOverPerson.current];
-    tempOrdersClone[draggedOverPerson.current] = temp;
-    dispatch(setTempOrder(tempOrdersClone));
-  }
-
+  
   useEffect(() => {
     setInvitatedOrders(tempOrderReducer.orders.map((order) => order.orderId));
+    setColumns([{columnid: 'droppable', orders: tempOrderReducer.orders}]);
     const getDirverOrderId = async () => {
       try{
         const res = await getDriverUnfinishedOrder();
@@ -47,13 +49,13 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
     }
     getDirverOrderId();
   }, [])
-
+  
   const handleInvitation = async () => {
     if(!dirverOrderId){
       try{
         const res = await getDriverUnfinishedOrder();
         setDirverOrderId(res.data[0].orderId);
-        if(res.data.length == 0){
+        if(res.data.length === 0){
           alert('您尚未設定訂單')
           setPanel(0)
           return;
@@ -86,6 +88,22 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
   }
 
   const onDragEnd = (result: any) => {
+    const { destination, source, draggableId } = result;
+    console.log("CheckoutPanel 96", result)
+    
+    if(!destination){
+      return;
+    }
+    if(destination.droppableId === source.droppableId && destination.index === source.index){
+      return;
+    }
+    
+    const tempOrdersClone = [...tempOrderReducer.orders];
+    const temp = tempOrdersClone[source.index];
+    tempOrdersClone.splice(source.index, 1);
+    tempOrdersClone.splice(destination.index, 0, temp);
+    setColumns([{columnid: 'droppable', orders: tempOrdersClone}]);
+    dispatch(setTempOrder(tempOrdersClone));
   }
 
   return <>
@@ -117,95 +135,61 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                 </div>
               </div>
               <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="droppable">
-                  {
-                    (provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="flex flex-col justify-center items-center w-[100%]"
-                      >
-                        {tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
-                          <Draggable draggableId={order.orderId.toString()} index={index} >
-                            {
-                              provided => (
-                                <div 
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  ref={provided.innerRef}
-                                  className="relative flex justify-center w-[100%] h-[5vh] mt-4"
-                                >
-                                  <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
-                                    <div>{order.startName}</div>
-                                    <div>{order.pickTime1}-{order.pickTime2}</div>
-                                  </div>
-                                  {
-                                    order.invitationStatus.invitated ? (
-                                      order.invitationStatus.accepted ? (
-                                        <div className="flex justify-center items-center rounded-lg bg-green-500 w-[14%] text-white ml-2">  
-                                          已接受
-                                        </div>
-                                      ):(
-                                        <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
-                                          邀請中
-                                        </div>
-                                      )
-                                    ) : (
-                                      <button 
-                                        className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
-                                        onClick={() => dispatch(removeTempOrder(order))}
-                                      >
-                                        移除
-                                      </button>
-                                    )
-                                  }                   
-                                </div>
-                              )
-                            }
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )
-                  }
-                </Droppable>
-              </DragDropContext>
-              {/* {
-                tempOrderReducer.orders && tempOrderReducer.orders.map((order, index) => (
-                  <div 
-                    className="relative flex justify-center w-[100%] h-[16%] mt-4"
-                    draggable={true}
-                    onDragStart={() => (dragOrder.current = index)}
-                    onDragEnter={() => (draggedOverPerson.current = index)}
-                    onDragEnd={handleSort}
-                  >
-                    <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
-                      <div>{order.startName}</div>
-                      <div>{order.pickTime1}-{order.pickTime2}</div>
-                    </div>
+                {columns.map((col) => (
+                  <Droppable droppableId={col.columnid} key={col.columnid} >
                     {
-                      order.invitationStatus.invitated ? (
-                        order.invitationStatus.accepted ? (
-                          <div className="flex justify-center items-center rounded-lg bg-green-500 w-[14%] text-white ml-2">  
-                            已接受
-                          </div>
-                        ):(
-                          <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
-                            邀請中
-                          </div>
-                        )
-                       ) : (
-                        <button 
-                          className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
-                          onClick={() => dispatch(removeTempOrder(order))}
+                      (provided) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                          className="flex flex-col justify-center items-center w-[100%]"
                         >
-                          移除
-                        </button>
+                          {col.orders.map((order, index) => (
+                            <Draggable draggableId={order.orderId.toString()} index={index} key={order.orderId.toString()} >
+                              {
+                                provided => (
+                                  <div 
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    ref={provided.innerRef}
+                                    className="relative flex justify-center w-[100%] h-[5vh] mt-4"
+                                  >
+                                    <div className="flex justify-between items-center px-4 bg-gray-200 rounded-md w-[70%] ">
+                                      <div>{order.startName}</div>
+                                      <div>{order.pickTime1}-{order.pickTime2}</div>
+                                    </div>
+                                    {
+                                      order.invitationStatus.invitated ? (
+                                        order.invitationStatus.accepted ? (
+                                          <div className="flex justify-center items-center rounded-lg bg-green-500 w-[14%] text-white ml-2">  
+                                            已接受
+                                          </div>
+                                        ):(
+                                          <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
+                                            邀請中
+                                          </div>
+                                        )
+                                      ) : (
+                                        <button 
+                                          className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
+                                          onClick={() => dispatch(removeTempOrder(order))}
+                                        >
+                                          移除
+                                        </button>
+                                      )
+                                    }                   
+                                  </div>
+                                )
+                              }
+                            </Draggable>
+                          ))}
+                          {provided.placeholder}
+                        </div>
                       )
-                    }                   
-                  </div>
-                ))
-              } */}
+                    }
+                  </Droppable>
+                ))}
+              </DragDropContext>
               <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
                 <div className="flex justify-center items-center bg-black text-white rounded-md w-[80%] ">
                   <div>終點：{driverStartDestReducer.dest.name}</div>

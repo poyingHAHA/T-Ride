@@ -4,13 +4,14 @@ import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marke
 import AdvMarker from "./AdvancedMarker"
 import { getSpots, getSpotOrders } from "../../../services/spotService";
 import { orderDTO, SpotDTO } from "../../../DTO/orders";
+import React from "react";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
 type DriverMapProps = {
   isLoaded: boolean;
   showSpots?: boolean;
-  directions?: DirectionsResult;
+  directions?: DirectionsResult[];
   setOrders?: (orders: orderDTO[]) => void;
   orders?: orderDTO[];
   setMarkerOrderId?: (orderId: number) => void
@@ -47,7 +48,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     strokeColor: 'white',
     strokeWeight: 2,
   };
-
+  
   const spotWithOrderIcon = {
     path: "M-1.547 12l6.563-6.609-1.406-1.406-5.156 5.203-2.063-2.109-1.406 1.406zM0 0q2.906 0 4.945 2.039t2.039 4.945q0 1.453-0.727 3.328t-1.758 3.516-2.039 3.070-1.711 2.273l-0.75 0.797q-0.281-0.328-0.75-0.867t-1.688-2.156-2.133-3.141-1.664-3.445-0.75-3.375q0-2.906 2.039-4.945t4.945-2.039z",
     fillColor: 'green',
@@ -57,19 +58,19 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     scale: 2,
     anchor: new google.maps.Point(0, 20),
   }
-
+  
   // 取得所有有tempOrder的地標
   useEffect(() => {
     if(tempOrderReducer.orders){
       const tempOrderSpots = tempOrderReducer.orders.map((order) => order.spotId);
       const tempOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
-      setTotalDistance(directions?.routes[0].legs && directions?.routes[0].legs.reduce((accumulator, currentValue) => {
-        if(currentValue.distance === undefined) return accumulator;
-        return accumulator+currentValue.distance.value
+      setTotalDistance(directions && directions.reduce((accumulator, currentValue) => {
+        if(currentValue.routes[0].legs[0].distance === undefined) return accumulator;
+        return accumulator+currentValue.routes[0].legs[0].distance.value
       }, 0)/1000 || 0);
-      setTotalDuration(directions?.routes[0].legs && directions?.routes[0].legs.reduce((accumulator, currentValue) => {
-        if(currentValue.duration === undefined) return accumulator;
-        return accumulator+currentValue.duration.value
+      setTotalDuration(directions && directions.reduce((accumulator, currentValue)=> {
+        if(currentValue.routes[0].legs[0].duration === undefined) return accumulator;
+        return accumulator+currentValue.routes[0].legs[0].duration.value
       }, 0)/60 || 0);
       
       console.log("DriverMap tempOrderSpots: ", tempOrderSpots);
@@ -170,17 +171,41 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
             {directions &&
               (
                 <>
-                  <DirectionsRenderer 
-                    directions={directions} 
-                    options={{
-                      polylineOptions: {
-                        // zIndex: 50,
-                        strokeColor: "#1976D2",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 4,
-                      }
-                  }} />
-
+                  {
+                    directions.map((leg, index) => (
+                      <React.Fragment key={index}>
+                        <DirectionsRenderer
+                          directions={leg}
+                          options={{
+                            polylineOptions: {
+                              strokeColor: getColorForLeg(index),
+                              strokeOpacity: 0.8,
+                              strokeWeight: 4,
+                              zIndex: ((1/(index+1))*100),
+                            },
+                            markerOptions: {
+                              // 全局標記設定，如果有特定 leg 的設定，會被覆蓋
+                              icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: getColorForLeg(index),
+                                fillOpacity: 1,
+                                strokeWeight: 0,
+                                scale: 12
+                              },
+                              label: {
+                                text: (index + 1).toString(),
+                                color: "black",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                              },
+                              zIndex: ((1/(index+1))*100),
+                            },
+                          }}
+                          routeIndex={0}
+                        />
+                      </React.Fragment>
+                    ))
+                  }
                 </>
               )
             }
@@ -283,6 +308,12 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         )}
       </div>
   </>
+}
+
+function getColorForLeg(legIndex: number) {
+  const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#800080", "#FFA500", "#00FFFF", "#FFC0CB"]; // 可以根據需要修改或擴展
+  const index = legIndex % colors.length; // 防止索引超出顏色陣列範圍
+  return colors[index];
 }
 
 const defaultOptions = {

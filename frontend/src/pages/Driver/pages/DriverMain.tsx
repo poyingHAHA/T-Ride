@@ -13,7 +13,7 @@ type DirectionsResult = google.maps.DirectionsResult;
 const libraries:Libraries = ["marker", "places"];
 
 const DriverMain = () => {
-  const [directions, setDirections] = useState<DirectionsResult>()
+  const [directions, setDirections] = useState<DirectionsResult[]>([])
   const [startPoint, setStartPoint] = useState<LatLngLiteral>()
   const [destPoint, setDestPoint] = useState<LatLngLiteral>()
   // 0: mainPanel, 1: pickupPanel, 2: checkoutPanel
@@ -65,24 +65,54 @@ const DriverMain = () => {
         })
       })
     }
+    // add start and destination to waypts
+    waypts.unshift({
+      location: { lat: startPoint.lat, lng: startPoint.lng },
+      stopover: true,
+    })
+    waypts.push({
+      location: { lat: destPoint.lat, lng: destPoint.lng },
+      stopover: true,
+    })
 
     const service = new google.maps.DirectionsService();
-    service.route(
-      {
-        origin: {lat: startPoint.lat, lng: startPoint.lng},
-        waypoints: waypts,
-        destination: {lat: destPoint.lat, lng: destPoint.lng},
-        travelMode: google.maps.TravelMode.DRIVING,
-      },
-      (result, status) => {
-        if (status === 'OK' && result) {
-          console.log("DriverMain 97: ", result)
-          setDirections(result);
-        } else {
-          console.error(`error fetching directions ${result}`);
-        }
+    waypts.forEach((waypt, index) => {
+      if(index === waypts.length - 1) return;
+      if(waypt.location !== undefined && waypts[index + 1].location !== undefined){
+        service.route(
+            {
+              origin: waypt.location,
+              destination: waypts[index + 1].location as google.maps.LatLngLiteral,
+              travelMode: google.maps.TravelMode.DRIVING,
+            },
+            (result, status) => {
+              if (status === 'OK' && result) {
+                console.log("DriverMain 97: ", result)
+                setDirections((prev) => [...prev, result]);
+              } else {
+                console.error(`error fetching directions ${result}`);
+              }
+            }
+        )
       }
-    );
+    })
+
+    // service.route(
+    //   {
+    //     origin: {lat: startPoint.lat, lng: startPoint.lng},
+    //     waypoints: waypts,
+    //     destination: {lat: destPoint.lat, lng: destPoint.lng},
+    //     travelMode: google.maps.TravelMode.DRIVING,
+    //   },
+    //   (result, status) => {
+    //     if (status === 'OK' && result) {
+    //       console.log("DriverMain 97: ", result)
+    //       setDirections(result);
+    //     } else {
+    //       console.error(`error fetching directions ${result}`);
+    //     }
+    //   }
+    // );
   }
 
   return <>

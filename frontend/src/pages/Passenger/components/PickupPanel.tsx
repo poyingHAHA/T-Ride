@@ -54,6 +54,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
     const token = getTokenFromCookie();
     const [selectedInvitation, setSelectedInvitation] = useState<number | null>(null);
     const navigate = useNavigate();
+    const [refresh, setRefresh] = useState<boolean>(false);
 
     const acceptDriverInvitationsHandler = async (params: AcceptDriverInvitations) => {
         const acceptDriverInvitationsResult = await acceptDriverInvitations(params);
@@ -106,14 +107,17 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
             }
         }
 
-        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/passenger/invitation/total/${orderId}`);
-      ws.onmessage = (event) => {
-        console.log(event.data);  
-      }
-      console.log("ws", ws);
+        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/send/${orderId}`);
+        ws.onmessage = (event) => {
+            console.log(event.data);
+            if (event.data === "true") {
+                setRefresh(!refresh);  
+            }
+        }
+        console.log("ws", ws);
         getInvitations();
         console.log(invitations)
-    }, [])
+    }, [refresh])
 
     useEffect(() => {
         const getAcceptedInvitations = async () => {
@@ -223,11 +227,12 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                                 <div className="m-2 py-2 flex justify-between items-end h-full rounded-lg ml-7 mr-5">
                                                     <div className='flex-1 mr-1'>
                                                         <div key={index}>
+                                                            <h3 className="font-bold">出發地： {invitation.startName}</h3>
                                                             <h3 className="font-bold">目的地： {invitation.endName}</h3>
-                                                            <h3 className="font-bold">driver OrderID： {invitation.orderId}</h3>
-                                                            <h3 className="font-bold">pax OrderID： {orderId}</h3>
+                                                            
                                                         </div>
-                                                        <p className="text-gray-500">行程時間：07:35 - 08:30</p>
+                                                        <p className="text-gray-500">預計司機出發時間：{formatUnixTimestamp(invitation.departureTime)}</p>
+                                                        <div className="text-xs">driver OrderID： {invitation.orderId} pax OrderID： {orderId}</div>
                                                     </div>
                                                     <span className="block ml-3 flex-col items-center justify-center mb-1">
                                                         <MdFace className="far fa-cog text-5xl block mx-auto" />

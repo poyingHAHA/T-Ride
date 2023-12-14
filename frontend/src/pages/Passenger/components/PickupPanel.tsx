@@ -8,6 +8,7 @@ import { deletePassengerOrder } from "../../../services/orderService";
 import { getTokenFromCookie } from "../../../utils/cookieUtil";
 import { acceptDriverInvitations, getPassengerAcceptedInvitations } from "../../../services/invitationService";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { getDriverinfo } from '../../../services/userService';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -32,6 +33,7 @@ interface Invitation {
     endName: string;
     departureTime: number;
     PassengerCount: number;
+    driverName?: string;
 }
 
 interface AcceptDriverInvitations {
@@ -55,6 +57,10 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
     const [selectedInvitation, setSelectedInvitation] = useState<number | null>(null);
     const navigate = useNavigate();
     const [refresh, setRefresh] = useState<boolean>(false);
+    const [driverName, setDriverName] = useState<string>("")
+    const [driverId, setDriverId] = useState<number>(-1)
+
+    console.log(driverId, driverName)
 
     const acceptDriverInvitationsHandler = async (params: AcceptDriverInvitations) => {
         const acceptDriverInvitationsResult = await acceptDriverInvitations(params);
@@ -85,27 +91,61 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
         }
     };
 
-    useEffect(() => {
-        const getInvitations = async () => {
-            try {
-                setLoading(true);
-                const unfinishedOrder = await getDriverInvitations(orderId);
-                console.log(unfinishedOrder.data.driverOrders)
-                setLoading(false);
-                if (unfinishedOrder.data.driverOrders.length > 0) {
-                    setInvitations(unfinishedOrder.data.driverOrders);
-                    setNum_Invitations(unfinishedOrder.data.driverOrders.length)
-                    console.log("inviting", unfinishedOrder.data.driverOrders)
-                }
-                else {
-                    console.log("no invitation")
-                }
-            } catch (err) {
-                console.log("false")
-                setLoading(false);
-                setError("發生錯誤");
-            }
+    const getDriverName = async () => {
+        try {
+            const Userinfo = await getDriverinfo(driverId);
+            setDriverName(Userinfo.data.userName)
+        } catch (err) {
+            setError("發生錯誤");
         }
+    }
+
+    useEffect(() => {
+        // const getInvitations = async () => {
+        //     try {
+        //         setLoading(true);
+        //         const unfinishedOrder = await getDriverInvitations(orderId);
+        //         console.log(unfinishedOrder.data.driverOrders)
+        //         setLoading(false);
+        //         if (unfinishedOrder.data.driverOrders.length > 0) {
+        //             setInvitations(unfinishedOrder.data.driverOrders);
+        //             setNum_Invitations(unfinishedOrder.data.driverOrders.length)
+        //             console.log("inviting", unfinishedOrder.data.driverOrders)
+        //         }
+        //         else {
+        //             console.log("no invitation")
+        //         }
+        //     } catch (err) {
+        //         console.log("false")
+        //         setLoading(false);
+        //         setError("發生錯誤");
+        //     }
+        // }
+
+        const getInvitations = async () => {
+            setLoading(true);
+            try {
+                const unfinishedOrderResponse = await getDriverInvitations(orderId);
+                const driverOrders = unfinishedOrderResponse.data.driverOrders;
+
+                const invitationsWithNames: Invitation[] = await Promise.all(driverOrders.map(async (invitation: Invitation) => {
+                    try {
+                        const userInfo = await getDriverinfo(invitation.userId);
+                        return { ...invitation, driverName: userInfo.data.userName };
+                    } catch (err) {
+                        console.error("Error fetching driver info:", err);
+                        return { ...invitation, driverName: "Unknown" }; // Use a default name in case of error
+                    }
+                }));
+
+                setInvitations(invitationsWithNames);
+                setNum_Invitations(driverOrders.length);
+            } catch (err) {
+                setError("發生錯誤");
+            } finally {
+                setLoading(false);
+            }
+        };
 
         const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/send/${orderId}`);
         ws.onmessage = (event) => {
@@ -155,14 +195,6 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                     <div className=" flex h-full w-full flex-col px-5 pt-5 pb-3 min-h-[50vh] z-50 overflow-auto overscroll-y-contain">
                         <div>
                             <div className="mb-4">
-                                {/* // backbutton
-                                    <button
-                                    className="absolute top-0 left-0 m-4 cursor-pointer"
-                                    type="button"
-                                // onClick={() => { navigate("/passenger/History") }}
-                                >
-                                    <IoMdArrowRoundBack className="far fa-compass text-2xl pt-1 mb-1 block mx-auto" />
-                                </button> */}
                                 <div className=' text-center text-xl font-bold'>
                                     Trip details
                                 </div>
@@ -230,19 +262,19 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                                 key={index}
                                                 onClick={() => handleInvitationClick(invitation.orderId)}
                                             >
-                                                <div className="text-xs">driver OrderID： {invitation.orderId} pax OrderID： {orderId}</div>
-                                                <div className="m-2 py-2 flex justify-between items-center justify-center items-end h-full rounded-lg ml-7 mr-5">
+                                                {/* <div className="text-xs">driver OrderID： {invitation.orderId} pax OrderID： {orderId}</div> */}
+                                                <div className="mx-2 py-2 flex justify-between items-center justify-center items-end h-full rounded-lg ml-7 mr-5">
                                                     <div className='flex-1 mr-1'>
                                                         <div key={index}>
-                                                            <div className="font-bold">出發地： {invitation.startName}</div>
-                                                            <div className="font-bold">目的地： {invitation.endName}</div>
+                                                            <div className="font-bold my-2">出發地： {invitation.startName}</div>
+                                                            <div className="font-bold my-2">目的地： {invitation.endName}</div>
                                                         </div>
-                                                        <p className="text-gray-500">司機預計出發時間：{formatUnixTimestamp(invitation.departureTime)}</p>
+                                                        <p className="font-bold my-2">司機預計出發時間：{formatUnixTimestamp(invitation.departureTime)}</p>
                                                     </div>
                                                     <div className="flex-2">
                                                         <span className="block ml-3 flex-col items-center justify-center mb-1">
                                                             <MdFace className="far fa-cog text-5xl block mx-auto" />
-                                                            <span className="block text-base mx-auto">Burns</span>
+                                                            <span className="block text-base mx-auto">{invitation.driverName}</span>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -311,27 +343,6 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                             </button>
                                         </div>
                                     </div>)}
-
-
-
-
-                                {/* <div className="h-20 flex justify-center items-center py-2" >
-                                    {selectedInvitation !== null ? (
-                                        <></>
-
-                                    ) : (
-                                        <></>
-                                    )}
-                                    <button
-                                        className="text-white text-xl bg-black rounded-lg mx-10 h-[50px] w-full items-center"
-                                        type="button"
-                                        onClick={() => {
-                                            setPickupPanel(false);
-                                            deletePassengerOrder(orderId, token)
-                                        }}
-                                    // delete passenger order
-                                    >Cancel</button>
-                                </div> */}
 
                                 <div className="px-3">
                                     <div className="flex">

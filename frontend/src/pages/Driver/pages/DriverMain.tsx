@@ -76,6 +76,7 @@ const DriverMain = () => {
       },
       (result, status) => {
         if (status === 'OK' && result) {
+          console.log("DriverMain 97: ", result)
           setDirections(result);
         } else {
           console.error(`error fetching directions ${result}`);

@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, createAction } from "@reduxjs/toolkit";
 import loginReducer from "./slices/login";
 import locationReducer from "./slices/location";
 import { combineReducers } from "redux";
@@ -8,6 +8,8 @@ import driverDepartReducer from "./slices/driverDepart";
 import passengerDepartReducer from "./slices/passengerDepart";
 import tempOrderReducer from "./slices/tempOrder";
 import driverJourneyReducer from "./slices/driverJourney";
+
+const resetState = createAction("RESET_STATE");
 
 const reducers = combineReducers({
   loginReducer,
@@ -20,12 +22,22 @@ const reducers = combineReducers({
   driverJourneyReducer
 })
 
+const rootReducer = (state: any, action: any) => {
+  if (action.type === resetState.type) {
+    state = undefined
+  }
+  return reducers(state, action)
+}
+
+
 const store = configureStore({
-  reducer: reducers,
+  reducer: rootReducer,
 })
 
+export {resetState};
+
 // RootState是一個type，可以從store中取得state
-export type RootState = ReturnType<typeof reducers>
+export type RootState = ReturnType<typeof rootReducer>
 
 // AppDispatch是一個type，可以取得dispatch function
 // dispatch function 是store提供的一個function，可以dispatch一個action

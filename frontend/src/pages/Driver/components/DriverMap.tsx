@@ -28,6 +28,8 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
+  const [totalDistance, setTotalDistance] = useState<number>(0);
+  const [totalDuration, setTotalDuration] = useState<number>(0);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markerIcon = {
     path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
@@ -61,11 +63,20 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     if(tempOrderReducer.orders){
       const tempOrderSpots = tempOrderReducer.orders.map((order) => order.spotId);
       const tempOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
+      setTotalDistance(directions?.routes[0].legs && directions?.routes[0].legs.reduce((accumulator, currentValue) => {
+        if(currentValue.distance === undefined) return accumulator;
+        return accumulator+currentValue.distance.value
+      }, 0)/1000 || 0);
+      setTotalDuration(directions?.routes[0].legs && directions?.routes[0].legs.reduce((accumulator, currentValue) => {
+        if(currentValue.duration === undefined) return accumulator;
+        return accumulator+currentValue.duration.value
+      }, 0)/60 || 0);
+      
       console.log("DriverMap tempOrderSpots: ", tempOrderSpots);
       setTempOrders(tempOrderIds)
       setTempOrderSpots(tempOrderSpots);
     }
-  }, [tempOrderReducer.orders]);
+  }, [tempOrderReducer.orders, directions]);
 
   useEffect(() => {
     // 取得所有地標
@@ -133,11 +144,11 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
           {
             directions && (
               <div>
-                <div className="absolute top-[70%] left-[65%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
+                <div className="absolute top-[5%] left-[5%] z-50 border border-amber-400 rounded-lg bg-white mr-4">
                   <div className="text-xs px-2 py-2 font-medium">
-                    距離：{directions.routes[0].legs[0].distance && directions.routes[0].legs[0].distance.text}
+                    距離：{totalDistance.toFixed(2)}公里
                     <br />
-                    時間：{directions.routes[0].legs[0].duration && directions.routes[0].legs[0].duration.text}
+                    時間：{(totalDuration/60).toFixed(2)}小時
                   </div>
                 </div>
               </div>
@@ -167,11 +178,9 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                         strokeColor: "#1976D2",
                         strokeOpacity: 0.8,
                         strokeWeight: 4,
-                      },
-                      markerOptions: {
-                        
                       }
                   }} />
+
                 </>
               )
             }

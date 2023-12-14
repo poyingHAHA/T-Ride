@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react";
 import { getDriverUnfinishedOrder, getInvitationTotal } from "../../../services/driveOrderService";
 import { postInvitation } from "../../../services/invitationService";
 import { useNavigate } from "react-router-dom";
-import { UnsetCookie } from "../../../utils/cookieUtil";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { orderDTO } from "../../../DTO/orders";
 
@@ -129,8 +128,8 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
             </div>
 
             <div className="flex flex-col h-[32vh] w-[100%] overflow-scroll mt-4">
-              <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
-                <div className="flex justify-center items-center bg-black text-white rounded-md w-[70%] ">
+              <div  className="relative flex justify-center w-auto h-auto px-2 mt-4">
+                <div className="flex justify-center items-center w-[80%] bg-black text-white rounded-md ">
                   <div>起點：{driverStartDestReducer.start.name}</div>
                 </div>
               </div>
@@ -190,9 +189,9 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                   </Droppable>
                 ))}
               </DragDropContext>
-              <div  className="relative flex justify-center w-[100%] h-[12%] mt-4">
-                <div className="flex justify-center items-center bg-black text-white rounded-md w-[80%] ">
-                  <div>終點：{driverStartDestReducer.dest.name}</div>
+              <div  className="relative flex justify-center w-auto h-auto mt-4">
+                <div className="flex justify-center items-center w-[80%] bg-black text-white rounded-md ">
+                  <div className="px-1">終點：{driverStartDestReducer.dest.name}</div>
                 </div>
               </div>
             </div>

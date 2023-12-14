@@ -85,7 +85,6 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
             return;
           }
           setPanel(0);
-          alert("您有未完成的訂單");
         }
         setLoading(false);
       } catch (err) {

@@ -106,13 +106,12 @@ const DriverInfo: React.FC = () => {
       fetchDriverOrder();
       fetchPassenger();
     }
-    if (userId){
-      const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
-      ws.onmessage = (event) => {
-        console.log("event.data", event.data);  
-      }
-      console.log("ws", ws);
+    const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
+    ws.onmessage = (event) => {
+      console.log("event.data", event.data);  
     }
+    console.log("ws", ws);
+
   }, [isLoad, orderId, refresh]);
 
   return (

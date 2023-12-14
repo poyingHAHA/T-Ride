@@ -3,9 +3,9 @@ const Card1: React.FC<{
   time: string;
 }> = (props) => {
   return (
-    <div className="bg-[#d9d9d9] rounded-[10px] p-[20px] w-[calc(100vw-80px)] text-[18px] font-sans whitespace-pre flex flex-wrap">
-      <span>{props.name}    </span>
-      <span>{props.time}</span>
+    <div className="bg-[#d9d9d9] rounded-[10px] p-[20px] w-[calc(100vw-80px)] text-[18px] font-sans flex flex-wrap">
+      <span className="w-full">{props.name}</span>
+      <span className="w-full">{props.time}</span>
     </div>
   );
 }

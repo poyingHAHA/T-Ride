@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from "react-router-dom";
-import { getPassengerUnfinishedOrder } from '../../../services/orderService';
+import { getPassengerUnfinishedOrder, getPassengerFinishedOrder } from '../../../services/orderService';
 import { useState, useEffect } from 'react';
 import { setStart, setDest } from "../../../slices/driverStartDest"
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
@@ -47,6 +47,23 @@ export default function PassengerHistory() {
         getUnfinishedOrder();
     }, [])
 
+    useEffect(() => {
+        const getFinishedOrder = async () => {
+            try {
+                setLoading(true);
+                const finishedOrder = await getPassengerFinishedOrder();
+                setLoading(false);
+                if (finishedOrder.data.length > 0) {
+                    setFinishedOrders(finishedOrder.data);
+                }
+            } catch (err) {
+                setLoading(false);
+                setError("發生錯誤");
+            }
+        }
+        getFinishedOrder();
+    }, [])
+
 
     return (
         <div>
@@ -70,30 +87,27 @@ export default function PassengerHistory() {
                                     onClick={() => {
                                         navigate("/passenger/Tripinfo", { state: { orderId: order.orderId } })
                                     }}>
-                                    <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-7">
-
-                                        <div className="px-4 py-2 bg-gray-100">
-                                            <p className="text-gray-600 text-sm">{formatUnixDateTimestamp(order.arrivalTime)} </p>
+                                    <div className="bg-gray-100 shadow-lg rounded-lg overflow-hidden mb-7">
+                                        <div className="px-4 py-2 bg-gray-100 mt-2 flex">
+                                            <p className="font-bold">{formatUnixDateTimestamp(order.arrivalTime)} </p>
                                         </div>
                                         <div className="p-4 flex">
                                             <div className='flex-1 overflow-hidden mr-2'>
                                                 <div className="flex items-center ">
                                                     <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
-                                                    <div className="text-sm font-semibold text-gray-800 truncate">{order.startName}</div>
+                                                    <div className="font-semibold text-gray-800 truncate">{order.startName}</div>
                                                 </div>
                                                 <div className="border-l-2 border-dotted border-green-500 my-2 mx-4"></div>
                                                 <div className="flex items-center">
                                                     <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
-                                                    <div className="text-sm font-semibold text-gray-800 truncate">{order.endName}</div>
+                                                    <div className="font-semibold text-gray-800 truncate">{order.endName}</div>
                                                 </div>
                                             </div>
-                                            <div className="flex-col items-center">
-                                                <p className="flex-1">${order.fee}</p>
-                                                {/* <p className="flex-1">order:{order.orderId}</p> */}
+                                            <div className="flex items-center justify-center">
+                                                <p className="flex-1 font-semibold">NT${order.fee}</p>
                                             </div>
                                         </div>
                                     </div>
-
                                 </button>
                             ))}
                         </ul>
@@ -106,39 +120,44 @@ export default function PassengerHistory() {
 
                 {finishedorders.length > 0 ? (
                     <ul>
-                        <div className="space-y-4 p-4">
-                            <button className=' w-full'
-                                type="button"
-                                onClick={() => {
-                                    navigate("/passenger/Tripinfo")
-                                }}>
-                                <div className="bg-white shadow-lg rounded-lg overflow-hidden mb-7">
+                        {finishedorders.map(finishedorder => (
+                            <div className="space-y-4 p-4">
+                                <button className=' w-full'
+                                    type="button"
+                                    onClick={() => {
+                                        navigate("/passenger/Tripinfo", { state: { orderId: finishedorder.orderId } })
+                                    }}>
+                                    <div className="bg-gray-100 shadow-lg rounded-lg overflow-hidden mb-7">
+                                        {/* <div className="border-solid border-b-2 overflow-hidden mb-7"> */}
+                                        <div className="px-4 py-2 mt-2 flex justify-between">
 
-                                    <div className="px-4 py-2 bg-gray-100">
-                                        <p className="text-gray-600 text-sm">2023/12/1</p>
-                                    </div>
-                                    <div className="p-4">
-                                        <div className="flex items-center">
-                                            <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
-                                            <div className="text-sm font-semibold text-gray-800">新竹市東區新莊車站</div>
+                                            <p className="font-bold">{formatUnixDateTimestamp(finishedorder.arrivalTime)} </p>
+                                            <div className="font-bold">
+                                                {/* ★★★★★ */}
+                                                Completed
+                                            </div>
                                         </div>
-                                        <div className="border-l-2 border-dotted border-green-500 my-2 mx-4"></div>
-                                        <div className="flex items-center">
-                                            <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
-                                            <div className="text-sm font-semibold text-gray-800 truncate">新竹市東區中央路巨城</div>
-                                        </div>
-                                    </div>
-                                    <div className="px-4 py-2 bg-gray-100 flex justify-between items-center">
-                                        <p className="">$200</p>
-                                        <div className="text-yellow-400 text-xs">
-                                            ★★★★★
-                                        </div>
-                                    </div>
-                                </div>
+                                        <div className="p-4 flex">
+                                            <div className='flex-1 overflow-hidden mr-2'>
+                                                <div className="flex items-center ">
+                                                    <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
+                                                    <div className="font-semibold text-gray-800 truncate">{finishedorder.startName}</div>
+                                                </div>
+                                                <div className="border-l-2 border-dotted border-green-500 my-2 mx-4"></div>
+                                                <div className="flex items-center">
+                                                    <div className="h-2 w-2 bg-black rounded-full mr-2"></div>
+                                                    <div className="font-semibold text-gray-800 truncate">{finishedorder.endName}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-center">
+                                                <p className="flex-1 font-semibold">NT${finishedorder.fee}</p>
 
-
-                            </button>
-                        </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        ))}
                     </ul>
                 ) : (
                     <div className='flex items-center justify-center'>

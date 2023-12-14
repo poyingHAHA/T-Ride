@@ -18,6 +18,12 @@ interface PostPassengerOrderRequest {
   passengerCount: number;
 }
 
+interface PostPassengerFinishedOrderRequest {
+  token: string;
+  orderId: number;
+}
+
+
 const postPassengerOrder = async (params: PostPassengerOrderRequest) => {
   try {
     const response = await post(
@@ -48,6 +54,18 @@ const getPassengerUnfinishedOrder = async () => {
   }
 }
 
+const getPassengerFinishedOrder = async () => {
+  const userId = getUserId();
+  console.log("getPassengerFinishedOrder userId: ", userId);
+  try {
+    const response: any = await get(`/order/passenger/finished/${userId}`);
+    console.log("getPassengerFinishedOrder response: ", response);
+    return response;
+  } catch (error) {
+    console.log("getPassengerFinishedOrder error: ", error);
+  }
+}
+
 const getPassengerOrderbyPorderID = async (orderId: number) => {
   console.log("getPassengerOrderbyPorderID orderId: ", orderId);
   try {
@@ -74,9 +92,30 @@ const deletePassengerOrder = async (orderId: number, tokens: string) => {
 
 }
 
+const postPassengerFinishedOrder = async (params: PostPassengerFinishedOrderRequest) => {
+  try {
+    const response = await post(
+      "/order/passenger/finish",
+      JSON.stringify(params),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    console.log("postPassengerFinishedOrder response: ", response);
+    return response;
+  } catch (error) {
+    console.log("postPassengerFinishedOrder error: ", error);
+  }
+}
+
+
 export {
   postPassengerOrder,
   getPassengerUnfinishedOrder,
+  getPassengerFinishedOrder,
   getPassengerOrderbyPorderID,
-  deletePassengerOrder
+  deletePassengerOrder,
+  postPassengerFinishedOrder
 }

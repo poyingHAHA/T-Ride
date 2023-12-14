@@ -61,7 +61,7 @@ const DriverInfo: React.FC = () => {
 
   useEffect(() => {
     if (!orderId) {
-      const id: number = driverStartDestReducer.order.orderId || 16;
+      const id: number = driverStartDestReducer.order.orderId || 0;
       setOrderId(id);
       localStorage.setItem("orderId", JSON.stringify(id));
     }
@@ -107,14 +107,14 @@ const DriverInfo: React.FC = () => {
       fetchPassenger();
     }
     if (userId){
-      const ws = new WebSocket(`ws://ws1.csie.ntu.edu.tw:5239/match/invitation/accept/${orderId}`);
+      const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
       ws.onmessage = (event) => {
         console.log(event.data);  
       }
       console.log("ws", ws);
     }
   }, [isLoad, orderId, refresh]);
-
+  console.log("ordreid", orderId)
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>

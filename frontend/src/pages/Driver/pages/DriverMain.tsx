@@ -7,6 +7,8 @@ import MainPanel from "../components/MainPanel";
 import PickupPanel from '../components/PickupPanel';
 import CheckoutPanel from '../components/CheckoutPanel';
 import { orderDTO } from '../../../DTO/orders';
+import { WaypointDTO } from '../../../DTO/waypoint';
+import { setWaypoint } from '../../../slices/waypoint';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -26,6 +28,7 @@ const DriverMain = () => {
   const [showSpots, setShowSpots] = useState<boolean>(false)
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
+  const waypointReducer = useAppSelector((state) => state.waypointReducer);
   const dispatch = useAppDispatch();
   
   // useJsApiLoader hook to load the Google Maps API
@@ -34,6 +37,10 @@ const DriverMain = () => {
     version: "beta",
     libraries,
   });
+
+  useEffect(() => {
+    fetchDirectionsOnce();
+  }, [])
   
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -46,22 +53,26 @@ const DriverMain = () => {
     })
 
     if(!driverStartDestReducer.start || !driverStartDestReducer.dest) return;
-    fetchDirections();
+    fetchDirectionsOnce();
   }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest])
 
-  const fetchDirections = () => {
+  const fetchDirectionsOnce = () => {
     if(!startPoint || ! destPoint) return;
-    let waypts: google.maps.DirectionsWaypoint[] = []
+    let waypts: WaypointDTO[] = []
     if(tempOrderReducer.orders.length > 0){
       console.log("DriverMain tempOrderReducer.orders: ", tempOrderReducer.orders)
       tempOrderReducer.orders.forEach((order) => {
         waypts.push({
           location: { lat: order.startPoint.lat, lng: order.startPoint.lng },
           stopover: true,
+          orderId: order.orderId,
+          pointType: "pickup"
         })
         waypts.push({
           location: { lat: order.endPoint.lat, lng: order.endPoint.lng },
           stopover: true,
+          orderId: order.orderId,
+          pointType: "dropoff"
         })
       })
     }
@@ -69,11 +80,17 @@ const DriverMain = () => {
     waypts.unshift({
       location: { lat: startPoint.lat, lng: startPoint.lng },
       stopover: true,
+      orderId: driverStartDestReducer.order.orderId,
+      pointType: "driverStart"
     })
     waypts.push({
       location: { lat: destPoint.lat, lng: destPoint.lng },
       stopover: true,
+      orderId: driverStartDestReducer.order.orderId,
+      pointType: "driverEnd"
     })
+
+    dispatch(setWaypoint(waypts));
 
     const service = new google.maps.DirectionsService();
     waypts.forEach((waypt, index) => {
@@ -96,23 +113,6 @@ const DriverMain = () => {
         )
       }
     })
-
-    // service.route(
-    //   {
-    //     origin: {lat: startPoint.lat, lng: startPoint.lng},
-    //     waypoints: waypts,
-    //     destination: {lat: destPoint.lat, lng: destPoint.lng},
-    //     travelMode: google.maps.TravelMode.DRIVING,
-    //   },
-    //   (result, status) => {
-    //     if (status === 'OK' && result) {
-    //       console.log("DriverMain 97: ", result)
-    //       setDirections(result);
-    //     } else {
-    //       console.error(`error fetching directions ${result}`);
-    //     }
-    //   }
-    // );
   }
 
   return <>

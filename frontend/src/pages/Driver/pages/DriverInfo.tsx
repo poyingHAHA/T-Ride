@@ -107,7 +107,7 @@ const DriverInfo: React.FC = () => {
       fetchPassenger();
     }
     if (userId){
-      const ws = new WebSocket(`ws://ws1.csie.ntu.edu.tw:5239/match/invitation/accept/${userId}`);
+      const ws = new WebSocket(`ws://ws1.csie.ntu.edu.tw:5239/match/invitation/accept/${orderId}`);
       ws.onmessage = (event) => {
         console.log(event.data);  
       }

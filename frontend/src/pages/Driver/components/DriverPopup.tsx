@@ -4,7 +4,6 @@ import { HiOutlineXCircle } from "react-icons/hi2";
 
 interface PopupProps {
     text: string;
-	tag: boolean;
     passengerOrderId: number;
     handleDelete: (passengerOrderId:number) => Promise<void>;
 }
@@ -18,9 +17,6 @@ const DriverPopup: React.FC<PopupProps> = (props) => {
     const handleCloseModal = () => {
       setShowModal(false);
     };
-
-    console.log("popup");
-
     return (
         <div>
             <button 

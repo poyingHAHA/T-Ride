@@ -11,8 +11,6 @@ interface Card2Props {
 }
 
 const Card2: React.FC<Card2Props> = (props) => {
-  console.log("card");
-
   return (
     <div className="bg-[#d9d9d9] flex flex-col p-[20px] gap-[15px] rounded-[10px] w-[calc(100vw-80px)]">
       <div className="flex flex-row justify-between items-center">
@@ -21,10 +19,8 @@ const Card2: React.FC<Card2Props> = (props) => {
           {props.state ? (<span className='text-[16px]'>已接受</span>) : (<span className='text-[16px]'>未接受</span>)}
         </div>
         <div className="flex flex-row gap-[10px]">
-          {props.state ? (
-            <Popup text={"刪除"} tag={props.state} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
-          ) : (
-            <Popup text={"取消"} tag={props.state} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
+          {!props.state && (
+            <Popup text={"取消"} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
           )}
         </div>
       </div>

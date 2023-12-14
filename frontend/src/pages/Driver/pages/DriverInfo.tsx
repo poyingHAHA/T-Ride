@@ -61,10 +61,8 @@ const DriverInfo: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log("useEffect");
-
     if (!orderId) {
-      const id: number = driverStartDestReducer.order.orderId || 16;
+      const id:any = driverStartDestReducer.order.orderId;
       setOrderId(id);
       localStorage.setItem("orderId", JSON.stringify(id));
     }
@@ -110,15 +108,13 @@ const DriverInfo: React.FC = () => {
       fetchPassenger();
     }
     if (userId){
-      const ws = new WebSocket(`ws://ws1.csie.ntu.edu.tw:5239/match/invitation/accept/${userId}`);
+      const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
       ws.onmessage = (event) => {
-        console.log(event.data);  
+        console.log("event.data", event.data);  
       }
       console.log("ws", ws);
     }
   }, [isLoad, orderId, refresh]);
-
-  console.log("info");
 
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">

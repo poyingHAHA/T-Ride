@@ -56,7 +56,7 @@ const DriverMain = () => {
     fetchDirectionsOnce();
   }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest])
 
-  const fetchDirectionsOnce = () => {
+  const fetchDirectionsOnce = async () => {
     if(!startPoint || ! destPoint) return;
     let waypts: WaypointDTO[] = []
     if(tempOrderReducer.orders.length > 0){
@@ -91,12 +91,12 @@ const DriverMain = () => {
     })
 
     dispatch(setWaypoint(waypts));
-
+    console.log("DriverMain 96: ", waypts)
     const service = new google.maps.DirectionsService();
-    waypts.forEach((waypt, index) => {
+    waypts.forEach(async (waypt, index) => {
       if(index === waypts.length - 1) return;
       if(waypt.location !== undefined && waypts[index + 1].location !== undefined){
-        service.route(
+        await service.route(
             {
               origin: waypt.location,
               destination: waypts[index + 1].location as google.maps.LatLngLiteral,

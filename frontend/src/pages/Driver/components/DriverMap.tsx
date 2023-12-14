@@ -4,6 +4,7 @@ import { GoogleMap, MarkerF, DirectionsRenderer, InfoWindowF, OverlayView, Marke
 import AdvMarker from "./AdvancedMarker"
 import { getSpots, getSpotOrders } from "../../../services/spotService";
 import { orderDTO, SpotDTO } from "../../../DTO/orders";
+import { getColor } from "../../../utils/colorUtil";
 import React from "react";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
@@ -178,7 +179,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                           directions={leg}
                           options={{
                             polylineOptions: {
-                              strokeColor: getColorForLeg(index),
+                              strokeColor: getColor(index),
                               strokeOpacity: 0.8,
                               strokeWeight: 4,
                               zIndex: ((1/(index+1))*100),
@@ -187,7 +188,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                               // 全局標記設定，如果有特定 leg 的設定，會被覆蓋
                               icon: {
                                 path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: getColorForLeg(index),
+                                fillColor: getColor(index),
                                 fillOpacity: 1,
                                 strokeWeight: 0,
                                 scale: 12
@@ -308,12 +309,6 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         )}
       </div>
   </>
-}
-
-function getColorForLeg(legIndex: number) {
-  const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#800080", "#FFA500", "#00FFFF", "#FFC0CB"]; // 可以根據需要修改或擴展
-  const index = legIndex % colors.length; // 防止索引超出顏色陣列範圍
-  return colors[index];
 }
 
 const defaultOptions = {

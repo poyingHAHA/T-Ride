@@ -53,7 +53,6 @@ const DriverInfo: React.FC = () => {
       );
       setRefresh(prev => prev+1);
       setIsLoad(false);
-      console.log("refresh", refresh);
       console.log("response",response);
     } catch (error) {
         console.log(error);
@@ -61,8 +60,6 @@ const DriverInfo: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log("useEffect");
-
     if (!orderId) {
       const id: number = driverStartDestReducer.order.orderId || 16;
       setOrderId(id);
@@ -117,8 +114,6 @@ const DriverInfo: React.FC = () => {
       console.log("ws", ws);
     }
   }, [isLoad, orderId, refresh]);
-
-  console.log("info");
 
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">

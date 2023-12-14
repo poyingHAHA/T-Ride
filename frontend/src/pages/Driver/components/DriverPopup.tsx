@@ -19,8 +19,6 @@ const DriverPopup: React.FC<PopupProps> = (props) => {
       setShowModal(false);
     };
 
-    console.log("popup");
-
     return (
         <div>
             <button 

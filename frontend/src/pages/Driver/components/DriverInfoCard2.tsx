@@ -11,8 +11,6 @@ interface Card2Props {
 }
 
 const Card2: React.FC<Card2Props> = (props) => {
-  console.log("card");
-
   return (
     <div className="bg-[#d9d9d9] flex flex-col p-[20px] gap-[15px] rounded-[10px] w-[calc(100vw-80px)]">
       <div className="flex flex-row justify-between items-center">

@@ -522,7 +522,7 @@ paths:
         '404':
           description: Order not found
         '409':
-          description: Order already completed
+          description: Order already completed or passenger already accept
   /order/passenger/{orderId}:
     get:
       summary: Get Passenger Order by ID
@@ -721,7 +721,7 @@ paths:
         '404':
           description: Order not found
         '409':
-          description: Invitation not sent or order completed
+          description: Invitation not sent or order completed or passenger already accept
   /match/driver/invitation/total/{driverOrderId}:
     get:
       summary: Get Invitations Sent by a Driver Order

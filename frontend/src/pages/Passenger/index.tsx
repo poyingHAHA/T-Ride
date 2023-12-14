@@ -6,6 +6,7 @@ import PassengerRoute from './pages/PassengerRoute';
 import PassengerAccount from './pages/PassengerAccount';
 import PassengerTripinfo from './pages/PassengerTripinfo';
 import PassengerMain from './pages/PassengerMain';
+import PassengerNavigating from './pages/PassengerNavigating';
 
 const Passenger: React.FC = () => {
     return (
@@ -20,5 +21,5 @@ const Passenger: React.FC = () => {
     )
 }
 
-export { PassengerMain, PassengerRoute, PassengerHistory, PassengerAccount, PassengerTripinfo };
+export { PassengerMain, PassengerRoute, PassengerHistory, PassengerAccount, PassengerTripinfo, PassengerNavigating };
 export default Passenger;

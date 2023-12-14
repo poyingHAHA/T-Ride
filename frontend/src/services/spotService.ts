@@ -23,9 +23,8 @@ const getNearLandMark = async (params: NearLandMarkRequest) => {
 
 // all: 0, 1，0: 全部，1: 只顯示有訂單的
 const getSpots = async (departureTime: number, all: number) => {
-   // 測試用
+  // 測試用
   departureTime = 1701081800;
-  all = 0;
   // ====================
   try {
     const response: any = await get(`/order/passenger/spot/all?departureTime=${departureTime}&withPassenger=${all}`);

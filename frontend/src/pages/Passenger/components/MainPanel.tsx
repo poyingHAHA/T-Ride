@@ -7,7 +7,8 @@ import { postPassengerOrder } from '../../../services/orderService';
 import { getTokenFromCookie } from "../../../utils/cookieUtil";
 import { useState, useEffect } from 'react';
 import { getPassengerUnfinishedOrder } from '../../../services/orderService';
-
+import ErrorLoading from "../../../components/ErrorLoading";
+import { acceptDriverInvitations, getPassengerAcceptedInvitations } from "../../../services/invitationService";
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
     isLoaded: boolean;
@@ -181,6 +182,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setO
                                         alert("請選擇合理的時間區間");
                                         return;
                                     }
+
                                     postpaxorderHandler({
                                         token: token,
                                         startPoint: { lat: startPoint.lat, lng: startPoint.lng },
@@ -221,6 +223,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPickupPanel, setO
                 </>
             )
         }
+        <ErrorLoading error={error} setError={setError} loading={loading} setLoading={setLoading} />
     </>;
 }
 

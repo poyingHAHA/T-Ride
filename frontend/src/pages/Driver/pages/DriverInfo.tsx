@@ -53,7 +53,6 @@ const DriverInfo: React.FC = () => {
       );
       setRefresh(prev => prev+1);
       setIsLoad(false);
-      console.log("refresh", refresh);
       console.log("response",response);
     } catch (error) {
         console.log(error);

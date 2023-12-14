@@ -96,7 +96,7 @@ const PassengerMain = () => {
         <main className="bg-white flex flex-col items-center h-screen w-full">
 
             <div className="relative h-1/2 w-full">
-                <PassengerMap isLoaded={isLoaded} directions={directions} />
+                <PassengerMap isLoaded={isLoaded} directions={directions} detail={true} />
             </div>
             <div className="bg-white h-fit absolute h-fit overflow-auto bottom-0 z-100 min-h-[25%] w-[100%]">
                 {

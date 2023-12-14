@@ -9,9 +9,10 @@ type DirectionsResult = google.maps.DirectionsResult;
 type PassengerMapProps = {
   isLoaded: boolean;
   directions?: DirectionsResult;
+  detail: boolean;
 };
 
-const PassengerMap = ({ isLoaded, directions }: PassengerMapProps) => {
+const PassengerMap = ({ isLoaded, directions, detail }: PassengerMapProps) => {
   const locationReducer = useAppSelector((state) => state.locationReducer);
   const [currentCenter, setCurrentCenter] = useState<LatLngLiteral>({ lat: locationReducer.lat || 0, lng: locationReducer.lng || 0 });
   const location = { ...locationReducer }
@@ -56,7 +57,7 @@ const PassengerMap = ({ isLoaded, directions }: PassengerMapProps) => {
       {isLoaded && (
         <>
           {
-            directions && (
+            directions && detail && (
               <div>
                 <div className="absolute top-0 left-0 z-50 border border-amber-400 rounded-lg bg-white mr-4">
                   <div className="text-xs px-2 py-2 font-medium">

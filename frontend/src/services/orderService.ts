@@ -48,6 +48,17 @@ const getPassengerUnfinishedOrder = async () => {
   }
 }
 
+const getPassengerOrderbyPorderID = async (orderId: number) => {
+  console.log("getPassengerOrderbyPorderID orderId: ", orderId);
+  try {
+    const response: any = await get(`/order/passenger/${orderId}`);
+    console.log("getPassengerOrderbyPorderID response: ", response);
+    return response;
+  } catch (error) {
+    console.log("getPassengerOrderbyPorderID error: ", error);
+  }
+}
+
 const deletePassengerOrder = async (orderId: number, tokens: string) => {
   try {
     const response = await remove(
@@ -66,5 +77,6 @@ const deletePassengerOrder = async (orderId: number, tokens: string) => {
 export {
   postPassengerOrder,
   getPassengerUnfinishedOrder,
+  getPassengerOrderbyPorderID,
   deletePassengerOrder
 }

@@ -131,16 +131,22 @@ async def accept_invitation():
     return await make_response("Successfully accepted invitation", 200)
 
 
-@match.websocket('/invitation/accept/<int:driverId>')
-async def accept_invitation_websocket(driverId):
+@match.websocket('/invitation/accept/<int:driverOrderId>')
+async def accept_invitation_websocket(driverOrderId):
     await websocket.accept()
 
-    driverId = int(driverId)
-    key = f'match-driver{driverId}'
+    driverOrderId = int(driverOrderId)
+
+    driver_order = order_service.get_driver_order(driverOrderId)
+    if driver_order is None:
+        raise Exception(f'websocket: order not exist')
+    driver_id = driver_order.user_id
+
+    key = f'match-driver{driver_id}'
 
     host = Config.get('server').get('host')
     port = Config.get('server').get('port')
-    ret = notification_service.register_host_port(driverId, f'{host}:{port}')
+    ret = notification_service.register_host_port(driver_id, f'{host}:{port}')
     if ret != None:
         raise Exception(f'websocket: {ret}')
 
@@ -151,19 +157,25 @@ async def accept_invitation_websocket(driverId):
     except asyncio.CancelledError:
         MessageQueue.delete(key)
 
-    print(f'accept invitation websocket with {driverId} is closed')
+    print(f'accept invitation websocket with {driverOrderId} is closed')
 
 
-@match.websocket('/invitation/send/<int:passengerId>')
-async def send_invitation_websocket(passengerId):
+@match.websocket('/invitation/send/<int:passengerOrderId>')
+async def send_invitation_websocket(passengerOrderId):
     await websocket.accept()
 
-    passengerId = int(passengerId)
-    key = f'match-passenger{passengerId}'
+    passengerOrderId = int(passengerOrderId)
+
+    passenger_order = order_service.get_passenger_order(passengerOrderId)
+    if passenger_order is None:
+        raise Exception(f'websocket: order not exist')
+    passenger_id = passenger_order.user_id
+
+    key = f'match-passenger{passenger_id}'
 
     host = Config.get('server').get('host')
     port = Config.get('server').get('port')
-    ret = notification_service.register_host_port(passengerId, f'{host}:{port}')
+    ret = notification_service.register_host_port(passenger_id, f'{host}:{port}')
     if ret != None:
         raise Exception(f'websocket: {ret}')
 
@@ -174,7 +186,7 @@ async def send_invitation_websocket(passengerId):
     except asyncio.CancelledError:
         MessageQueue.delete(key)
 
-    print(f'send invitation websocket with {passengerId} is closed')
+    print(f'send invitation websocket with {passengerOrderId} is closed')
 
 @match.websocket('/position/driver/get/<int:passengerOrderId>')
 async def get_driver_position_websocket(passengerOrderId):

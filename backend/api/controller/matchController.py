@@ -62,8 +62,8 @@ async def delete_driver_invitation(driverOrderId, passengerOrderId):
         return await make_response("Not the driver's own order",403)
     if ret == "Order not found":
         return await make_response("Order not found",404)
-    if ret == "Invitation not sent or order completed":
-        return await make_response("Invitation not sent or order completed",409)
+    if ret == "Invitation not sent or passenger already accept":
+        return await make_response("Invitation not sent or passenger already accept",409)
     else:
         return utils.to_json({
         "totalOrderCount": ret["total_order_count"],

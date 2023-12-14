@@ -248,8 +248,9 @@ class OrderService:
 
         invitations = self.match_repository.get_driver_invitations(order_id)
         accepted_count = len([invitation for invitation in invitations if invitation.accepted])
-        self.user_repository.add_abandon_order_count(user_id, accepted_count)
-
+        # self.user_repository.add_abandon_order_count(user_id, accepted_count)
+        if accepted_count > 0:
+            return "passenger already accept"
         self.order_repository.delete_driver_order(order_id)
 
     def delete_passenger_order(self, token, order_id):

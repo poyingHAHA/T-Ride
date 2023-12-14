@@ -76,14 +76,14 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       
       const res = await postInvitation(dirverOrderId, passengerOrderIds);
       console.log("CheckoutPanel 74", res)
-      if(res?.success === 0){
-        alert("Invlid token, 請重新登入")
-        UnsetCookie();
-        navigate('/login');
-        return;
-      }else{
-        navigate('/driver/info');
-      }
+      navigate('/driver/info');
+      // if(res?.success === 0){
+      //   alert("Invlid token, 請重新登入")
+      //   UnsetCookie();
+      //   navigate('/login');
+      //   return;
+      // }else{
+      // }
     }
   }
 

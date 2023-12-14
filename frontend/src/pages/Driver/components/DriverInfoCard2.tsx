@@ -1,17 +1,17 @@
 import Popup from '../components/DriverPopup';
 
 interface Card2Props {
-  driverOrderId: number,
   orderId: number,
   userName: string;
   startName: string;
   endName: string;
   pickTime: string;
   state: boolean;
-  onUpdate: () => void;
+  handleDelete: (passengerOrderId:number) => Promise<void>;
 }
 
-const Card2: React.FC<Card2Props> = (props, {onUpdate}) => {
+const Card2: React.FC<Card2Props> = (props) => {
+  console.log("card");
 
   return (
     <div className="bg-[#d9d9d9] flex flex-col p-[20px] gap-[15px] rounded-[10px] w-[calc(100vw-80px)]">
@@ -22,9 +22,9 @@ const Card2: React.FC<Card2Props> = (props, {onUpdate}) => {
         </div>
         <div className="flex flex-row gap-[10px]">
           {props.state ? (
-            <Popup text={"刪除"} tag={props.state} driverOrderId={props.driverOrderId} passengerOrderId={props.orderId} onUpdate={props.onUpdate}/>
+            <Popup text={"刪除"} tag={props.state} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
           ) : (
-            <Popup text={"取消"} tag={props.state} driverOrderId={props.driverOrderId} passengerOrderId={props.orderId} onUpdate={props.onUpdate}/>
+            <Popup text={"取消"} tag={props.state} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
           )}
         </div>
       </div>

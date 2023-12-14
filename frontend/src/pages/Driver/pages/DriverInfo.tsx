@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Card1 from "../components/DriverInfoCard1";
 import Card2 from "../components/DriverInfoCard2";
-import { getStartEnd, getInvitationTotal  } from "../../../services/driveOrderService";
+import { getStartEnd, getInvitationTotal, deleteDriverInvitation  } from "../../../services/driveOrderService";
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { setJourney, setStartEnd } from "../../../slices/driverJourney";
 import ErrorLoading from '../../../components/ErrorLoading';
+import { getTokenFromCookie } from '../../../utils/cookieUtil';
 
 interface InfoItem {
   orderId: number,
@@ -26,7 +27,6 @@ interface StartEnd {
 }
 
 const DriverInfo: React.FC = () => {
-
   const [orderId, setOrderId] = useState(0);
   const [userId, setUserId] = useState();
   const [start, setStart] = useState<StartEnd>({name:"",time:"",date:""});
@@ -36,21 +36,38 @@ const DriverInfo: React.FC = () => {
   const [isLoad, setIsLoad] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); //ErrorLoading
   const [error, setError] = useState<string>("");
-  const [refresh, setRefresh] = useState(0);
+  const [refresh, setRefresh] = useState<number>(0);
   const navigate = useNavigate();  
   const dispatch = useAppDispatch();
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
 
-  //refresh when invitation is deleted in Popup component
-  const handleUpdate = () => {
-    setRefresh(prev => prev+1);
+  async function handleDelete(passengerOrderId:number) {
+    console.log("handleDelete");
+    try {
+      const token = getTokenFromCookie();
+      const response = await deleteDriverInvitation(
+          orderId, //driver
+          passengerOrderId,
+          token
+      );
+      setRefresh(prev => prev+1);
+      setIsLoad(false);
+      console.log("refresh", refresh);
+      console.log("response",response);
+    } catch (error) {
+        console.log(error);
+    }
   }
 
   useEffect(() => {
-    const id: any = driverStartDestReducer.order.orderId;
-    setOrderId(id);
-    localStorage.setItem("orderId", JSON.stringify(id));
+    console.log("useEffect");
+
+    if (!orderId) {
+      const id: number = driverStartDestReducer.order.orderId || 16;
+      setOrderId(id);
+      localStorage.setItem("orderId", JSON.stringify(id));
+    }
 
     async function fetchDriverOrder() {
       try {
@@ -97,9 +114,11 @@ const DriverInfo: React.FC = () => {
       ws.onmessage = (event) => {
         console.log(event.data);  
       }
-      console.log(ws);
+      console.log("ws", ws);
     }
-  }, [isLoad, orderId]);
+  }, [isLoad, orderId, refresh]);
+
+  console.log("info");
 
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
@@ -108,14 +127,14 @@ const DriverInfo: React.FC = () => {
       <div className="flex flex-col items-center rounded-t-[30px] rounded-t-[30px] bg-white w-screen h-[calc(100vh-320px)] fixed bottom-[150px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         <Card1 name={start.name} time={start.time} />
         { 
-          info.map((place: InfoItem) => {
-            return (<Card2 key={place.orderId} {...place} driverOrderId={orderId} onUpdate={handleUpdate} />);
+          info?.map((place: InfoItem) => {
+            return (<Card2 key={place.orderId} {...place} handleDelete={handleDelete} />);
         })}
         <Card1 name={end.name} time={end.time} />
       </div>
 
       <div className="bg-white flex flex-col justify-evenly items-center w-screen h-[120px] bottom-[70px] fixed gap-[10px] pb-[10px] pt-[10px]">
-        <span className="text-[18px]">已接受邀請： {info.filter(item => item.state).length}/{info.length}</span>
+        <span className="text-[18px]">已接受邀請： {info?.filter(item => item.state)?.length}/{info?.length}</span>
         <div className="flex flex-row w-full justify-evenly">
           <button 
             className="w-[120px] h-[50px] bg-black rounded-[10px] text-[24px] text-white"

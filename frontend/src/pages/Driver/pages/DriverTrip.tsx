@@ -52,12 +52,14 @@ const DriverTrip: React.FC =() => {
     async function fetchAll() {
       try {
         if (!driverJourneyReducer.StartPoint.name){
-          console.log("reducer is empty");
+          console.log("reset reducer");
           const orderId = Number(localStorage.getItem("orderId"));
           setLoading(true);
           const middle: InfoItem[] = await getInvitationTotal(orderId) as InfoItem[];
-          setLoading(false);
+          const result:any= await getStartEnd(orderId);
           dispatch(setJourney(middle));
+          dispatch(setStartEnd(result[0]));
+          setLoading(false);
         }
         const mappedPlaces = driverJourneyReducer.Midpoints.flatMap((mid) => [
           {

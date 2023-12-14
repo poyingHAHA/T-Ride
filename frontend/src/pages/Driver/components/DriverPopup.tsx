@@ -1,33 +1,15 @@
 import React, { useState } from 'react';
 import ReactModal from 'react-modal';
-import { useNavigate } from 'react-router-dom';
 import { HiOutlineXCircle } from "react-icons/hi2";
-import { deleteDriverInvitation  } from "../../../services/driveOrderService";
-import { getTokenFromCookie } from '../../../utils/cookieUtil';
 
 interface PopupProps {
     text: string;
 	tag: boolean;
-    driverOrderId: number;
     passengerOrderId: number;
-    onUpdate: () => void;
+    handleDelete: (passengerOrderId:number) => Promise<void>;
 }
 
 const DriverPopup: React.FC<PopupProps> = (props) => {
-    const token = getTokenFromCookie();
-    async function handleDelete(){
-        try {
-            const response = await deleteDriverInvitation(
-                props.driverOrderId,
-                props.passengerOrderId,
-                token
-            );
-            console.log("response",response);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     //handle modal
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => {
@@ -36,6 +18,9 @@ const DriverPopup: React.FC<PopupProps> = (props) => {
     const handleCloseModal = () => {
       setShowModal(false);
     };
+
+    console.log("popup");
+
     return (
         <div>
             <button 
@@ -53,9 +38,9 @@ const DriverPopup: React.FC<PopupProps> = (props) => {
                     <button 
                         className='bg-black w-[145px] h-[50px] opacity-100 text-white text-[24px] rounded-[10px] mx-auto mb-[25px]'
                         onClick={() => {
-                            handleDelete();
+                            props.handleDelete(props.passengerOrderId);
+                            props.handleDelete(props.passengerOrderId);
                             handleCloseModal();
-                            props.onUpdate();
                         }}
                     >確定</button>
                 </div>

@@ -81,9 +81,7 @@ class UserRepository:
                 token = utils.rand_str()
                 expire = utils.get_time() + int(Config.get('service').get('tokenExpire'))
 
-                token_sql = f'''DELETE FROM session
-                                WHERE user_id = {row[f2i["id"]]};
-                                INSERT INTO session(token, expire, user_id)
+                token_sql = f'''INSERT INTO session(token, expire, user_id)
                                 VALUES(%s, %s, %s);'''
                 cur.execute(token_sql,(token,expire,row[f2i["id"]]))
                 DbConnection.conn.commit()

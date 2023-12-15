@@ -50,13 +50,32 @@ const DriverTrip: React.FC =() => {
   };
 
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.watchPosition(
       ({ coords }) => {
         const { latitude, longitude } = coords;
         setCoords({lat: latitude, lng: longitude});
+        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+        ws.onopen = () => {
+          // const data = JSON.stringify(coords);
+          const sendCoords = setInterval(()=>{
+            ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
+          console.log("send");
+          },5000);
+        }
+        ws.onerror = (error) => {
+          console.log("error: ", error)
+        }
+        ws.onclose = (event) => {
+          console.log("close: ", event);
+        }
+        console.log("ws", ws);
       },
       (error) => console.error(`Error getting geolocation: ${error.message}`)
     );
+  }
+
+  if (!orderId){
+    setOrderId(Number(localStorage.getItem("orderId")));
   }
 
   useEffect(() => {
@@ -65,7 +84,6 @@ const DriverTrip: React.FC =() => {
       try {
         if (!driverJourneyReducer.StartPoint.name){
           console.log("reset reducer");
-          setOrderId(Number(localStorage.getItem("orderId")));
           setLoading(true);
           const middle: InfoItem[] = await getInvitationTotal(orderId) as InfoItem[];
           const result:any= await getStartEnd(orderId);
@@ -113,16 +131,6 @@ const DriverTrip: React.FC =() => {
       }
     }
     fetchAll();
-
-    const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
-    ws.onopen = () => {
-      ws.send(coords); 
-      console.log("send",coords);
-    };
-    ws.onmessage = (event) => {
-      console.log(event.data);
-    };
-    console.log("ws", ws);
 
   }, [isLoad, orderId, coords]);
 

@@ -129,10 +129,8 @@ const DriverInfo: React.FC = () => {
       setRefresh(prev => prev+1);
     }
     console.log("ws", ws);
-  }, [refresh]);
+  }, [refresh, isLoad]);
 
-  console.log("driverInfo")
-  console.log(info);
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>

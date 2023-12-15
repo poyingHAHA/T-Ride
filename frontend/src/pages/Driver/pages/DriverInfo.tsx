@@ -129,7 +129,7 @@ const DriverInfo: React.FC = () => {
       setRefresh(prev => prev+1);
     }
     console.log("ws", ws);
-  }, [refresh, isLoad, orderId]);
+  }, [refresh]);
 
   console.log("driverInfo")
   console.log(info);

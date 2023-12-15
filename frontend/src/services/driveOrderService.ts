@@ -221,4 +221,13 @@ const getPerson = async (userId: number) => {
   }
 }
 
-export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder, deleteDriverInvitation, getPerson, deleteDriverOrder };
+const getFinishedOrder = async (driverId: number) => {
+  try {
+    const response:{data: driverOrderDTO[]} = await get(`/order/driver/finished/${driverId}`) as {data: driverOrderDTO[]};
+    return response.data;
+  } catch(error) {
+    console.log(error);
+  }
+}
+
+export { postDriverOrder, getAcceptedOrders, postInvitation, getStartEnd, getInvitationTotal, getDriverUnfinishedOrder, deleteDriverInvitation, getPerson, deleteDriverOrder, getFinishedOrder };

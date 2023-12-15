@@ -19,10 +19,8 @@ const Card2: React.FC<Card2Props> = (props) => {
           {props.state ? (<span className='text-[16px]'>已接受</span>) : (<span className='text-[16px]'>未接受</span>)}
         </div>
         <div className="flex flex-row gap-[10px]">
-          {props.state ? (
-            <Popup text={"刪除"} tag={props.state} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
-          ) : (
-            <Popup text={"取消"} tag={props.state} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
+          {!props.state && (
+            <Popup text={"取消"} passengerOrderId={props.orderId} handleDelete={props.handleDelete} />
           )}
         </div>
       </div>

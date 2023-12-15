@@ -9,6 +9,7 @@ import DriverInfo from './pages/DriverInfo';
 import DriverTrip from './pages/DriverTrip';
 import DriverDetail from './pages/DriverDetail';
 import DriverRating from './pages/DriverRating';
+import DriverHistoryRecord from './pages/DriverHistoryRecord';
 import { useAppDispatch } from '../../hooks';
 import { setLocation } from '../../slices/location';
 import DriverAccount from './pages/DriverAccount';
@@ -44,5 +45,5 @@ const Driver: React.FC = () => {
   </>
 }
 
-export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverRating, DriverAccount };
+export { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverRating, DriverAccount, DriverHistoryRecord };
 export default Driver;

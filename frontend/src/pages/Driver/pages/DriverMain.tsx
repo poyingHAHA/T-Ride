@@ -53,8 +53,12 @@ const DriverMain = () => {
     })
 
     if(!driverStartDestReducer.start || !driverStartDestReducer.dest) return;
-    fetchDirectionsOnce();
-  }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest])
+    if(waypointReducer.waypoints.length === 0) {
+      fetchDirectionsOnce();
+      return;
+    }
+    fetchDirectionsWaypts(waypointReducer.waypoints);
+  }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest, waypointReducer.waypoints])
 
   const fetchDirectionsOnce = async () => {
     if(!startPoint || ! destPoint) return;
@@ -65,14 +69,20 @@ const DriverMain = () => {
         waypts.push({
           location: { lat: order.startPoint.lat, lng: order.startPoint.lng },
           stopover: true,
+          startName: order.startName,
+          time: order.pickTime1,
           orderId: order.orderId,
-          pointType: "pickup"
+          pointType: "pickup",
+          invitationStatus: order.invitationStatus
         })
         waypts.push({
           location: { lat: order.endPoint.lat, lng: order.endPoint.lng },
           stopover: true,
+          endName: order.endName,
+          time: order.pickTime2,
           orderId: order.orderId,
-          pointType: "dropoff"
+          pointType: "dropoff",
+          invitationStatus: order.invitationStatus
         })
       })
     }
@@ -80,13 +90,13 @@ const DriverMain = () => {
     waypts.unshift({
       location: { lat: startPoint.lat, lng: startPoint.lng },
       stopover: true,
-      orderId: driverStartDestReducer.order.orderId,
+      orderId: driverStartDestReducer.order.orderId as number,
       pointType: "driverStart"
     })
     waypts.push({
       location: { lat: destPoint.lat, lng: destPoint.lng },
       stopover: true,
-      orderId: driverStartDestReducer.order.orderId,
+      orderId: driverStartDestReducer.order.orderId as number,
       pointType: "driverEnd"
     })
 
@@ -106,6 +116,31 @@ const DriverMain = () => {
             (result, status) => {
               if (status === 'OK' && result) {
                 console.log("DriverMain 97: ", result)
+                setDirections((prev) => [...prev, result]);
+              } else {
+                console.error(`error fetching directions ${result}`);
+              }
+            }
+        )
+      }
+    }
+  }
+
+  const fetchDirectionsWaypts = async (waypoints: WaypointDTO[]) => {
+    setDirections([]);
+    const service = new google.maps.DirectionsService();
+    for(let [index, waypt] of waypoints.entries()){
+      if(index === waypoints.length - 1) return;
+      if(waypt.location !== undefined && waypoints[index + 1].location !== undefined){
+        await service.route(
+            {
+              origin: waypt.location,
+              destination: waypoints[index + 1].location as google.maps.LatLngLiteral,
+              travelMode: google.maps.TravelMode.DRIVING,
+            },
+            (result, status) => {
+              if (status === 'OK' && result) {
+                console.log("DriverMain 140: ", result)
                 setDirections((prev) => [...prev, result]);
               } else {
                 console.error(`error fetching directions ${result}`);

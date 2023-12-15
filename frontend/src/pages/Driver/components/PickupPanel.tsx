@@ -1,10 +1,11 @@
 import { orderDTO } from "../../../DTO/orders";
-import { useAppSelector } from "../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { useState, useRef, useEffect } from "react";
 import PickupCard from "./PickupCard";
 import { getDriverUnfinishedOrder, getAcceptedOrders, getInvitationTotal, deleteDriverOrder } from "../../../services/driveOrderService";
 import ErrorLoading from "../../../components/ErrorLoading";
 import { useNavigate } from "react-router-dom";
+import { setTempOrder } from "../../../slices/tempOrder";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -23,6 +24,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const cardContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (cardContainerRef.current) {
@@ -57,6 +59,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
       else{
         const res = await deleteDriverOrder(driverStartDestReducer.order.orderId);
         if(res.status === 200){
+          dispatch(setTempOrder([]))
           alert(`取消成功`);
         }
         else{

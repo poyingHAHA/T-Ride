@@ -40,14 +40,13 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
     console.log(driverDepart)
   }
 
-
-
   useEffect(() => {
     const getUnfinishedOrder = async () => {
       try {
         setLoading(true);
         const unfinishedOrder = await getDriverUnfinishedOrder();
         if (unfinishedOrder.data.length > 0) {
+          console.log("MainPanel 48: ", unfinishedOrder)
           const invitationTotal = await getInvitationTotal(unfinishedOrder.data[0].orderId);
           dispatch(setOrderId({ orderId: unfinishedOrder.data[0].orderId }));
           setUnfinishedOrder(unfinishedOrder.data[0]);
@@ -82,12 +81,12 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
                 }
               }));
             }
-            setPanel(1);
-            setShowSpots(true);
-            return;
           }
-          setPanel(0);
+          setPanel(1);
+          setShowSpots(true);
+          return;
         }
+        setPanel(0);
         setLoading(false);
       } catch (err) {
         console.log(err)

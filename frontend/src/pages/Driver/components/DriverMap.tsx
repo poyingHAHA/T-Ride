@@ -150,7 +150,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                   <div className="text-xs px-2 py-2 font-medium">
                     距離：{totalDistance.toFixed(2)}公里
                     <br />
-                    時間：{(totalDuration/60).toFixed(2)}小時
+                    時間：{(totalDuration/60).toFixed(0)}小時 {(totalDuration%60).toFixed(0)}分鐘
                   </div>
                 </div>
               </div>

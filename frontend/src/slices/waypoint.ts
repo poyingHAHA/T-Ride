@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { WaypointDTO } from "../DTO/waypoint";
+import { stat } from "fs";
 
 interface waypointState {
   waypoints: WaypointDTO[]
@@ -19,7 +20,7 @@ export const waypoint = createSlice({
       }else{
         // 去掉重複的waypoint
         state.waypoints = state.waypoints.filter(order => !(order.orderId === action.payload.orderId && order.pointType === action.payload.pointType))
-        state.waypoints = [...state.waypoints, action.payload]
+        state.waypoints.splice(state.waypoints.length-1, 0, action.payload)
       }
     },
     removeWaypoint: (state, action) => {

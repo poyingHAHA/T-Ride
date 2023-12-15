@@ -89,17 +89,16 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         alert("請選擇出發時間")
         return;
       }
-      console.log("DriverMap 92: ", driverDepart.departureTime)
       const spots = await getSpots(driverDepart.departureTime, 1);
       setSpots(spots);
-      console.log("DriverMap Spots: ", spots);
     }
     try {
+      setCurrentCenter({lat: driverStartDestReducer.start.lat as number, lng: driverStartDestReducer.start.lng as number});
       fetchData();
     } catch (error) {
       console.log(error);
     }
-  }, [showSpots]);
+  }, [showSpots, driverStartDestReducer.start]);
 
   const defaultProps = {
     center: {
@@ -221,7 +220,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }  
             {
-              (driverStartDestReducer.start.name && !directions) &&  (
+              (driverStartDestReducer.start.name && (directions ? directions.length < 2 : true)) &&  (
                 <MarkerF
                   position={{lat: driverStartDestReducer.start.lat, lng: driverStartDestReducer.start.lng} as LatLngLiteral }
                   label={"Start"}
@@ -230,7 +229,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }
             {
-              (driverStartDestReducer.dest.name && !directions ) &&  (
+              (driverStartDestReducer.dest.name && (directions ? directions.length < 2 : true)) &&  (
                 <MarkerF
                   position={{lat: driverStartDestReducer.dest.lat, lng: driverStartDestReducer.dest.lng} as LatLngLiteral }
                   label={"Dest"}

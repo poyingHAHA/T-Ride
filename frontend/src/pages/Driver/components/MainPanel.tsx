@@ -34,6 +34,8 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
 
   const handleChangeDepartureTime = (e: React.ChangeEvent<HTMLInputElement>) => {
     const departureTime = new Date(e.target.value).getTime() / 1000;
+    console.log("MainPanel 37: ", departureTime)
+    // dispatch(setDepartureTime("1703202938"));
     dispatch(setDepartureTime(departureTime));
     console.log(driverDepart)
   }
@@ -137,6 +139,7 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
         departureTime: driverDepart.departureTime,
         passengerCount: driverDepart.passengerCount,
       }
+      console.log("MainPanel 140", order);
       setLoading(true);
       try{
         const res = await postDriverOrder(order);

@@ -89,6 +89,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         alert("請選擇出發時間")
         return;
       }
+      console.log("DriverMap 92: ", driverDepart.departureTime)
       const spots = await getSpots(driverDepart.departureTime, 1);
       setSpots(spots);
       console.log("DriverMap Spots: ", spots);

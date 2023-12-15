@@ -27,7 +27,7 @@ interface StartEnd {
 }
 
 const DriverInfo: React.FC = () => {
-  const [orderId, setOrderId] = useState(0);
+  const [orderId, setOrderId] = useState<any>(0);
   const [userId, setUserId] = useState();
   const [start, setStart] = useState<StartEnd>({name:"",time:"",date:""});
   const [end, setEnd] = useState<StartEnd>({name:"",time:"",date:""});
@@ -52,20 +52,25 @@ const DriverInfo: React.FC = () => {
           token
       );
       setRefresh(prev => prev+1);
-      setIsLoad(false);
       console.log("response",response);
     } catch (error) {
         console.log(error);
     }
   }
 
-  useEffect(() => {
-    if (!orderId) {
+  if (!orderId) {
+    if (driverStartDestReducer.order.orderId){
       const id:any = driverStartDestReducer.order.orderId;
       setOrderId(id);
       localStorage.setItem("orderId", JSON.stringify(id));
     }
+    else {
+      setOrderId(localStorage.getItem("orderId"));
+    }
+  }
 
+  useEffect(() => {
+    console.log("useEffect");
     async function fetchDriverOrder() {
       try {
         setLoading(true);
@@ -73,27 +78,37 @@ const DriverInfo: React.FC = () => {
         setLoading(false);
         dispatch(setStartEnd(result[0]));
         setUserId(result[1]);
-        console.log("result", result);
+        setStart(result[0][0]);
+        setEnd(result[0][1]);
+        setDate(result[0][0].date);
       } catch (error) {
         console.error(error);
         setLoading(false);
         setError("發生錯誤");
       }
-      const Start = driverJourneyReducer.StartPoint;
-      const End = driverJourneyReducer.EndPoint;
-      setStart(Start);
-      setEnd(End);
-      setDate(Start.date);
     };
 
     async function fetchPassenger() {
       try {
         setLoading(true);
-        const result = await getInvitationTotal(orderId);
+        const result:any = await getInvitationTotal(orderId) as any;
         setLoading(false);
         dispatch(setJourney(result));
-        const temp = driverJourneyReducer.Midpoints;
-        setInfo(temp);
+        const passengerOrders:InfoItem[] = result?.map((item:any) => {
+          return ({
+            orderId: item.orderId,
+            userId: item.userId,
+            userName: item.userName,
+            startName: item.startName,
+            endName: item.endName,
+            pickTime: item.pickTime,
+            arriveTime: item.arriveTime,
+            state: item.state,
+            date: item.date
+          });
+        })
+        setInfo(passengerOrders);
+        console.log("passengerOrder", info);
         setIsLoad(true);
       } catch (error) {
         console.log(error);
@@ -106,14 +121,18 @@ const DriverInfo: React.FC = () => {
       fetchDriverOrder();
       fetchPassenger();
     }
+
     const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
     ws.onmessage = (event) => {
       console.log("event.data", event.data);  
+      alert("accepted");
+      setRefresh(prev => prev+1);
     }
     console.log("ws", ws);
+  }, [refresh, isLoad, orderId]);
 
-  }, [isLoad, orderId, refresh]);
-
+  console.log("driverInfo")
+  console.log(info);
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>

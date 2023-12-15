@@ -65,9 +65,9 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       }
     }else{
       let passengerOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
-      for(const order of passengerOrderIds){
-        passengerOrderIds = passengerOrderIds.filter((id) => id !== order);
-      }
+      // for(const order of passengerOrderIds){
+      //   passengerOrderIds = passengerOrderIds.filter((id) => id !== order);
+      // }
       console.log("CheckoutPanel 68", passengerOrderIds)
       if(passengerOrderIds.length === 0){
         navigate('/driver/info');
@@ -76,14 +76,14 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       
       const res = await postInvitation(dirverOrderId, passengerOrderIds);
       console.log("CheckoutPanel 74", res)
-      if(res?.success === 0){
-        alert("Invlid token, 請重新登入")
-        UnsetCookie();
-        navigate('/login');
-        return;
-      }else{
-        navigate('/driver/info');
-      }
+      navigate('/driver/info');
+      // if(res?.success === 0){
+      //   alert("Invlid token, 請重新登入")
+      //   UnsetCookie();
+      //   navigate('/login');
+      //   return;
+      // }else{
+      // }
     }
   }
 

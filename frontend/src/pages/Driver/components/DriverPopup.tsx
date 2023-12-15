@@ -34,7 +34,7 @@ const DriverPopup: React.FC<PopupProps> = (props) => {
                     <button 
                         className='bg-black w-[145px] h-[50px] opacity-100 text-white text-[24px] rounded-[10px] mx-auto mb-[25px]'
                         onClick={() => {
-                            props.handleDelete(props.passengerOrderId);
+                            // props.handleDelete(props.passengerOrderId);
                             props.handleDelete(props.passengerOrderId);
                             handleCloseModal();
                         }}

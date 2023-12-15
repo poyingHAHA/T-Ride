@@ -21,8 +21,10 @@ const DriverTrip: React.FC =() => {
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const [trip, setTrip] = useState<TripItem[]>([]);
+  const [orderId, setOrderId] = useState<number>(0);
   const [isLoad, setIsLoad] = useState(false);
   const [date, setDate] = useState("");
+  const [coords, setCoords] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false); //ErrorLoading
   const [error, setError] = useState<string>("");
 
@@ -47,13 +49,23 @@ const DriverTrip: React.FC =() => {
     window.location.href = externalURL;
   };
 
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords;
+        setCoords({lat: latitude, lng: longitude});
+      },
+      (error) => console.error(`Error getting geolocation: ${error.message}`)
+    );
+  }
+
   useEffect(() => {
     
     async function fetchAll() {
       try {
         if (!driverJourneyReducer.StartPoint.name){
           console.log("reset reducer");
-          const orderId = Number(localStorage.getItem("orderId"));
+          setOrderId(Number(localStorage.getItem("orderId")));
           setLoading(true);
           const middle: InfoItem[] = await getInvitationTotal(orderId) as InfoItem[];
           const result:any= await getStartEnd(orderId);
@@ -81,10 +93,6 @@ const DriverTrip: React.FC =() => {
           return timeA - timeB;  
         });
 
-        // setLoading(true);
-        // const StartEnd: StartEnd[] = await getStartEnd(orderId) as StartEnd[];
-        // setLoading(false);
-        // dispatch(setStartEnd(StartEnd[0]));
         const start = { 
           type: "起點", 
           name: driverJourneyReducer.StartPoint.name, 
@@ -105,8 +113,18 @@ const DriverTrip: React.FC =() => {
       }
     }
     fetchAll();
-  }, [isLoad]);
 
+    const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+    ws.onopen = () => {
+      ws.send(coords); 
+      console.log("send",coords);
+    };
+    ws.onmessage = (event) => {
+      console.log(event.data);
+    };
+    console.log("ws", ws);
+
+  }, [isLoad, orderId, coords]);
 
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">

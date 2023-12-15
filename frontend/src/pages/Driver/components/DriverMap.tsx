@@ -131,7 +131,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
   // 抓取地圖中心點
   const centerChangeHandler = () => {
     if(mapRef.current){
-        const center = mapRef.current?.getCenter();
+        // const center = mapRef.current?.getCenter();
         // console.log(center?.toJSON())
         // if(center!==null && center!==undefined){
         //   setCurrentCenter(center.toJSON());
@@ -181,7 +181,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                             polylineOptions: {
                               strokeColor: getColor(index),
                               strokeOpacity: 0.8,
-                              strokeWeight: 4,
+                              strokeWeight: 10* (1/(index+1)),
                               zIndex: ((1/(index+1))*100),
                             },
                             markerOptions: {

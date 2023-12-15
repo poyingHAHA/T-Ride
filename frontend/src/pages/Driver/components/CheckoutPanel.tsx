@@ -47,7 +47,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       }
     }
     getDirverOrderId();
-  }, [])
+  }, [tempOrderReducer.orders])
   
   const handleInvitation = async () => {
     if(!dirverOrderId){

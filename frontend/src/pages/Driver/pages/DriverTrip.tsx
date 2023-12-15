@@ -49,37 +49,36 @@ const DriverTrip: React.FC =() => {
     window.location.href = externalURL;
   };
 
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(
-      ({ coords }) => {
-        const { latitude, longitude } = coords;
-        setCoords({lat: latitude, lng: longitude});
-        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
-        ws.onopen = () => {
-          // const data = JSON.stringify(coords);
-          const sendCoords = setInterval(()=>{
-            ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
-          console.log("send");
-          },5000);
-        }
-        ws.onerror = (error) => {
-          console.log("error: ", error)
-        }
-        ws.onclose = (event) => {
-          console.log("close: ", event);
-        }
-        console.log("ws", ws);
-      },
-      (error) => console.error(`Error getting geolocation: ${error.message}`)
-    );
-  }
-
   if (!orderId){
     setOrderId(Number(localStorage.getItem("orderId")));
   }
 
   useEffect(() => {
-    
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(
+        ({ coords }) => {
+          const { latitude, longitude } = coords;
+          setCoords({lat: latitude, lng: longitude});
+          const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+          ws.onopen = () => {
+            // const data = JSON.stringify(coords);
+            const sendCoords = setInterval(()=>{
+              ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
+            console.log("send");
+            },10000);
+          }
+          ws.onerror = (error) => {
+            console.log("error: ", error)
+          }
+          ws.onclose = (event) => {
+            console.log("close: ", event);
+          }
+          console.log("ws", ws);
+        },
+        (error) => console.error(`Error getting geolocation: ${error.message}`)
+      );
+    }  
+
     async function fetchAll() {
       try {
         if (!driverJourneyReducer.StartPoint.name){
@@ -91,25 +90,6 @@ const DriverTrip: React.FC =() => {
           dispatch(setStartEnd(result[0]));
           setLoading(false);
         }
-        const mappedPlaces = driverJourneyReducer.Midpoints.flatMap((mid) => [
-          {
-            type: "中途經過",
-            name: mid.startName,
-            time: mid.pickTime,
-          },
-          {
-            type: "中途經過",
-            name: mid.endName,
-            time: mid.arriveTime,
-          }
-        ]);
-
-        // Sorting based on time
-        mappedPlaces.sort((a:TripItem, b:TripItem) => {
-          const timeA:any = new Date("1970-01-01T" + a.time);  
-          const timeB:any = new Date("1970-01-01T" + b.time);
-          return timeA - timeB;  
-        });
 
         const start = { 
           type: "起點", 
@@ -122,7 +102,34 @@ const DriverTrip: React.FC =() => {
           name: driverJourneyReducer.EndPoint.name, 
           time: driverJourneyReducer.EndPoint.time, 
         };
-        setTrip([start, ...mappedPlaces, end]);
+
+        const startPlaces:any = driverJourneyReducer.Midpoints.map((mid) => {
+          if (mid.state) {return( 
+            {
+              type: "中途經過",
+              name: mid.startName,
+              time: mid.pickTime,
+            });
+          } else {return {}}
+        });
+        const endPlaces:any = driverJourneyReducer.Midpoints.map((mid) => {
+          if (mid.state && (mid.endName!==end.name)) {return( 
+            {
+              type: "中途經過",
+              name: mid.endName,
+              time: mid.arriveTime,
+            });
+          } else {return {}}
+        });
+
+        // Sorting based on time
+        // mappedPlaces.sort((a:TripItem, b:TripItem) => {
+        //   const timeA:any = new Date("1970-01-01T" + a.time);  
+        //   const timeB:any = new Date("1970-01-01T" + b.time);
+        //   return timeA - timeB;  
+        // });
+
+        setTrip([start, ...startPlaces, ...endPlaces, end]);
         setIsLoad(true);
       } catch (error) {
         console.log(error);

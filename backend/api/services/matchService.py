@@ -56,7 +56,10 @@ class MatchService:
             self.order_repository.get_invited_orders(driver_order_id)]:
             return "already invited"
 
-        await self.notification_repository.notify_send_invitation(driver_order_id, passenger_order.user_id)
+        await self.notification_repository.notify_send_invitation(
+            driver_id,
+            driver_order_id,
+            passenger_order_id)
 
         self.match_repository.send_invitation(driver_order.order_id, passenger_order.order_id)
 
@@ -150,8 +153,9 @@ class MatchService:
         # must send notification first because need to get passenger-related drivers
         # accepted driver
         await self.notification_repository.notify_accept_invitation(
+            passenger_id,
             passenger_order_id,
-            driver_order.user_id,
+            driver_order_id,
             True)
         # rejected driver
         for related_order in self.order_repository.get_passenger_invitation_orders(passenger_order_id):
@@ -161,7 +165,7 @@ class MatchService:
 
             await self.notification_repository.notify_accept_invitation(
                 passenger_order_id,
-                related_order.user_id,
+                related_order.order_id,
                 False)
 
         # TODO: 目前沒有考慮因其他乘客造成繞路，使得抵達時間延後

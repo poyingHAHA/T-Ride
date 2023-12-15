@@ -4,7 +4,7 @@ import { MdFace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { FaCircle, FaSquareFull } from "react-icons/fa6";
 import { getDriverInvitations } from "../../../services/invitationService";
-import { deletePassengerOrder } from "../../../services/orderService";
+import { deletePassengerOrder, getPassengerOrderbyPorderID } from "../../../services/orderService";
 import { getTokenFromCookie } from "../../../utils/cookieUtil";
 import { acceptDriverInvitations, getPassengerAcceptedInvitations } from "../../../services/invitationService";
 import { IoMdArrowRoundBack } from "react-icons/io";
@@ -59,8 +59,9 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
     const [refresh, setRefresh] = useState<boolean>(false);
     const [driverName, setDriverName] = useState<string>("")
     const [driverId, setDriverId] = useState<number>(-1)
+    const [fee, setFee] = useState<number>(0)
 
-    console.log(driverId, driverName)
+    console.log(orderId)
 
     const acceptDriverInvitationsHandler = async (params: AcceptDriverInvitations) => {
         const acceptDriverInvitationsResult = await acceptDriverInvitations(params);
@@ -95,6 +96,15 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
         try {
             const Userinfo = await getDriverinfo(driverId);
             setDriverName(Userinfo.data.userName)
+        } catch (err) {
+            setError("發生錯誤");
+        }
+    }
+
+    const getOrderFee = async () => {
+        try {
+            const fee = await getPassengerOrderbyPorderID(orderId);
+            setFee(fee.data.fee)
         } catch (err) {
             setError("發生錯誤");
         }
@@ -169,6 +179,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
     }, [refresh])
 
     useEffect(() => {
+        getOrderFee();
         const getAcceptedInvitations = async () => {
             try {
                 setLoading(true);
@@ -186,6 +197,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
             }
         }
         getAcceptedInvitations();
+        
     }, [])
 
     return <>
@@ -205,7 +217,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
                                     {passengerDepart.departureTime1 ? formatUnixDatestamp(passengerDepart.departureTime1) : '未設定時間'}
                                 </div>
                                 <div className="flex-1 text-right text-lg mr-5">
-                                    $200
+                                    NT${fee}
                                 </div>
                             </div>
 

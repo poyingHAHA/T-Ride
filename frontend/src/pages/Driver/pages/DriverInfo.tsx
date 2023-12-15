@@ -7,6 +7,7 @@ import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { setJourney, setStartEnd } from "../../../slices/driverJourney";
 import ErrorLoading from '../../../components/ErrorLoading';
 import { getTokenFromCookie } from '../../../utils/cookieUtil';
+import { confirmAlert } from 'react-confirm-alert';
 
 interface InfoItem {
   orderId: number,
@@ -69,6 +70,30 @@ const DriverInfo: React.FC = () => {
     }
   }
 
+  // const submit = () => {
+  //   console.log("handleAccept");
+  //   confirmAlert({
+  //     title: 'Confirm to accept',
+  //     message: 'New invitation accepted',
+  //     buttons: [
+  //       {
+  //         label: 'Accept',
+  //         onClick: () => alert('Invitation accepted')
+  //       }
+  //     ]
+  //   });
+  //   setRefresh(prev => prev+1);
+  // }
+
+  const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
+  ws.onmessage = (event) => {
+    console.log("event.data", event.data);  
+    // submit();
+    alert("Invitation accepted");
+    setRefresh(prev => prev+1);
+  }
+  console.log("ws", ws);
+
   useEffect(() => {
     console.log("useEffect");
     async function fetchDriverOrder() {
@@ -121,14 +146,6 @@ const DriverInfo: React.FC = () => {
       fetchDriverOrder();
       fetchPassenger();
     }
-
-    const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
-    ws.onmessage = (event) => {
-      console.log("event.data", event.data);  
-      alert("accepted");
-      setRefresh(prev => prev+1);
-    }
-    console.log("ws", ws);
   }, [refresh, isLoad]);
 
   return (

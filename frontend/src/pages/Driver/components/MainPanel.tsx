@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import ErrorLoading from '../../../components/ErrorLoading';
 import { orderDTO } from '../../../DTO/orders';
 import { addTempOrder } from '../../../slices/tempOrder';
+import { addWaypoint, setWaypoint } from '../../../slices/waypoint';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
@@ -75,6 +76,18 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
                 arrivalTime: invitation.arriveTime,  
                 passengerCount: invitation.passengerCount,
                 passenger: invitation.passengerCount  ,
+                invitationStatus: {
+                  invitated: true,
+                  accepted: invitation.accepted,
+                }
+              }));
+              dispatch(addWaypoint({
+                location: { lat: invitation.startPlace.lat, lng: invitation.startPlace.lng },
+                stopover: true,
+                startName: invitation.startName,
+                time: invitation.pickTime,
+                orderId: invitation.orderId,
+                pointType: "pickup",
                 invitationStatus: {
                   invitated: true,
                   accepted: invitation.accepted,

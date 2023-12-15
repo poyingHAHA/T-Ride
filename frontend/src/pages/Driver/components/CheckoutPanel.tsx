@@ -9,6 +9,7 @@ import { orderDTO } from "../../../DTO/orders";
 import { WaypointDTO } from "../../../DTO/waypoint";
 import { removeWaypoint, setWaypoint } from "../../../slices/waypoint";
 import { getColor } from "../../../utils/colorUtil";
+import { resetState } from "../../../store";
 
 type CheckoutPanelProps = {
   isLoaded: boolean;
@@ -68,7 +69,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       }
     }else{
       let passengerOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
-      dispatch(setTempOrder([]));
+      dispatch(resetState());
       console.log("CheckoutPanel 68", passengerOrderIds)
       if(passengerOrderIds.length === 0){
         navigate('/driver/info');
@@ -78,13 +79,6 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       const res = await postInvitation(dirverOrderId, passengerOrderIds);
       console.log("CheckoutPanel 74", res)
       navigate('/driver/info');
-      // if(res?.success === 0){
-      //   alert("Invlid token, 請重新登入")
-      //   UnsetCookie();
-      //   navigate('/login');
-      //   return;
-      // }else{
-      // }
     }
   }
 

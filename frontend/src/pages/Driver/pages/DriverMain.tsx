@@ -54,6 +54,7 @@ const DriverMain = () => {
 
     if(!driverStartDestReducer.start || !driverStartDestReducer.dest) return;
     if(waypointReducer.waypoints.length === 0) {
+      console.log("DriverMain 90: fetchDirectionsOnce")
       fetchDirectionsOnce();
       return;
     }

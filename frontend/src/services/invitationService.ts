@@ -70,7 +70,8 @@ const postInvitation = async (driverOrderId: number, passengerOrderIds: number[]
       invitations.push(invitation)
     }
 
-    Promise.all(invitations).then((responses) => {
+    const result = await Promise.all(invitations).then((responses) => {
+      console.log("postInvitation responses: ", responses)
       const successInvited = responses.filter((result: any) => result.status === 200)
 
       return {
@@ -79,12 +80,13 @@ const postInvitation = async (driverOrderId: number, passengerOrderIds: number[]
       }
     }).catch((error) => {
       console.log("post Invitation error: ", error)
+      return{
+        success: 0,
+        fail: passengerOrderIds.length
+      }
     })
 
-    return {
-      success: 0,
-      fail: 0
-    } as InvitationResultDTO
+    return result
   } catch (error) {
     console.log("post Invitation error: ", error)
   }

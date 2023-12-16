@@ -48,7 +48,7 @@ const DriverMain = () => {
   });
 
   useEffect(() => {
-    if(firstLoad){
+    if(firstLoad && panel === 0){
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         const timestamp = position.timestamp;
@@ -104,7 +104,7 @@ const DriverMain = () => {
               }
               dispatch(setTempOrder(tempOrders));
               console.log("DriverMain 105: fetchDirections first", tempOrders)
-              fetchDirectionsOnce(unfinishedOrder.data[0].startPoint, unfinishedOrder.data[0].endPoint, tempOrders);
+              await fetchDirectionsOnce(unfinishedOrder.data[0].startPoint, unfinishedOrder.data[0].endPoint, tempOrders);
               setLoading(false);
             }
             setPanel(1);
@@ -113,22 +113,23 @@ const DriverMain = () => {
           }
           setPanel(0);
           setLoading(false);
+          setFirstLoad(false);
         } catch (err) {
           console.log(err)
           setLoading(false);
           console.log("DriverMain 108: ", err)
           setError("發生錯誤");
+          setFirstLoad(false);
           setPanel(0);
         }
-        setFirstLoad(false);
       }
       getUnfinishedOrder();
     }
   }, [firstLoad])
   
   useEffect(() => {
-    if(!firstLoad){
-      console.log("DriverMain 118: ", tempOrderReducer.orders)
+    console.log("DriverMain 130: ", panel)
+    if(panel !== 0){
       if(waypointReducer.waypoints.length === 0) {
         console.log("DriverMain 90: fetchDirectionsOnce")
         if(driverStartDestReducer.start || driverStartDestReducer.dest){

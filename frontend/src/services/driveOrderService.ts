@@ -177,7 +177,7 @@ const getAcceptedOrders = async (orderId: number) => {
   }
 }
 
-const getInvitationTotal = async (orderId: number) => {
+const   getInvitationTotal = async (orderId: number, convert: boolean=true) => {
   try {
     const response: {data: driverInvitationTotalDTO} = await get(`/match/driver/invitation/total/${orderId}`) as { data: driverInvitationTotalDTO };
     const acceptedOrders = await Promise.all(response.data.invitations
@@ -189,8 +189,9 @@ const getInvitationTotal = async (orderId: number) => {
           userName: name,
           startName: order.passengerOrder.startName,
           endName: order.passengerOrder.endName,
-          pickTime: convertUTC(order.passengerOrder.departureTime1),
-          arriveTime: convertUTC(order.passengerOrder.arrivalTime),
+          pickTime: convert ? convertUTC(order.passengerOrder.departureTime1) : order.passengerOrder.departureTime1,
+          pickTime2: convert ? convertUTC(order.passengerOrder.departureTime2) : order.passengerOrder.departureTime2,
+          arriveTime: convert ? convertUTC(order.passengerOrder.arrivalTime) : order.passengerOrder.arrivalTime,
           state: order.accepted,
           startPlace: {
             lat: order.passengerOrder.startPoint.lat,

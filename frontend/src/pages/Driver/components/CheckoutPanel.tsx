@@ -69,7 +69,8 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       }
     }else{
       let passengerOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
-      dispatch(resetState());
+      dispatch(setTempOrder([]));
+      dispatch(setWaypoint([]));
       console.log("CheckoutPanel 68", passengerOrderIds)
       if(passengerOrderIds.length === 0){
         navigate('/driver/info');

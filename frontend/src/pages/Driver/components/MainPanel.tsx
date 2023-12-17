@@ -8,19 +8,22 @@ import { useState, useEffect } from 'react';
 import ErrorLoading from '../../../components/ErrorLoading';
 import { orderDTO } from '../../../DTO/orders';
 import { addTempOrder } from '../../../slices/tempOrder';
+import { addWaypoint, setWaypoint } from '../../../slices/waypoint';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MainPanelProps = {
   isLoaded: boolean;
+  unfinishedOrderMain: orderDTO[];
   setStartPoint: (point: LatLngLiteral) => any;
   setDestPoint: (point: LatLngLiteral) => any;
   setPanel: (panel: number) => any;
   setShowSpots: (showSpots: boolean) => any;
 };
-const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpots }: MainPanelProps) => {
+
+const MainPanel = ({ isLoaded, unfinishedOrderMain, setStartPoint, setDestPoint, setPanel, setShowSpots }: MainPanelProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [unfinishedOrder, setUnfinishedOrder] = useState<orderDTO[]>([]);
+  const [unfinishedOrder, setUnfinishedOrder] = useState<orderDTO[]>(unfinishedOrderMain);
   const driverDepart = useAppSelector((state) => state.driverDepartReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
@@ -39,66 +42,6 @@ const MainPanel = ({ isLoaded, setStartPoint, setDestPoint, setPanel, setShowSpo
     dispatch(setDepartureTime(departureTime));
     console.log(driverDepart)
   }
-
-
-
-  useEffect(() => {
-    const getUnfinishedOrder = async () => {
-      try {
-        setLoading(true);
-        const unfinishedOrder = await getDriverUnfinishedOrder();
-        if (unfinishedOrder.data.length > 0) {
-          const invitationTotal = await getInvitationTotal(unfinishedOrder.data[0].orderId);
-          dispatch(setOrderId({ orderId: unfinishedOrder.data[0].orderId }));
-          setUnfinishedOrder(unfinishedOrder.data[0]);
-          dispatch(setStart({ name: unfinishedOrder.data[0].startName, placeId: "", lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng }));
-          dispatch(setDest({ name: unfinishedOrder.data[0].endName, placeId: "", lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng }));
-          dispatch(setDepartureTime(unfinishedOrder.data[0].departureTime));
-          dispatch(setPassengerCount(unfinishedOrder.data[0].passengerCount));
-          setStartPoint({ lat: unfinishedOrder.data[0].startPoint.lat, lng: unfinishedOrder.data[0].startPoint.lng });
-          setDestPoint({ lat: unfinishedOrder.data[0].endPoint.lat, lng: unfinishedOrder.data[0].endPoint.lng });
-          if (invitationTotal !== undefined && invitationTotal.length > 0) {
-            console.log("MainPanel 60: ", invitationTotal)
-            for(const invitation of invitationTotal){
-              dispatch(addTempOrder({
-                orderId: invitation.orderId,
-                startPoint: {
-                  lat: invitation.startPlace.lat,
-                  lng: invitation.startPlace.lng,
-                },
-                startName: invitation.startName,
-                endPoint: {
-                  lat: invitation.endPlace.lat,
-                  lng: invitation.endPlace.lng,
-                },
-                endName: invitation.endName,
-                departureTime: invitation.pickTime,
-                arrivalTime: invitation.arriveTime,  
-                passengerCount: invitation.passengerCount,
-                passenger: invitation.passengerCount  ,
-                invitationStatus: {
-                  invitated: true,
-                  accepted: invitation.accepted,
-                }
-              }));
-            }
-            setPanel(1);
-            setShowSpots(true);
-            return;
-          }
-          setPanel(0);
-        }
-        setLoading(false);
-      } catch (err) {
-        console.log(err)
-        setLoading(false);
-        setError("發生錯誤");
-        setPanel(0);
-      }
-    }
-    getUnfinishedOrder();
-  }, [])
-
 
   const handlePostDriverOrder = async () => {
     const token = getTokenFromCookie();

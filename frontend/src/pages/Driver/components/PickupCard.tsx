@@ -3,6 +3,7 @@ import { orderDTO } from "../../../DTO/orders";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { addTempOrder, removeTempOrder } from "../../../slices/tempOrder";
+import { addWaypoint } from "../../../slices/waypoint";
 
 type PickupCardProps = {
   order: orderDTO;
@@ -46,12 +47,48 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
       setPickupSelected(true);
       if(tempOrderReducer.orders?.length === 0){
         dispatch(addTempOrder({...order, invitationStatus: {invited: false, accepted: false}}));
+        dispatch(addWaypoint({
+            location: { lat: order.startPoint.lat, lng: order.startPoint.lng },
+            stopover: true,
+            startName: order.startName,
+            time: order.pickTime1,
+            orderId: order.orderId,
+            pointType: "pickup",
+            invitationStatus: order.invitationStatus
+          }))
+          dispatch(addWaypoint({
+            location: { lat: order.endPoint.lat, lng: order.endPoint.lng },
+            stopover: true,
+            endName: order.endName,
+            time: order.pickTime2,
+            orderId: order.orderId,
+            pointType: "dropoff",
+            invitationStatus: order.invitationStatus
+          }))
       }
       // 如果tempOrderReducer.orders裡面沒有這個order，就把它加進去
       else if(tempOrderReducer.orders.length > 0){
         const index = tempOrderReducer.orders?.findIndex((tempOrder) => tempOrder.orderId === order.orderId);
         if(index === -1){
           dispatch(addTempOrder({...order, invitationStatus: {invited: false, accepted: false}}));
+          dispatch(addWaypoint({
+            location: { lat: order.startPoint.lat, lng: order.startPoint.lng },
+            stopover: true,
+            startName: order.startName,
+            time: order.pickTime1,
+            orderId: order.orderId,
+            pointType: "pickup",
+            invitationStatus: order.invitationStatus
+          }))
+          dispatch(addWaypoint({
+            location: { lat: order.endPoint.lat, lng: order.endPoint.lng },
+            stopover: true,
+            endName: order.endName,
+            time: order.pickTime2,
+            orderId: order.orderId,
+            pointType: "dropoff",
+            invitationStatus: order.invitationStatus
+          }))
         }
         else{
           // 如果tempOrderReducer.orders裡面已經有這個order，就把它從tempOrderReducer.orders裡面移除

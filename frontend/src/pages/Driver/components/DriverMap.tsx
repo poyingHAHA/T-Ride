@@ -89,17 +89,16 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         alert("請選擇出發時間")
         return;
       }
-      console.log("DriverMap 92: ", driverDepart.departureTime)
       const spots = await getSpots(driverDepart.departureTime, 1);
       setSpots(spots);
-      console.log("DriverMap Spots: ", spots);
     }
     try {
+      setCurrentCenter({lat: driverStartDestReducer.start.lat as number, lng: driverStartDestReducer.start.lng as number});
       fetchData();
     } catch (error) {
       console.log(error);
     }
-  }, [showSpots]);
+  }, [showSpots, driverStartDestReducer.start]);
 
   const defaultProps = {
     center: {
@@ -132,7 +131,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
   // 抓取地圖中心點
   const centerChangeHandler = () => {
     if(mapRef.current){
-        const center = mapRef.current?.getCenter();
+        // const center = mapRef.current?.getCenter();
         // console.log(center?.toJSON())
         // if(center!==null && center!==undefined){
         //   setCurrentCenter(center.toJSON());
@@ -151,7 +150,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                   <div className="text-xs px-2 py-2 font-medium">
                     距離：{totalDistance.toFixed(2)}公里
                     <br />
-                    時間：{(totalDuration/60).toFixed(2)}小時
+                    時間：{(totalDuration/60).toFixed(0)}小時 {(totalDuration%60).toFixed(0)}分鐘
                   </div>
                 </div>
               </div>
@@ -182,7 +181,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
                             polylineOptions: {
                               strokeColor: getColor(index),
                               strokeOpacity: 0.8,
-                              strokeWeight: 4,
+                              strokeWeight: 10* (1/(index+1)),
                               zIndex: ((1/(index+1))*100),
                             },
                             markerOptions: {
@@ -221,7 +220,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }  
             {
-              (driverStartDestReducer.start.name && !directions) &&  (
+              (driverStartDestReducer.start.name && (directions ? directions.length < 2 : true)) &&  (
                 <MarkerF
                   position={{lat: driverStartDestReducer.start.lat, lng: driverStartDestReducer.start.lng} as LatLngLiteral }
                   label={"Start"}
@@ -230,7 +229,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
               )
             }
             {
-              (driverStartDestReducer.dest.name && !directions ) &&  (
+              (driverStartDestReducer.dest.name && (directions ? directions.length < 2 : true)) &&  (
                 <MarkerF
                   position={{lat: driverStartDestReducer.dest.lat, lng: driverStartDestReducer.dest.lng} as LatLngLiteral }
                   label={"Dest"}

@@ -134,7 +134,6 @@ const DriverInfo: React.FC = () => {
         })
         setInfo(passengerOrders);
         console.log("passengerOrder", info);
-        setIsLoad(true);
       } catch (error) {
         console.log(error);
         setLoading(false);
@@ -145,8 +144,9 @@ const DriverInfo: React.FC = () => {
     if (orderId){
       fetchDriverOrder();
       fetchPassenger();
+      setIsLoad(true);
     }
-  }, [refresh, isLoad]);
+  }, [refresh, isLoad, orderId]);
 
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">

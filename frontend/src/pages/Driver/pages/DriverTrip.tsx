@@ -110,7 +110,7 @@ const DriverTrip: React.FC =() => {
               name: mid.startName,
               time: mid.pickTime,
             });
-          } else {return {}}
+          }
         });
         const endPlaces:any = driverJourneyReducer.Midpoints.map((mid) => {
           if (mid.state && (mid.endName!==end.name)) {return( 
@@ -119,7 +119,7 @@ const DriverTrip: React.FC =() => {
               name: mid.endName,
               time: mid.arriveTime,
             });
-          } else {return {}}
+          }
         });
 
         // Sorting based on time
@@ -128,7 +128,6 @@ const DriverTrip: React.FC =() => {
         //   const timeB:any = new Date("1970-01-01T" + b.time);
         //   return timeA - timeB;  
         // });
-
         setTrip([start, ...startPlaces, ...endPlaces, end]);
         setIsLoad(true);
       } catch (error) {
@@ -140,13 +139,16 @@ const DriverTrip: React.FC =() => {
     fetchAll();
 
   }, [isLoad, orderId, coords]);
-
+  
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
       <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>
       <div className="text-center w-screen fixed top-[120px] font-normal text-[18px] font-sans">{date}</div>
       <div className="flex flex-col items-center rounded-t-[30px] bg-white w-screen h-[calc(100vh-320px)] fixed bottom-[150px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {trip.map((place, index) => {
+          if (place === null || place === undefined) {
+            return null;
+          }
           return (<DriverTripCard key={index} {...place} />);
         })}
       </div>

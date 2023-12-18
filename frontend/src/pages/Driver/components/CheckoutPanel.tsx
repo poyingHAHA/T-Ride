@@ -69,15 +69,17 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
       }
     }else{
       let passengerOrderIds = tempOrderReducer.orders.map((order) => order.orderId);
+      let unInvitedOrderIds = tempOrderReducer.orders.filter((order) => order.invitationStatus !== undefined && !order.invitationStatus.invitated)
+                                            .map((order) => order.orderId);
       dispatch(setTempOrder([]));
       dispatch(setWaypoint([]));
       console.log("CheckoutPanel 68", passengerOrderIds)
-      if(passengerOrderIds.length === 0){
+      if(passengerOrderIds.length === 0 || unInvitedOrderIds.length === 0){
         navigate('/driver/info');
         return;
       }
       
-      const res = await postInvitation(dirverOrderId, passengerOrderIds);
+      const res = await postInvitation(dirverOrderId, unInvitedOrderIds);
       console.log("CheckoutPanel 74", res)
       navigate('/driver/info');
     }

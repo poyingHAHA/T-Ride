@@ -86,7 +86,7 @@ const PassengerMap = ({ isLoaded, directions, detail }: PassengerMapProps) => {
                 <>
                   <DirectionsRenderer directions={directions} options={{
                     polylineOptions: {
-                      strokeColor: "#1976D2",
+                      strokeColor: "#black",
                       strokeOpacity: 0.8,
                       strokeWeight: 4,
                     }

@@ -103,8 +103,8 @@ const MainPanel = ({ isLoaded, unfinishedOrderMain, setStartPoint, setDestPoint,
       isLoaded && (
         <>
           <div className='flex flex-col justify-around items-center h-fit min-h-[40vh] bg-white rounded-t-3xl z-50'>
-            <div className='flex justify-center items-center w-[100%] mt-4'>
-              <div className='flex flex-col items-start justify-start ml-0 mr-2'>
+            <div className='flex justify-between items-center w-[80%] mt-4'>
+              <div className='flex flex-col items-start justify-start ml-0'>
                 <label htmlFor="departureTime" className='text-sm'>出發時間</label>
                 <input
                   type="datetime-local"
@@ -115,7 +115,7 @@ const MainPanel = ({ isLoaded, unfinishedOrderMain, setStartPoint, setDestPoint,
                   onChange={(e) => handleChangeDepartureTime(e)}
                 />
               </div>
-              <div className='flex flex-col items-start w-[20%] '>
+              <div className='flex flex-col items-start w-[30%] '>
                 <label htmlFor="passNumber" className='text-sm'>人數</label>
                 <select name="passNumber" id="passNumber" className='h-12 rounded w-[100%] text-center' onChange={handleSelectPassengerCount} >
                   {

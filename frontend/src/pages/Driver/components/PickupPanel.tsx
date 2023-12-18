@@ -110,14 +110,14 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
 
             <div className='fixed bottom-20 flex justify-center w-[100%]'>
               <button 
-                className='rounded bg-[#f3e779] w-[25vw] h-10 text-xl mr-4' 
+                className='rounded bg-black w-[40vw] h-10 text-white text-xl mr-4' 
                 onClick={backBtnHandler}
               >
                 取消
               </button>
 
               <button 
-                className='rounded bg-cyan-800 w-[60vw] h-10 text-white text-xl'
+                className='rounded bg-black w-[40vw] h-10 text-white text-xl'
                 onClick={() => {
                   setPanel(2);
                   setShowSpots && setShowSpots(false);

@@ -79,7 +79,8 @@ const DriverTrip: React.FC =() => {
         (error) => console.error(`Error getting geolocation: ${error.message}`),
         {
           maximumAge: 0,
-          timeout: 10000
+          timeout: 10000,
+          enableHighAccuracy: false
         }
       );
     return () => {

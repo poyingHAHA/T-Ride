@@ -74,7 +74,6 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         return accumulator+currentValue.routes[0].legs[0].duration.value
       }, 0)/60 || 0);
       
-      console.log("DriverMap tempOrderSpots: ", tempOrderSpots);
       setTempOrders(tempOrderIds)
       setTempOrderSpots(tempOrderSpots);
     }

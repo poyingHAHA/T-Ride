@@ -64,6 +64,7 @@ const DriverTrip: React.FC =() => {
       sendCoords = setInterval(()=>{
           if(currentPositionReducer.lat !== null && currentPositionReducer.lng !== null){
             ws.send(`${currentPositionReducer.lat.toFixed(7)}, ${currentPositionReducer.lng.toFixed(7)}`);
+            console.log("send")
           }else{
             console.log("no current position")
           }

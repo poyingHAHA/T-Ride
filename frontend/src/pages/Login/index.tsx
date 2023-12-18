@@ -5,6 +5,7 @@ import { userLogin } from "../../services/loginService"
 import { useEffect, useState } from "react";
 import { getTokenFromCookie } from "../../utils/cookieUtil";
 import ErrorLoading from "../../components/ErrorLoading";
+import { IoCarSport } from "react-icons/io5";
 
 const Login: React.FC = () => {
   const loginReducer = useAppSelector((state) => state.loginReducer);
@@ -42,11 +43,12 @@ const Login: React.FC = () => {
   }
 
   return (
-    <main className="bg-amber-200 flex flex-col items-center h-screen">
-      <h1 className="text-black text-center text-4xl font-semibold leading-[52px] whitespace-nowrap mt-28 max-md:mt-10">
-        登入
-      </h1>
-      <Form method="post" className="bg-white self-stretch flex w-full h-screen flex-col items-stretch mt-16 pt-40 pb-96 px-16 rounded-[50px_50px_0px_0px] max-md:max-w-full max-md:mt-10 max-md:px-5 max-md:py-24">
+    <main className="bg-white flex flex-col items-center h-screen">
+      <div className="flex flex-col justify-center items-center w-[100%] h-[60%]">
+        <IoCarSport className="w-[50%] h-[50%]" />
+        <p className="text-xl font-bold">T-Ride</p>
+      </div>
+      <Form method="post" className="bg-white self-stretch flex w-full h-screen flex-col px-8 rounded-[50px_50px_0px_0px]">
         <input
           type="account"
           placeholder="公司帳號"
@@ -60,7 +62,7 @@ const Login: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button
-          className="text-white text-2xl leading-7 whitespace-nowrap bg-cyan-800 mb-0 items-center mt-6 px-5 py-3.5 rounded-xl max-md:mb-2.5"
+          className="text-white text-2xl leading-7 whitespace-nowrap bg-black mb-0 items-center mt-6 px-5 py-3.5 rounded-xl max-md:mb-2.5"
           type="button"
           onClick={loginHandler}
         >

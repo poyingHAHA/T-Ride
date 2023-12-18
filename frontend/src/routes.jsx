@@ -1,10 +1,11 @@
 import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "./pages/Error"
-import Driver, { DriverMain, DriverRoute, DriverHistory, DriverSetting } from "./pages/Driver";
-import Passenger, { PassengerMain, PassengerRoute, PassengerHistory, PassengerAccount, PassengerTripinfo } from "./pages/Passenger";
+import Driver, { DriverMain, DriverRoute, DriverHistory, DriverSetting, DriverInfo, DriverTrip, DriverDetail, DriverRating, DriverAccount, DriverHistoryRecord } from "./pages/Driver";
+import Passenger, { PassengerMain, PassengerRoute, PassengerHistory, PassengerAccount, PassengerTripinfo, PassengerNavigating } from "./pages/Passenger";
 import Login from "./pages/Login";
 import SelectRole from "./pages/SelectRole";
 import DriverRegister from "./pages/DriverRegister";
+import PassengerSetting from "./pages/Passenger/pages/PassengerSetting";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,30 @@ const router = createBrowserRouter([
         path: "setting",
         element: <DriverSetting />
       },
+      {
+        path: "info",
+        element: <DriverInfo />
+      },
+      {
+        path: "trip",
+        element: <DriverTrip />
+      },
+      {
+        path: "detail",
+        element: <DriverDetail />
+      },
+      {
+        path: "rating",
+        element: <DriverRating />
+      },
+      {
+        path: "account",
+        element: <DriverAccount />
+      },
+      {
+        path: "record",
+        element: <DriverHistoryRecord />
+      }
     ]
   },
   {
@@ -53,11 +78,20 @@ const router = createBrowserRouter([
       },
       {
         path: "account",
-        element: <PassengerAccount />
+        element: <PassengerAccount />,
+
       },
       {
         path: "tripinfo",
         element: <PassengerTripinfo />
+      },
+      {
+        path: "setting",
+        element: <PassengerSetting />
+      },
+      {
+        path: "navigating",
+        element: <PassengerNavigating />
       },
     ]
   },

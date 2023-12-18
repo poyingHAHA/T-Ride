@@ -7,7 +7,7 @@ const SelectRole: React.FC = () => {
     <div className="justify-center items-center bg-white flex flex-col px-5 h-screen">
       <section className="flex w-[200px] max-w-full flex-col items-stretch max-md:my-10">
         <button
-          className="text-white text-center text-2xl leading-7 whitespace-nowrap bg-cyan-800 items-center px-5 py-3.5 rounded-xl"
+          className="text-white text-center text-2xl leading-7 whitespace-nowrap bg-black items-center px-5 py-3.5 rounded-xl"
           role="heading"
           onClick={() => {
             navigate("/driver")
@@ -23,7 +23,7 @@ const SelectRole: React.FC = () => {
         </button>
 
         <button
-          className="text-black text-center text-2xl leading-7 whitespace-nowrap bg-amber-200 items-center mt-12 px-5 py-3.5 rounded-xl"
+          className="text-white text-center text-2xl leading-7 whitespace-nowrap bg-black items-center mt-12 px-5 py-3.5 rounded-xl"
           role="heading"
           onClick={() => {
             navigate("/passenger")

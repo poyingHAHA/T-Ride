@@ -1,14 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 interface locationState {
-  latitude?: number,
-  longitude?: number,
+  lat?: number,
+  lng?: number,
   timestamp?: number
 }
 
 const initialState: locationState = {
-  latitude: undefined,
-  longitude: undefined,
+  lat: 25.0174525,
+  lng: 121.545246,
   timestamp: undefined
 }
 
@@ -17,13 +17,13 @@ export const locationSlice = createSlice({
   initialState,
   reducers: {
     setLocation: (state, action) => {
-      state.latitude = action.payload.latitude
-      state.longitude = action.payload.longitude
+      state.lat = action.payload.lat
+      state.lng = action.payload.lng
       state.timestamp = action.payload.timestamp
     },
     clearLocation: (state) => {
-      state.latitude = undefined
-      state.longitude = undefined
+      state.lat = undefined
+      state.lng = undefined
       state.timestamp = undefined
     }
   }

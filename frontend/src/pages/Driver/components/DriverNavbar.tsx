@@ -1,26 +1,54 @@
-import { MdHomeFilled, MdOutlineRoute, MdHistory, MdSettings } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { MdHome, MdOutlineStar, MdHistory, MdAccountCircle } from "react-icons/md";
 
 const DriverNavbar: React.FC = () => {
   const navigate = useNavigate()
   
   return <>
-    <nav className="bg-white flex flex-col items-stretch">
-      <div className="flex w-full items-stretch justify-between gap-5 px-14 py-4 border-t-2 border-gray-200 max-md:max-w-full max-md:flex-wrap max-md:px-5">
-        <button className="rounded-full bg-amber-200 p-2" onClick={() => navigate("/driver")} >
-          <MdHomeFilled className="text-4xl text-black" />
-        </button>
-        <button className="rounded-full bg-amber-200 p-2" onClick={() => navigate("/driver/route")} >
-          <MdOutlineRoute className="text-4xl text-black" />
-        </button>
-        <button className="rounded-full bg-amber-200 p-2" onClick={() => navigate("/driver/history")} >
-          <MdHistory className="text-4xl text-black" />
-        </button>
-        <button className="rounded-full bg-amber-200 p-2" onClick={() => navigate("/driver/setting")} >
-          <MdSettings  className="text-4xl text-black" />
-        </button>
+    <div className="fixed bottom-0 w-full px-3 bg-white border-gray border-t-2 border-solid">
+      <div className="flex">
+          <div className="flex-1 group">
+              <button className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"
+                  onClick={() => navigate("/driver")} >
+                  <span className="block px-1 pt-1 pb-1">
+                      <MdHome className="text-2xl pt-1 mb-1 block mx-auto" />
+                      <span className="block text-xs pb-2 mx-auto">Home</span>
+                      <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
+                  </span>
+              </button>
+          </div>
+          <div className="flex-1 group">
+              <a className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"
+                  onClick={() => navigate("/driver/route")}>
+                  <span className="block px-1 pt-1 pb-1">
+                      <MdOutlineStar className="far fa-compass text-2xl pt-1 mb-1 block mx-auto" />
+                      <span className="block text-xs pb-2 mx-auto">Favorite</span>
+                      <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
+                  </span>
+              </a>
+          </div>
+          <div className="flex-1 group">
+              <a className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"
+                  onClick={() => navigate("/driver/history")} >
+                  <span className="block px-1 pt-1 pb-1">
+                      <MdHistory className="far fa-search text-2xl pt-1 mb-1 block mx-auto" />
+                      <span className="block text-xs pb-2 mx-auto">History</span>
+                      <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
+                  </span>
+              </a>
+          </div>
+          <div className="flex-1 group">
+              <button className="flex items-end justify-center text-center mx-auto px-4 pt-2 w-full text-gray-400 group-hover:text-black"
+                  onClick={() => navigate("/driver/account")} >
+                  <span className="block px-1 pt-1 pb-1">
+                      <MdAccountCircle className="far fa-cog text-2xl pt-1 mb-1 block mx-auto" />
+                      <span className="block text-xs pb-2 mx-auto">Account</span>
+                      <span className="block w-5 mx-auto h-1 group-hover:bg-black rounded-full"></span>
+                  </span>
+              </button>
+          </div>
       </div>
-    </nav>
+  </div>
   </>
 }
 

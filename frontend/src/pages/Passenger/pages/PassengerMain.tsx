@@ -1,40 +1,122 @@
-import React from 'react'
-import { Form, useNavigate } from "react-router-dom";
+import PassengerMap from '../components/PassengerMap';
+import { useState, useEffect } from 'react'
+import { useNavigate } from "react-router-dom";
+import { useJsApiLoader, Libraries } from '@react-google-maps/api';
+import { useAppSelector, useAppDispatch } from "../../../hooks";
+import { setStart, setDest, resetStart, resetDest } from "../../../slices/passengerStartDest"
+import { setLocation } from '../../../slices/location';
+import MainPanel from "../components/MainPanel";
+import PickupPanel from '../components/PickupPanel';
+import { orderDTO } from '../../../DTO/orders';
 
-export default function Home() {
 
+const libraries: Libraries = ["marker", "places"];
+type LatLngLiteral = google.maps.LatLngLiteral;
+type DirectionsResult = google.maps.DirectionsResult;
+
+const PassengerMain = () => {
     const navigate = useNavigate();
+    // const [directions, setDirections] = useState<DirectionsResult>()
+    const [directions, setDirections] = useState<DirectionsResult | undefined>(undefined);
+    const [direction_time, setDirection_time] = useState<number>(0)
+    const [startPoint, setStartPoint] = useState<LatLngLiteral>()
+    const [destPoint, setDestPoint] = useState<LatLngLiteral>()
+    const [pickupPanel, setPickupPanel] = useState<boolean>(false)
+    const [orderId, setOrderId] = useState<number>(0);
 
-    return (
-        <main className="bg-gray-300 flex flex-col items-center h-screen">
-            <iframe className="flex-1 w-full h-full"
-                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12080.73732861526!2d-74.0059418!3d40.7127847!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM40zMDA2JzEwLjAiTiA3NMKwMjUnMzcuNyJX!5e0!3m2!1sen!2sus!4v1648482801994!5m2!1sen!2sus"
-                title="Google Maps Location View"
-            >
-            </iframe>
-            <Form method="post" className="flex-1 bg-white flex w-full h-screen flex-col px-10 pb-20 pt-10">
+    // 紀錄使用者點選marker後，該地標附近的訂單
+    const [orders, setOrders] = useState<orderDTO[]>([])
+    // // Redux state selectors
+    const passengerDepart = useAppSelector((state) => state.passengerDepartReducer);
+    const passengerStartDestReducer = useAppSelector((state) => state.passengerStartDestReducer);
+    // Dispatch hook from Redux
+    const dispatch = useAppDispatch();
 
-                <input
-                    type="datetime-local"
-                    className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select a time" required
-                />
+    // useJsApiLoader hook to load the Google Maps API
+    const { isLoaded } = useJsApiLoader({
+        googleMapsApiKey: process.env.REACT_APP_GOOGLEMAP_API_KEY || "",
+        version: "beta",
+        libraries,
+    });
 
-                <input type="text" id="location-input" className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-6" placeholder="Pickup location" required />
+    useEffect(() => {
+        // Reset start and destination when the component mounts
+        dispatch(resetStart());
+        dispatch(resetDest());
+    }, [dispatch]);
 
-                <input type="text" id="location-input" className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-6" placeholder="Where to?" required />
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            const timestamp = position.timestamp;
+            console.log("Index: ", position)
 
-                <input type="number" id="default-search" className="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-6" placeholder="How many passengers?" required />
+            dispatch(setLocation({ lat: latitude, lng: longitude, timestamp }));
+        }, (error) => {
+            console.log("Index: ", error)
+        })
 
-                <button
-                    className="text-white text-xl bg-black p-3 mb-0 items-center mt-6 rounded-xl max-md:mb-2.5"
-                    type="button"
-                    onClick={() => {
-                        navigate("/passenger/Tripinfo")
-                    }}
+        if (!passengerStartDestReducer.start || !passengerStartDestReducer.dest) return;
+        fetchDirections();
+    }, [startPoint, destPoint, isLoaded])
 
-                >Confirm</button>
-            </Form>
 
+    const fetchDirections = () => {
+        if (!startPoint || !destPoint) return;
+        setDirections(undefined);
+
+        const service = new google.maps.DirectionsService();
+        service.route(
+            {
+                origin: { lat: startPoint.lat, lng: startPoint.lng },
+                destination: { lat: destPoint.lat, lng: destPoint.lng },
+                travelMode: google.maps.TravelMode.DRIVING,
+            },
+            (result, status) => {
+                if (status === 'OK' && result) {
+                    setDirections(result);
+                    if (result.routes[0] &&
+                        result.routes[0].legs[0] &&
+                        result.routes[0].legs[0].duration &&
+                        result.routes[0].legs[0].duration.value !== undefined) {
+
+                        const time = result.routes[0].legs[0].duration.value;
+                        setDirection_time(time)
+                    }
+                } else {
+                    console.error(`error fetching directions ${result}`);
+                }
+            }
+        );
+    }
+
+
+    return <>{isLoaded && (
+
+        <main className="bg-white flex flex-col items-center h-screen w-full">
+
+            <div className="relative h-1/2 w-full">
+                <PassengerMap isLoaded={isLoaded} directions={directions} detail={true} />
+            </div>
+            <div className="bg-white h-fit absolute h-fit overflow-auto bottom-0 z-100 min-h-[25%] w-[100%]">
+                {
+                    pickupPanel
+                        ? <PickupPanel
+                            isLoaded={isLoaded}
+                            setPickupPanel={setPickupPanel}
+                            orderId={orderId}
+                            directions_time={direction_time} />
+                        : <MainPanel
+                            isLoaded={isLoaded}
+                            setStartPoint={setStartPoint}
+                            setDestPoint={setDestPoint}
+                            setPickupPanel={setPickupPanel}
+                            setOrderId={setOrderId} />
+                }
+            </div>
         </main>
-    )
+    )}
+    </>
 }
+
+export default PassengerMain

@@ -1,0 +1,1000 @@
+openapi: 3.0.0
+info:
+  title: T-Ride
+  description: |-
+    T-Ride
+  version: 0.1.99
+tags:
+  - name: user
+    description: 管理使用者資料
+  - name: order
+    description: 負責訂單
+  - name: match
+    description: 負責配對
+paths:
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: 註冊
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: tester
+                password:
+                  type: string
+                  example: tester
+              required:
+                - name
+                - password
+      responses:
+        '200':
+          description: 註冊成功
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: 登入
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: tester 
+                password:
+                  type: string
+                  example: tester
+              required:
+                - name
+                - passwor
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  userId:
+                    type: integer
+        '400':
+          description: Invalid parameter format
+        '401':
+          description: Unauthorized
+  /user/driver_data:
+    post:
+      tags:
+        - user
+      summary: 上傳司機資料
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                vehicleName:
+                  type: string
+                vehiclePlate:
+                  type: string
+                passengerCount:
+                  type: integer
+              required:
+                - vehicleName
+                - vehiclePlate
+                - passengerCount
+      responses:
+        '200':
+          description: 註冊成功
+        '400':
+          description: Invalid parameter format
+        '401':
+          description: 無效token
+        '404':
+          description: 乘客數為無效參數
+        '409':
+          description: 資料已上傳過
+          
+  /user/{userId}:
+    get:
+      summary: Get User Information by ID
+      tags:
+        - user
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDriverDetails'
+        '404':
+          description: User not found
+  /order/driver:
+    post:
+      summary: Create Driver Order
+      tags:
+        - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                startPoint:
+                  type: object
+                  properties:
+                    lng:
+                      type: number
+                      example: 120.99777403377531
+                    lat:
+                      type: number
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
+                  description: Start point coordinates
+                startName:
+                  type: string
+                  description: Name of the starting location
+                endPoint:
+                  type: object
+                  properties:
+                    lng:
+                      type: number
+                      example: 120.99777403377531
+                    lat:
+                      type: number
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
+                  description: End point coordinates
+                endName:
+                  type: string
+                  description: Name of the destination location
+                departureTime:
+                  type: integer
+                  description: Departure time in Unix timestamp format (seconds)
+                passengerCount:
+                  type: integer
+                  description: Number of passengers
+                  example: 4
+              required:
+                - token
+                - startPoint
+                - startName
+                - endPoint
+                - endName
+                - departureTime
+                - passengerCount
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+        '401':
+          description: Invalid token
+        '400':
+          description: Incorrect parameter format
+  /order/passenger:
+    post:
+      summary: Create Passenger Order
+      tags:
+        - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                startPoint:
+                  type: object
+                  properties:
+                    lng:
+                      type: number
+                      example: 120.99777403377531
+                    lat:
+                      type: number
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
+                  description: Start point coordinates
+                startName:
+                  type: string
+                  description: Name of the starting location
+                endPoint:
+                  type: object
+                  properties:
+                    lng:
+                      type: number
+                      example: 120.99777403377531
+                    lat:
+                      type: number
+                      example: 24.787707214648197
+                  required:
+                    - lng
+                    - lat
+                  description: End point coordinates
+                endName:
+                  type: string
+                  description: Name of the destination location
+                departureTime1:
+                  type: integer
+                  description: First choice of departure time in Unix timestamp format (seconds)
+                  example: 100
+                departureTime2:
+                  type: integer
+                  description: Second choice of departure time in Unix timestamp format (seconds)
+                  example: 200
+                passengerCount:
+                  type: integer
+                  description: Number of passengers
+                  example: 2
+              required:
+                - token
+                - startPoint
+                - startName
+                - endPoint
+                - endName
+                - departureTime1
+                - departureTime2
+                - passengerCount
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId:
+                    type: integer
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '404':
+          description: no spots in database
+          
+          
+  /order/driver/unfinished/{user_id}:
+    get:
+      summary: Get Unfinished Driver Orders for a User
+      tags:
+        - order
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DriverOrderDetails'
+        '404':
+          description: User not found
+  /order/passenger/unfinished/{user_id}:
+    get:
+      summary: Get Unfinished Passenger Orders for a User
+      tags:
+        - order
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PassengerOrderDetails'
+        '404':
+          description: User not found
+  /order/driver/finished/{user_id}:
+    get:
+      summary: Get Finished Driver Orders for a User
+      tags:
+        - order
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DriverOrderDetails'
+        '404':
+          description: User not found
+  /order/passenger/finished/{user_id}:
+    get:
+      summary: Get Finished Passenger Orders for a User
+      tags:
+        - order
+      parameters:
+        - name: user_id
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PassengerOrderDetails'
+        '404':
+          description: User not found
+  /order/fee:
+    get:
+      summary: Get Trip Fee
+      tags:
+        - order
+      parameters:
+        - name: startLat
+          in: query
+          description: Start point latitude
+          required: true
+          schema:
+            type: number
+            example: 24.787707214648197
+        - name: startLng
+          in: query
+          description: Start point longitude
+          required: true
+          schema:
+            type: number
+            example: 120.99777403377531
+        - name: endLat
+          in: query
+          description: Start point latitude
+          required: true
+          schema:
+            type: number
+            example: 22.787707214648197
+        - name: endLng
+          in: query
+          description: Start point longitude
+          required: true
+          schema:
+            type: number
+            example: 122.99777403377531
+        - name: passengerCount
+          in: query
+          description: Number of passengers
+          required: true
+          schema:
+            type: integer
+            example: 5
+        - name: departureTime
+          in: query
+          description: Passenger departure time 
+          required: true
+          schema:
+            type: integer
+            example: 1703050472
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fee:
+                    type: integer
+        '400':
+          description: Incorrect parameter format
+  /order/passenger/spot/all:
+    get:
+      summary: Get Spots Information with Passengers for a Departure Time Range
+      tags:
+        - order
+      parameters:
+        - name: departureTime
+          in: query
+          description: Departure time in Unix timestamp format
+          required: true
+          schema:
+            type: integer
+        - name: withPassenger
+          in: query
+          description: 是否只回傳有乘客的spot，預設為1，要回傳所有spot請帶0
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  spots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PassengerSpotDetails'
+        '400':
+          description: Incorrect parameter format
+  /order/passenger/spot/{spotId}:
+    get:
+      summary: Get Passenger Orders for a Spot
+      tags:
+        - order
+      parameters:
+        - name: spotId
+          in: path
+          description: ID of the spot
+          required: true
+          schema:
+            type: integer
+        - name: departureTime
+          in: query
+          description: Departure time in Unix timestamp format
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PassengerOrderDetails'
+        '400':
+          description: Incorrect parameter format
+        '404':
+          description: Spot not found
+  /order/driver/{orderId}:
+    get:
+      summary: Get Driver Order by ID
+      tags:
+        - order
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DriverOrderDetails'
+        '404':
+          description: Order not found
+    delete:
+      summary: Delete Driver Order by ID and Token
+      tags:
+        - order
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+        - name: token
+          in: query
+          description: User token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrderCount:
+                    type: integer
+                  abandonCount:
+                    type: integer
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed or passenger already accept
+  /order/passenger/{orderId}:
+    get:
+      summary: Get Passenger Order by ID
+      tags:
+        - order
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PassengerOrderDetails'
+        '404':
+          description: Order not found
+    delete:
+      summary: Delete Passenger Order by ID and Token
+      tags:
+        - order
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+        - name: token
+          in: query
+          description: User token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrderCount:
+                    type: integer
+                  abandonCount:
+                    type: integer
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the passenger's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed
+  /order/driver/finish:
+    post:
+      summary: Finish Driver Order
+      tags:
+        - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                orderId:
+                  type: integer
+              required:
+                - token
+                - orderId
+      responses:
+        '200':
+          description: Order finished successfully
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed or passenger order not completed 
+          
+  /order/passenger/finish:
+    post:
+      summary: Finish Passenger Order
+      tags:
+        - order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                orderId:
+                  type: integer
+              required:
+                - token
+                - orderId
+      responses:
+        '200':
+          description: Order finished successfully
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the passenger's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Order already completed
+  /match/driver/invitation:
+    post:
+      summary: Send Invitation to Passenger
+      tags:
+        - match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                driverOrderId:
+                  type: integer
+                passengerOrderId:
+                  type: integer
+              required:
+                - token
+                - driverOrderId
+                - passengerOrderId
+      responses:
+        '200':
+          description: Invitation sent successfully
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Invitation already sent, accepted, or order completed
+  /match/driver/invitation/{driverOrderId}/{passengerOrderId}:
+    delete:
+      summary: Cancel Invitation to passengers
+      tags:
+        - match
+      parameters:
+        - name: driverOrderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+        - name: passengerOrderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+        - name: token
+          in: query
+          description: Authentication token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Invitation canceled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalOrderCount:
+                    type: integer
+                  abandonCount:
+                    type: integer
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the driver's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Invitation not sent or order completed or passenger already accept
+  /match/driver/invitation/total/{driverOrderId}:
+    get:
+      summary: Get Invitations Sent by a Driver Order
+      tags:
+        - match
+      parameters:
+        - name: driverOrderId
+          in: path
+          description: ID of the driver order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DriverTotalInvitations'
+        '404':
+          description: Order not found
+  /match/passenger/invitation/total/{passengerOrderId}:
+    get:
+      summary: Get Driver Orders Inviting a Passenger Order
+      tags:
+        - match
+      parameters:
+        - name: passengerOrderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PassengerTotalInvitations'
+        '404':
+          description: Order not found
+
+  /match/passenger/accepted/{passengerOrderId}:
+    get:
+      summary: Get the Accepted Driver Order
+      tags:
+        - match
+      parameters:
+        - name: passengerOrderId
+          in: path
+          description: ID of the passenger order
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  driverOrder:
+                    $ref: '#/components/schemas/DriverOrderDetails'
+        '404':
+          description: Order not found
+
+  /match/passenger/invitation/accept:
+    post:
+      summary: Accept Invitation to a Driver Order
+      tags:
+        - match
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInvitationRequest'
+      responses:
+        '200':
+          description: Successfully accepted invitation
+        '400':
+          description: Incorrect parameter format
+        '401':
+          description: Invalid token
+        '403':
+          description: Not the passenger's own order
+        '404':
+          description: Order not found
+        '409':
+          description: Invitation not received or order already accepted/completed
+components:
+  schemas:
+    DriverOrderDetails:
+      type: object
+      properties:
+        orderId:
+          type: integer
+        userId:
+          type: integer
+        startPoint:
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
+        startName:
+          type: string
+        endPoint:
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
+        endName:
+          type: string
+        departureTime:
+          type: integer
+        passengerCount:
+          type: integer
+    PassengerOrderDetails:
+      type: object
+      properties:
+        orderId:
+          type: integer
+        userId:
+          type: integer
+        startPoint:
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
+        startName:
+          type: string
+        endPoint:
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
+        endName:
+          type: string
+        pickTime1:
+          type: integer
+        pickTime2:
+          type: integer
+        arrivalTime:
+          type: integer
+        passengerCount:
+          type: integer
+        fee:
+          type: integer
+    UserDriverDetails:
+      type: object
+      properties:
+        username:
+          type: string
+        total_order_count:
+          type: integer
+        abandon_order_count:
+          type: integer
+        driverdata:
+          type: object
+          properties:
+            vehicle_name:
+              type: string
+            vehicle_plate:
+              type: string
+            passenger_count:
+              type: integer
+    DriverTotalInvitations:
+      type: object
+      properties:
+        invitations:
+          type: array
+          items:
+            type: object
+            properties:
+              passengerOrder:
+                $ref: '#/components/schemas/PassengerOrderDetails'
+              accepted:
+                type: boolean  
+    PassengerTotalInvitations:
+      type: object
+      properties:
+        driverOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriverOrderDetails'
+    
+    AcceptInvitationRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        driverOrderId:
+          type: integer
+        passengerOrderId:
+          type: integer
+      required:
+        - token
+        - driverOrderId
+        - passengerOrderId
+        
+    PassengerSpotDetails:
+      type: object
+      properties:
+        spotId:
+          type: integer
+        spotName:
+          type: string
+        spotPoint:
+          type: object
+          properties:
+            lng:
+              type: number
+              example: 120.99777403377531
+            lat:
+              type: number
+              example: 24.787707214648197
+        passengerCount:
+          type: integer
+ 

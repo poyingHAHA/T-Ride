@@ -1,0 +1,7 @@
+quart
+quart-cors
+googlemaps
+psycopg2
+pandas
+httpx
+uvicorn

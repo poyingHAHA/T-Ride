@@ -275,7 +275,11 @@ async def get_passenger_orders_from_spot(spotId):
     if ret == "spot not found":
         return await make_response("Spot not found", 404)
 
-    return utils.to_json([PassengerOrderVo(order) for order in ret])
+    ret = [PassengerOrderVo(order) for order in ret]
+    # a piece of shit
+    for r in ret:
+        r.userName = user_service.get_user(r.userId).user_name
+    return utils.to_json(ret)
 
 
 @order.route('/fee', methods=['GET'])

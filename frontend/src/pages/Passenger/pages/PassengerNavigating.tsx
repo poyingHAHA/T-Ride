@@ -116,14 +116,14 @@ export default function PassengerNavigating() {
     {isLoaded && (
         <div className="relative h-full w-full">
             <NavigatingMap isLoaded={isLoaded} directions={directions} driverlocation={driverlocations} />
-
+{/* 
             (driverlocations && (
                 <div className='absolute top-20 w-full flex items-center justify-center h-[50px] p-3 bg-gray-100 '>
                     <div className="flex text-black text-2xl rounded-lg ">
                         Loading...
                     </div>
                 </div>    
-            ))
+            )) */}
 
             <div className='absolute bottom-20 w-full flex items-center justify-center p-3'>
                 <button

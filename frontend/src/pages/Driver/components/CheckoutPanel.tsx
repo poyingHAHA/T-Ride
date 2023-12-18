@@ -126,7 +126,9 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
               </div>
               <div className="mt-2" >
                 <p>
-                  總金額<span className='ml-1'>0</span>元
+                  總金額<span className='ml-1'>{
+                    tempOrderReducer.orders.reduce((accumulator, currentValue)=> accumulator+ currentValue.fee, 0)
+                  }</span>元
                 </p>
               </div>
             </div>

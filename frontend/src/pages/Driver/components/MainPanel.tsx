@@ -104,7 +104,7 @@ const MainPanel = ({ isLoaded, unfinishedOrderMain, setStartPoint, setDestPoint,
         <>
           <div className='flex flex-col justify-around items-center h-fit min-h-[40vh] bg-white rounded-t-3xl z-50'>
             <div className='flex justify-center items-center w-[100%] mt-4'>
-              <div className='flex flex-col items-start justify-start'>
+              <div className='flex flex-col items-start justify-start ml-0 mr-2'>
                 <label htmlFor="departureTime" className='text-sm'>出發時間</label>
                 <input
                   type="datetime-local"

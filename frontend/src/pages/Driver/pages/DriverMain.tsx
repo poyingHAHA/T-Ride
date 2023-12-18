@@ -107,6 +107,7 @@ const DriverMain = () => {
               await fetchDirectionsOnce(unfinishedOrder.data[0].startPoint, unfinishedOrder.data[0].endPoint, tempOrders);
               setLoading(false);
             }
+            setLoading(false);
             setPanel(1);
             setShowSpots(true);
             return;

@@ -21,7 +21,7 @@ const NavigatingMap = ({ isLoaded, directions, driverlocation }: NavigatingMapPr
       lat: location.lat,
       lng: location.lng
     },
-    zoom: 15
+    zoom: 8
   };
 
   console.log("Passenger location: ", location);

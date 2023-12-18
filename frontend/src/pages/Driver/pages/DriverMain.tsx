@@ -12,6 +12,7 @@ import { addWaypoint, setWaypoint } from '../../../slices/waypoint';
 import { getDriverUnfinishedOrder, getInvitationTotal } from '../../../services/driveOrderService';
 import { setDest, setOrderId, setStart } from '../../../slices/driverStartDest';
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
+import { setCurrLocation, setId, clearId } from '../../../slices/currentLocation'
 import tempOrder, { addTempOrder, setTempOrder } from '../../../slices/tempOrder';
 import ErrorLoading from '../../../components/ErrorLoading';
 import { start } from 'repl';
@@ -39,6 +40,7 @@ const DriverMain = () => {
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const waypointReducer = useAppSelector((state) => state.waypointReducer);
+  const currentPositionReducer = useAppSelector((state) => state.currentLocationReducer)
   const dispatch = useAppDispatch();
   
   // useJsApiLoader hook to load the Google Maps API
@@ -128,6 +130,30 @@ const DriverMain = () => {
       getUnfinishedOrder();
     }
   }, [firstLoad])
+
+  useEffect(() => {
+    const id = navigator.geolocation.watchPosition(
+      ({coords}) => {
+        console.log(coords)
+        dispatch(setCurrLocation({
+          lat: coords.latitude,
+          lng: coords.longitude
+        }))
+      },
+      (error) => {
+        console.log("DriverMain 140: ", error)
+      },
+      {
+        maximumAge: 0,
+        timeout: 10000,
+        enableHighAccuracy: false
+      }
+    )
+    dispatch(setId(id))
+    return () => {
+      navigator.geolocation.clearWatch(id);
+    }
+  }, [])
   
   useEffect(() => {
     console.log("DriverMain 130: ", panel)

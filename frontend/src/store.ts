@@ -9,6 +9,7 @@ import passengerDepartReducer from "./slices/passengerDepart";
 import tempOrderReducer from "./slices/tempOrder";
 import driverJourneyReducer from "./slices/driverJourney";
 import waypointReducer from "./slices/waypoint";
+import currentLocationReducer from "./slices/currentLocation";
 
 const resetState = createAction("RESET_STATE");
 
@@ -21,7 +22,8 @@ const reducers = combineReducers({
   passengerDepartReducer,
   tempOrderReducer,
   driverJourneyReducer,
-  waypointReducer
+  waypointReducer,
+  currentLocationReducer
 })
 
 const rootReducer = (state: any, action: any) => {

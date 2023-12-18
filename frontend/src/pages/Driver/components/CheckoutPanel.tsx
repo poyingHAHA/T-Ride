@@ -9,6 +9,7 @@ import { orderDTO } from "../../../DTO/orders";
 import { WaypointDTO } from "../../../DTO/waypoint";
 import { removeWaypoint, setWaypoint } from "../../../slices/waypoint";
 import { getColor } from "../../../utils/colorUtil";
+import { convertUTC } from "../../../services/formatService";
 import { resetState } from "../../../store";
 
 type CheckoutPanelProps = {
@@ -106,7 +107,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
   }
 
   const getCardClass = (index: number) => {
-    return `flex flex-col justify-between px-4 bg-[${getColor(index).toLowerCase()}] rounded-md w-[70%] py-2`
+    return `flex flex-col justify-between px-4 bg-[${getColor(index).toLowerCase()}] rounded-md shadow-md w-[70%] py-2`
   }
 
   return <>
@@ -135,7 +136,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
 
             <div className="flex flex-col h-[30vh] w-[100%] overflow-scroll mt-4">
               <div  className="relative flex justify-center w-auto h-auto px-2 mt-4">
-                <div className="flex justify-center items-center w-[90%] px-2 bg-black text-white rounded-md ">
+                <div className="flex justify-center items-center w-[90%] px-2 bg-white text-black shadow-md rounded-md ">
                   <div>起點：{driverStartDestReducer.start.name}</div>
                 </div>
               </div>
@@ -171,12 +172,12 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                                       waypt.startName !== undefined ? (
                                         <div className={getCardClass(index-1)} style={{backgroundColor: `${getColor(index-1)}`}}>
                                           <div>出發: {waypt.startName}</div>
-                                          <div>預計出發時間: {waypt.time}</div>
+                                          <div>預計出發時間: {convertUTC(waypt.time as number)}</div>
                                         </div>
                                       ) : (
                                         <div className={getCardClass(index-1)} style={{backgroundColor: `${getColor(index-1)}`}} >
                                           <div>終點: {waypt.endName}</div>
-                                          <div>預計抵達時間: {waypt.time}</div>
+                                          <div>預計抵達時間: {convertUTC(waypt.time as number)}</div>
                                         </div>
                                       )
                                     }
@@ -188,7 +189,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                                             已接受
                                           </div>
                                         ):(
-                                          <div className="flex justify-center items-center rounded-lg bg-cyan-800 w-[14%] text-white ml-2">  
+                                          <div className="flex justify-center items-center rounded-lg bg-black w-[14%] text-white ml-2">  
                                             邀請中
                                           </div>
                                         )
@@ -217,7 +218,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                 ))}
               </DragDropContext>
               <div  className="relative flex justify-center w-auto h-auto px-2 mt-4 bottom-2">
-                <div className="flex justify-center items-center w-[90%] px-2 bg-black text-white rounded-md ">
+                <div className="flex justify-center items-center w-[90%] px-2 bg-white text-black shadow-md rounded-md ">
                   <div>終點：{driverStartDestReducer.dest.name}</div>
                 </div>
               </div>

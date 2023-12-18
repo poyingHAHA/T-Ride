@@ -1,0 +1,3 @@
+在正式執行前：
+1. app.py的app.run()是否關閉debug
+2. config中googleMapsApi.test是否設為0

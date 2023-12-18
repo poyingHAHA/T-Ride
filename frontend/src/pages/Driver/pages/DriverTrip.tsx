@@ -54,18 +54,19 @@ const DriverTrip: React.FC =() => {
   }
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
+    console.log("Driver trip 57")
+    let sendCoords: any;
+    const id = navigator.geolocation.watchPosition(
         ({ coords }) => {
           const { latitude, longitude } = coords;
           setCoords({lat: latitude, lng: longitude});
           const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
           ws.onopen = () => {
             // const data = JSON.stringify(coords);
-            const sendCoords = setInterval(()=>{
+            sendCoords = setInterval(()=>{
               ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
-            console.log("send");
-            },10000);
+              console.log("send");
+            },5000);
           }
           ws.onerror = (error) => {
             console.log("error: ", error)
@@ -75,9 +76,43 @@ const DriverTrip: React.FC =() => {
           }
           console.log("ws", ws);
         },
-        (error) => console.error(`Error getting geolocation: ${error.message}`)
+        (error) => console.error(`Error getting geolocation: ${error.message}`),
+        {
+          maximumAge: 0,
+          timeout: 10000
+        }
       );
-    }  
+    return () => {
+      clearInterval(sendCoords);
+      navigator.geolocation.clearWatch(id);
+    }
+  }, [isLoad])
+
+  useEffect(() => {
+    // if (navigator.geolocation) {
+    //   navigator.geolocation.watchPosition(
+    //     ({ coords }) => {
+    //       const { latitude, longitude } = coords;
+    //       setCoords({lat: latitude, lng: longitude});
+    //       const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+    //       ws.onopen = () => {
+    //         // const data = JSON.stringify(coords);
+    //         const sendCoords = setInterval(()=>{
+    //           ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
+    //         console.log("send");
+    //         },5000);
+    //       }
+    //       ws.onerror = (error) => {
+    //         console.log("error: ", error)
+    //       }
+    //       ws.onclose = (event) => {
+    //         console.log("close: ", event);
+    //       }
+    //       console.log("ws", ws);
+    //     },
+    //     (error) => console.error(`Error getting geolocation: ${error.message}`)
+    //   );
+    // }  
 
     async function fetchAll() {
       try {

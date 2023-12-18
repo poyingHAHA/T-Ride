@@ -14,6 +14,7 @@ import { setDest, setOrderId, setStart } from '../../../slices/driverStartDest';
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
 import tempOrder, { addTempOrder, setTempOrder } from '../../../slices/tempOrder';
 import ErrorLoading from '../../../components/ErrorLoading';
+import { start } from 'repl';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -130,10 +131,11 @@ const DriverMain = () => {
   
   useEffect(() => {
     console.log("DriverMain 130: ", panel)
+
     if(panel !== 0){
       if(waypointReducer.waypoints.length === 0) {
         console.log("DriverMain 90: fetchDirectionsOnce")
-        if(driverStartDestReducer.start || driverStartDestReducer.dest){
+        if(driverStartDestReducer.start || driverStartDestReducer.dest || startPoint || destPoint){
           fetchDirectionsOnce(driverStartDestReducer.start as LatLngLiteral, driverStartDestReducer.dest as LatLngLiteral);
         }
       }else{
@@ -141,6 +143,12 @@ const DriverMain = () => {
       }
     }
   }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest, waypointReducer.waypoints])
+
+  useEffect(() => {
+    if(panel === 0){
+      fetchDirectionsOnce(startPoint as LatLngLiteral, destPoint as LatLngLiteral)
+    }
+  }, [startPoint, destPoint])
 
   const fetchDirectionsOnce = async (startPoint: LatLngLiteral, destPoint: LatLngLiteral, tempOrders: orderDTO[]=[]) => {
     if(!startPoint || !destPoint) return;
@@ -188,7 +196,7 @@ const DriverMain = () => {
     })
 
     dispatch(setWaypoint(waypts));
-    console.log("DriverMain 96: ", waypts)
+    console.log("DriverMain 193: ", waypts)
     setDirections([]);
     const service = new google.maps.DirectionsService();
     for(let [index, waypt] of waypts.entries()){
@@ -202,7 +210,7 @@ const DriverMain = () => {
             },
             (result, status) => {
               if (status === 'OK' && result) {
-                console.log("DriverMain 97: ", result)
+                console.log("DriverMain 207: ", result)
                 setDirections((prev) => [...prev, result]);
               } else {
                 console.error(`error fetching directions ${result}`);

@@ -65,7 +65,7 @@ const DriverTrip: React.FC =() => {
             const sendCoords = setInterval(()=>{
               ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
             console.log("send");
-            },10000);
+            },5000);
           }
           ws.onerror = (error) => {
             console.log("error: ", error)

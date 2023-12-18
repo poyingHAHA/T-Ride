@@ -52,6 +52,7 @@ class PassengerOrderVo:
         self.endName = passenger_order_dto.end_name
         self.fee = passenger_order_dto.fee
         self.arrivalTime = passenger_order_dto.arrival_time
+        self.spot_id = passenger_order_dto.spot_id
 
 
 class SpotWithCountVo:

@@ -67,6 +67,7 @@ class PassengerOrderDto:
         self.end_name = passenger_order_entity.end_name
         self.fee = passenger_order_entity.fee
         self.arrival_time = arrival_time
+        self.spot_id = passenger_order_entity.spot_id
 
 
 class SpotDto:

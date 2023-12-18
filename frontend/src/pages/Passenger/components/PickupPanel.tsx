@@ -157,7 +157,7 @@ const PickupPanel = ({ isLoaded, setPickupPanel, orderId, directions_time }: Pic
             }
         };
 
-        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/send/${orderId}`);
+        const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/invitation/send/${orderId}`);
         ws.onmessage = (event) => {
             console.log(event.data);
             try {

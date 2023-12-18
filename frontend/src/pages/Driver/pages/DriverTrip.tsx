@@ -59,7 +59,7 @@ const DriverTrip: React.FC =() => {
         ({ coords }) => {
           const { latitude, longitude } = coords;
           setCoords({lat: latitude, lng: longitude});
-          const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+          const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
           ws.onopen = () => {
             // const data = JSON.stringify(coords);
             const sendCoords = setInterval(()=>{

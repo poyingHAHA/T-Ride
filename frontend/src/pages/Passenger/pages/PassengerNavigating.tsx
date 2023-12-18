@@ -74,7 +74,7 @@ export default function PassengerNavigating() {
     }, [refresh])
 
     useEffect(() => {
-        const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/get/${passengerOrderId}`);
+        const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/position/driver/get/${passengerOrderId}`);
         ws.onopen = () => {
             console.log("ws open");
         }

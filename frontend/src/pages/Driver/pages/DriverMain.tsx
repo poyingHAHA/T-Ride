@@ -173,7 +173,7 @@ const DriverMain = () => {
   }, [startPoint, destPoint, waypointReducer.waypoints])
 
   useEffect(() => {
-    if(panel === 0 && firstLoad){
+    if(panel === 0){
       console.log("DriverMain 152")
       setDirections([])
       fetchDirectionsOnce(startPoint as LatLngLiteral, destPoint as LatLngLiteral)

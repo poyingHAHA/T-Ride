@@ -32,7 +32,7 @@ const DriverTrip: React.FC =() => {
 
   //navigation
   const handleNavigate = () => {
-    const start = [driverJourneyReducer.StartPoint.name]
+    const start = [driverJourneyReducer.StartPoint.place.lat, driverJourneyReducer.StartPoint.place.lng]
     const mid = driverJourneyReducer.Midpoints.map((mid) => {
       const location = [mid.startName, mid.endName];
       return location;
@@ -43,11 +43,12 @@ const DriverTrip: React.FC =() => {
     const origin = coordinates[0];
     const waypoints = coordinates.slice(1);
     const baseUrl = "https://www.google.com/maps/dir/";
-    const urlEnd = `/@${origin},16z/`; 
+    // const urlEnd = `/@${origin},16z/`; 
     // /data=!4m2!4m1!3e0?authuser=0&entry=ttu
     // /data=!3m1!4b1?entry=ttu
-    const waypointsString = waypoints.map(coord => coord.join(',')).join('/');
-    const externalURL = `${baseUrl}${origin}/${waypointsString}${urlEnd}`;
+    const waypointsString = waypoints.map(coord => coord.join('/')).join('/');
+    const externalURL = `${baseUrl}${origin}/${waypointsString}`;
+    // console.log(externalURL);
     window.location.href = externalURL;
   };
 

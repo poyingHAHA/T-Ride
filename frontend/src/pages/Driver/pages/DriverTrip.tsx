@@ -6,6 +6,7 @@ import DriverTripCard from "../components/DriverTripCard";
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { getStartEnd, getInvitationTotal  } from "../../../services/driveOrderService";
 import { StartEnd, InfoItem, setStartEnd, setJourney } from "../../../slices/driverJourney";
+import { setCurrLocation, setId, clearId } from "../../../slices/currentLocation"
 import ErrorLoading from '../../../components/ErrorLoading';
 
 interface TripItem {
@@ -20,6 +21,7 @@ const DriverTrip: React.FC =() => {
   const dispatch = useAppDispatch();
   const driverJourneyReducer = useAppSelector((state) => state.driverJourneyReducer);
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
+  const currentPositionReducer = useAppSelector((state) => state.currentLocationReducer)
   const [trip, setTrip] = useState<TripItem[]>([]);
   const [orderId, setOrderId] = useState<number>(0);
   const [isLoad, setIsLoad] = useState(false);
@@ -54,30 +56,60 @@ const DriverTrip: React.FC =() => {
   }
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
-        ({ coords }) => {
-          const { latitude, longitude } = coords;
-          setCoords({lat: latitude, lng: longitude});
-          const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
-          ws.onopen = () => {
-            // const data = JSON.stringify(coords);
-            const sendCoords = setInterval(()=>{
-              ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
-            console.log("send");
-            },5000);
+    console.log("Driver trip 57")
+    let sendCoords: any;
+    const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+    ws.onopen = () => {
+      // const data = JSON.stringify(coords);
+      sendCoords = setInterval(()=>{
+          if(currentPositionReducer.lat !== null && currentPositionReducer.lng !== null){
+            ws.send(`${currentPositionReducer.lat.toFixed(7)}, ${currentPositionReducer.lng.toFixed(7)}`);
+            console.log("send")
+          }else{
+            console.log("no current position")
           }
-          ws.onerror = (error) => {
-            console.log("error: ", error)
-          }
-          ws.onclose = (event) => {
-            console.log("close: ", event);
-          }
-          console.log("ws", ws);
-        },
-        (error) => console.error(`Error getting geolocation: ${error.message}`)
-      );
-    }  
+        },5000);
+      }
+      ws.onerror = (error) => {
+        console.log("error: ", error)
+      }
+      ws.onclose = (event) => {
+        console.log("close: ", event);
+      console.log("ws", ws);
+    }
+        
+    return () => {
+      clearInterval(sendCoords);
+      dispatch(clearId())
+      ws.close()
+    }
+  }, [])
+
+  useEffect(() => {
+    // if (navigator.geolocation) {
+    //   navigator.geolocation.watchPosition(
+    //     ({ coords }) => {
+    //       const { latitude, longitude } = coords;
+    //       setCoords({lat: latitude, lng: longitude});
+    //       const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/position/driver/send/${orderId}`);
+    //       ws.onopen = () => {
+    //         // const data = JSON.stringify(coords);
+    //         const sendCoords = setInterval(()=>{
+    //           ws.send(`${latitude.toFixed(7)}, ${longitude.toFixed(7)}`);
+    //         console.log("send");
+    //         },5000);
+    //       }
+    //       ws.onerror = (error) => {
+    //         console.log("error: ", error)
+    //       }
+    //       ws.onclose = (event) => {
+    //         console.log("close: ", event);
+    //       }
+    //       console.log("ws", ws);
+    //     },
+    //     (error) => console.error(`Error getting geolocation: ${error.message}`)
+    //   );
+    // }  
 
     async function fetchAll() {
       try {

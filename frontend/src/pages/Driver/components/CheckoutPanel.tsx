@@ -195,7 +195,7 @@ const CheckoutPanel = ({ isLoaded, setPanel, setShowSpots }: CheckoutPanelProps)
                                         )
                                       ) : (
                                         <button 
-                                          className="rounded-lg bg-cyan-800 w-[14%] text-white ml-2"
+                                          className="rounded-lg bg-black w-[14%] text-white ml-2"
                                           onClick={() => {
                                             dispatch(removeTempOrder(waypt))
                                             dispatch(removeWaypoint(waypt))

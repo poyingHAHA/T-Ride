@@ -85,7 +85,7 @@ const DriverInfo: React.FC = () => {
   //   setRefresh(prev => prev+1);
   // }
 
-  const ws = new WebSocket(`ws://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
+  const ws = new WebSocket(`wss://t-ride.azurewebsites.net/match/invitation/accept/${orderId}`);
   ws.onmessage = (event) => {
     console.log("event.data", event.data);  
     // submit();

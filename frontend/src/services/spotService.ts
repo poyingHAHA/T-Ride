@@ -43,7 +43,15 @@ const getSpotOrders = async (spotId: number, departureTime: number) => {
   // ====================
   try {
     const response: any = await get(`/order/passenger/spot/${spotId}?departureTime=${departureTime}`);
-    const data: orderDTO[] = response.data;
+    // console.log("getSpotOrders 46: ", response.data)
+    const data: orderDTO[] = response.data.map((order: any) => {
+      return {
+        ...order,
+        pickTime1: order.departureTime1,
+        pickTime2: order.departureTime2,
+        arrivalTime: order.arrivalTime,
+      }
+    });
 
     return data;
   } catch (error) {

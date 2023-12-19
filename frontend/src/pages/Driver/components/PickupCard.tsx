@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { addTempOrder, removeTempOrder } from "../../../slices/tempOrder";
 import { addWaypoint } from "../../../slices/waypoint";
+import { convertUTC } from "../../../services/formatService";
 
 type PickupCardProps = {
   order: orderDTO;
@@ -18,6 +19,7 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const driverDepartReducer = useAppSelector((state) => state.driverDepartReducer);
   useEffect(() => {
+    console.log("PickupCard 22: ", order)
     if(order.orderId === markerOrderId){
       setMarkerSelected(true);
     }
@@ -119,7 +121,7 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
       onClick={onCLickHandler}
     >
       <div className="grow mx-4 my-2">
-        <p>userId: {order.userId}</p>
+        <p>乘客: { order.userName!==undefined ? order.userName : order.userId }</p>
         <div className="flex justify-between">
           <p>人數:</p>
           <p>{order.passengerCount}人</p>
@@ -130,15 +132,15 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
         </div>
         <div className="flex justify-between">
           <p>起點:</p>
-          <p>{order.startName}</p>
+          <p className="truncate w-40">{order.startName}</p>
         </div>
         <div className="flex justify-between">
           <p>終點:</p>
-          <p>{order.endName}</p>
+          <p className="truncate w-40">{order.endName}</p>
         </div>
         <div className="flex justify-between">
           <p>出發時間:</p>
-          <p>{order.pickTime1}~{order.pickTime2}</p>
+          <p>{convertUTC(order.pickTime1)}~{convertUTC(order.pickTime2)}</p>
         </div>
       </div>
       <div className="flex justify-center items-center">

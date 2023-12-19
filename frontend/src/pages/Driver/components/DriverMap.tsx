@@ -74,7 +74,6 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
         return accumulator+currentValue.routes[0].legs[0].duration.value
       }, 0)/60 || 0);
       
-      console.log("DriverMap tempOrderSpots: ", tempOrderSpots);
       setTempOrders(tempOrderIds)
       setTempOrderSpots(tempOrderSpots);
     }
@@ -117,6 +116,7 @@ const DriverMap = ({isLoaded, directions, showSpots, setOrders, orders, setMarke
     }
     // TODO: 依照目前的設計，該地標一定會有訂單，主要是訂單可能會被刪除或被其他司機收走，所以要再確認
     let orders = await getSpotOrders(spotId, driverDepart.departureTime);
+    console.log("DriverMap 120: ", orders)
     // 取得地標附近的訂單，並傳給父層，讓PickupPanel顯示
     orders = orders.map((order) => {order.spotId = spotId; return order});
     if (setOrders) setOrders(orders);

@@ -28,7 +28,7 @@ const DriverContact: React.FC = ()=> {
       <ReactModal 
         isOpen={showModal}
         className="w-screen h-screen flex justify-center items-center bg-[#ededed]">
-        <div className="flex flex-col justify-center w-[calc(100vw-80px)] h-[calc(100vh-320px)] bg-white shadow rounded-[30px] p-[20px] gap-[25px]">
+        <div className="flex flex-col justify-center w-[calc(100vw-80px)] h-[calc(100vh-220px)] bg-white shadow rounded-[30px] p-[20px] gap-[25px]">
             <button onClick={handleCloseModal} className="absolute right-[50px] top-[180px]">
               <HiOutlineXCircle className='w-[50px] h-[50px]'/>
             </button>

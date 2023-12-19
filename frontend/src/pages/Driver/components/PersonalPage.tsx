@@ -34,8 +34,8 @@ const PersonalPage: React.FC<Person> = (props)=> {
         <ReactModal 
           isOpen={showModal}
           className="w-screen h-screen flex justify-center items-center bg-[#ededed]">
-          <div className="flex flex-col justify-center items-center w-[calc(100vw-80px)] h-[calc(100vh-420px)] bg-white shadow rounded-[30px] p-[20px] gap-[30px]">
-              <button onClick={handleCloseModal} className="absolute right-[50px] top-[230px]">
+          <div className="flex flex-col justify-center items-end w-[calc(100vw-80px)] h-[calc(100vh-320px)] bg-white shadow rounded-[30px] p-[20px] gap-[30px]">
+              <button onClick={handleCloseModal} className="right-[50px] text-right">
                 <HiOutlineXCircle className='w-[50px] h-[50px]'/>
               </button>
               <div className="w-full flex flex-start gap-[30px] items-center">
@@ -48,7 +48,7 @@ const PersonalPage: React.FC<Person> = (props)=> {
                 <p>總共搭乘次數： {props.total}</p>
                 <p>總共棄單次數： {props.abandon}</p>
               </div>
-              <button className="w-[200px] h-[60px] bg-black rounded-[10px] text-white text-[24px]">
+              <button className="w-full h-[60px] bg-black rounded-[10px] text-white text-[24px]">
                 加入好友
               </button>
           </div>

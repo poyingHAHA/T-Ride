@@ -32,12 +32,12 @@ const DriverTrip: React.FC =() => {
 
   //navigation
   const handleNavigate = () => {
-    const start = [driverJourneyReducer.StartPoint.place.lat, driverJourneyReducer.StartPoint.place.lng]
+    const start = [driverJourneyReducer.StartPoint.name]
     const mid = driverJourneyReducer.Midpoints.map((mid) => {
-      const location = [mid.startPlace.lat, mid.startPlace.lng];
+      const location = [mid.startName, mid.endName];
       return location;
     });
-    const end = [driverJourneyReducer.EndPoint.place.lat, driverJourneyReducer.EndPoint.place.lng]
+    const end = [driverJourneyReducer.EndPoint.name];
     const coordinates = [start, ...mid, end];
 
     const origin = coordinates[0];
@@ -174,8 +174,8 @@ const DriverTrip: React.FC =() => {
   
   return (
     <div className="bg-[#ededed] m-0 h-full w-screen">
-      <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">行程資訊</div>
-      <div className="text-center w-screen fixed top-[120px] font-normal text-[18px] font-sans">{date}</div>
+      <div className="text-center w-screen fixed top-[20px] font-bold text-[36px] font-serif">行程資訊</div>
+      <div className="text-center w-screen fixed top-[80px] font-normal text-[18px] font-sans">{date}</div>
       <div className="flex flex-col items-center rounded-t-[30px] bg-white w-screen h-[calc(100vh-320px)] fixed bottom-[150px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {trip.map((place, index) => {
           if (place === null || place === undefined) {

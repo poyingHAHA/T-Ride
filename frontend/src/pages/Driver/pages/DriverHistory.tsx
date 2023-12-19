@@ -26,8 +26,8 @@ const DriverHistory = () => {
 
   return(
     <div className="bg-[#ededed] m-0 h-full w-screen">
-      <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">歷史訂單</div>
-      <div className="flex flex-col items-center rounded-t-[30px] rounded-t-[30px] bg-white w-screen h-[calc(100vh-150px)] fixed bottom-[0px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
+      <div className="text-center w-screen fixed top-[20px] font-bold text-[36px] font-serif">歷史訂單</div>
+      <div className="flex flex-col items-center rounded-t-[30px] rounded-t-[30px] bg-white w-screen h-[calc(100vh-240px)] fixed bottom-[70px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {orders.map((order: driverOrderDTO) => {
           return(<HistoryCard key={order.orderId} {...order}/>);
         })}

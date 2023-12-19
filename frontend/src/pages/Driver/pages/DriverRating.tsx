@@ -46,7 +46,7 @@ const DriverRating: React.FC =() => {
 
   return(
     <div className="bg-[#ededed] m-0 h-full w-screen">
-      <div className="text-center w-screen fixed top-[60px] font-bold text-[36px] font-serif">乘客評分</div>
+      <div className="text-center w-screen fixed top-[20px] font-bold text-[36px] font-serif">乘客評分</div>
       <div className="flex flex-col justify-between items-center rounded-t-[30px] bg-white w-screen h-[calc(100vh-320px)] fixed bottom-[150px] overflow-auto pt-[40px] pb-[40px] gap-[30px]">
         {names.map((name, index) => {
           return (

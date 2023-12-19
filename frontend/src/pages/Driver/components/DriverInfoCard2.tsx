@@ -26,11 +26,11 @@ const Card2: React.FC<Card2Props> = (props) => {
       </div>
       <div className="flex flex-col gap-[5px]">
         <div>
-          <span className="text-[18px] whitespace-pre">起點        ：</span>
+          <span className="text-[18px] whitespace-pre">起點：</span>
           <span className="text-[18px] font-bold">{props.startName}</span>
         </div>
         <div>
-          <span className="text-[18px] whitespace-pre">終點        ：</span>
+          <span className="text-[18px] whitespace-pre">終點：</span>
           <span className="text-[18px] font-bold">{props.endName}<br /></span>
         </div>
         <div>

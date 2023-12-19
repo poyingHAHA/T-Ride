@@ -27,23 +27,27 @@ const DriverDetailCard: React.FC<InfoItem> = (props) => {
   },[]);
 
   return(
-    <div className="flex flex-row h-[220px] w-[calc(100%-80px) bg-[#d9d9d9] p-[20px] rounded-[30px] text-[18px] justify-between">
+    <div className="flex flex-col w-[calc(100%-80px) bg-[#d9d9d9] p-[20px] rounded-[30px] text-[18px] justify-between gap-[20px]">
+      <div className="flex flex-row justify-between">
+        <div>
+          <p className="text-[24px]">{props.name}</p>
+          <span className=" whitespace-pre">人數：</span>
+          <span>{props.headcount}</span><br />
+          <span className="whitespace-pre">金額：</span>
+          <span>{props.price}</span><br />
+          <span className=" whitespace-pre">出發時間：</span>
+          <span>{props.time}</span><br/>
+        </div>
+        <div className="flex flex-col mr-0 gap-[15px] justify-start items-center">
+          <PersonalPage name={props.name} total={totalOrder} abandon={abandonCount}/>
+          <DriverContact />
+        </div>
+      </div>
       <div>
-        <p className="text-[24px]">{props.name}</p>
-        <span className=" whitespace-pre">人數：</span>
-        <span>{props.headcount}</span><br />
-        <span className="whitespace-pre">金額：</span>
-        <span>{props.price}</span><br />
         <span className=" whitespace-pre">起點：</span>
         <span>{props.start}</span><br />
         <span className=" whitespace-pre">終點：</span>
         <span>{props.end}</span><br />
-        <span className=" whitespace-pre">出發時間：</span>
-        <span>{props.time}</span>
-      </div>
-      <div className="flex flex-col mr-0 gap-[15px] justify-center items-center">
-        <PersonalPage name={props.name} total={totalOrder} abandon={abandonCount}/>
-        <DriverContact />
       </div>
     </div>
   );

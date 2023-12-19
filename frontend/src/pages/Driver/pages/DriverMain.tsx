@@ -12,8 +12,10 @@ import { addWaypoint, setWaypoint } from '../../../slices/waypoint';
 import { getDriverUnfinishedOrder, getInvitationTotal } from '../../../services/driveOrderService';
 import { setDest, setOrderId, setStart } from '../../../slices/driverStartDest';
 import { setDepartureTime, setPassengerCount } from '../../../slices/driverDepart';
+import { setCurrLocation, setId, clearId } from '../../../slices/currentLocation'
 import tempOrder, { addTempOrder, setTempOrder } from '../../../slices/tempOrder';
 import ErrorLoading from '../../../components/ErrorLoading';
+import { start } from 'repl';
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -38,6 +40,7 @@ const DriverMain = () => {
   const driverStartDestReducer = useAppSelector((state) => state.driverStartDestReducer);
   const tempOrderReducer = useAppSelector((state) => state.tempOrderReducer);
   const waypointReducer = useAppSelector((state) => state.waypointReducer);
+  const currentPositionReducer = useAppSelector((state) => state.currentLocationReducer)
   const dispatch = useAppDispatch();
   
   // useJsApiLoader hook to load the Google Maps API
@@ -48,7 +51,9 @@ const DriverMain = () => {
   });
 
   useEffect(() => {
+    console.log("DriverMain 52")
     if(firstLoad && panel === 0){
+      setFirstLoad(false)
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
         const timestamp = position.timestamp;
@@ -107,43 +112,76 @@ const DriverMain = () => {
               await fetchDirectionsOnce(unfinishedOrder.data[0].startPoint, unfinishedOrder.data[0].endPoint, tempOrders);
               setLoading(false);
             }
+            setLoading(false);
             setPanel(1);
             setShowSpots(true);
             return;
           }
           setPanel(0);
           setLoading(false);
-          setFirstLoad(false);
         } catch (err) {
           console.log(err)
           setLoading(false);
           console.log("DriverMain 108: ", err)
           setError("發生錯誤");
-          setFirstLoad(false);
           setPanel(0);
         }
       }
       getUnfinishedOrder();
     }
   }, [firstLoad])
+
+  useEffect(() => {
+    const id = navigator.geolocation.watchPosition(
+      ({coords}) => {
+        console.log(coords)
+        dispatch(setCurrLocation({
+          lat: coords.latitude,
+          lng: coords.longitude
+        }))
+      },
+      (error) => {
+        console.log("DriverMain 140: ", error)
+      },
+      {
+        maximumAge: 0,
+        timeout: 20000,
+        enableHighAccuracy: false
+      }
+    )
+    dispatch(setId(id))
+    return () => {
+      navigator.geolocation.clearWatch(id);
+    }
+  }, [])
   
   useEffect(() => {
     console.log("DriverMain 130: ", panel)
+
     if(panel !== 0){
       if(waypointReducer.waypoints.length === 0) {
         console.log("DriverMain 90: fetchDirectionsOnce")
-        if(driverStartDestReducer.start || driverStartDestReducer.dest){
+        if(driverStartDestReducer.start || driverStartDestReducer.dest || startPoint || destPoint){
+          setDirections([])
           fetchDirectionsOnce(driverStartDestReducer.start as LatLngLiteral, driverStartDestReducer.dest as LatLngLiteral);
         }
       }else{
+        setDirections([])
         fetchDirectionsWaypts(waypointReducer.waypoints);
       }
     }
-  }, [startPoint, destPoint, isLoaded, tempOrderReducer.orders, driverStartDestReducer.start, driverStartDestReducer.dest, waypointReducer.waypoints])
+  }, [startPoint, destPoint, waypointReducer.waypoints])
+
+  useEffect(() => {
+    if(panel === 0 && firstLoad){
+      console.log("DriverMain 152")
+      setDirections([])
+      fetchDirectionsOnce(startPoint as LatLngLiteral, destPoint as LatLngLiteral)
+    }
+  }, [startPoint, destPoint])
 
   const fetchDirectionsOnce = async (startPoint: LatLngLiteral, destPoint: LatLngLiteral, tempOrders: orderDTO[]=[]) => {
     if(!startPoint || !destPoint) return;
-    console.log("DriverMain 142: ", tempOrders.length)
     let waypts: WaypointDTO[] = []
     let temporders: orderDTO[] = tempOrders;
     if(tempOrders.length === 0){
@@ -187,7 +225,7 @@ const DriverMain = () => {
     })
 
     dispatch(setWaypoint(waypts));
-    console.log("DriverMain 96: ", waypts)
+
     setDirections([]);
     const service = new google.maps.DirectionsService();
     for(let [index, waypt] of waypts.entries()){
@@ -201,7 +239,6 @@ const DriverMain = () => {
             },
             (result, status) => {
               if (status === 'OK' && result) {
-                console.log("DriverMain 97: ", result)
                 setDirections((prev) => [...prev, result]);
               } else {
                 console.error(`error fetching directions ${result}`);

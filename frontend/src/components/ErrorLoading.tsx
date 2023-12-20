@@ -29,7 +29,7 @@ const ErrorLoading = ({ error, setError, loading, setLoading }: ErrorLoadingProp
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white rounded-xl flex flex-col justify-center items-center p-8">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-            <div className="mt-4 text-gray-900 text-xl">登入中</div>
+            <div className="mt-4 text-gray-900 text-xl">等待中...</div>
           </div>
         </div>
       )

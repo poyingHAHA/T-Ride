@@ -3,7 +3,7 @@ import { orderDTO } from "../../../DTO/orders";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { addTempOrder, removeTempOrder } from "../../../slices/tempOrder";
-import { addWaypoint } from "../../../slices/waypoint";
+import { addWaypoint, removeWaypoint } from "../../../slices/waypoint";
 import { convertUTC } from "../../../services/formatService";
 
 type PickupCardProps = {
@@ -103,7 +103,9 @@ const PickupCard = ({order, markerOrderId}: PickupCardProps) => {
       if(tempOrderReducer.orders!==undefined && tempOrderReducer.orders.length > 0){
         const index = tempOrderReducer.orders?.findIndex((tempOrder) => tempOrder.orderId === order.orderId);
         if(index !== -1){
+          console.log("PickupCard remove: ", order)
           dispatch(removeTempOrder(order));
+          dispatch(removeWaypoint({orderId: order.orderId}))
         }
       }
     }

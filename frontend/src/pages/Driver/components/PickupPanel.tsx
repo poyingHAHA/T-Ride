@@ -6,6 +6,7 @@ import { getDriverUnfinishedOrder, getAcceptedOrders, getInvitationTotal, delete
 import ErrorLoading from "../../../components/ErrorLoading";
 import { useNavigate } from "react-router-dom";
 import { setTempOrder } from "../../../slices/tempOrder";
+import { setWaypoint } from "../../../slices/waypoint";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type PickupPanelProps = {
@@ -60,6 +61,7 @@ const PickupPanel = ({ isLoaded, setPanel, orders, markerOrderId, setShowSpots }
         const res = await deleteDriverOrder(driverStartDestReducer.order.orderId);
         if(res.status === 200){
           dispatch(setTempOrder([]))
+          dispatch(setWaypoint([]))
           alert(`取消成功`);
         }
         else{
